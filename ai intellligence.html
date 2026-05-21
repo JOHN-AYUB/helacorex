@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Advanced AI Intelligence Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b;
+            --hela-gold: #d97706;
+            --hela-emerald: #10b981;
+            --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px;
+            --liquid-radius-md: 20px;
+            --liquid-radius-lg: 28px;
+            --liquid-radius-xl: 36px;
+
+            /* Dark Mode (Default) */
+            --bg-primary: #050507;
+            --text-primary: #ffffff;
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glass-dark-bg: rgba(10, 10, 15, 0.6);
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+        }
+
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --text-primary: #0f172a;
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.6) 100%);
+            --glass-border: rgba(148, 163, 184, 0.3);
+            --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            --glass-dark-bg: rgba(241, 245, 249, 0.8);
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--liquid-radius-lg);
+            transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .liquid-glass::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .liquid-glass:hover::after { left: 100%; }
+
+        .liquid-glass-dark {
+            background: var(--glass-dark-bg);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: var(--liquid-radius-md);
+            transition: background 0.5s, border-color 0.5s;
+        }
+
+        .btn-liquid {
+            position: relative;
+            overflow: hidden;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+            color: var(--text-primary);
+        }
+
+        .btn-liquid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(16, 185, 129, 0.3));
+        }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        @keyframes float-reverse { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(15px); } }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } }
+        @keyframes fade-up { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+        .gradient-text-hela {
+            background: linear-gradient(135deg, #f59e0b 0%, #10b981 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-secondary { color: var(--text-secondary); }
+        .text-tertiary { color: var(--text-tertiary); }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        .layer-card {
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        .layer-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .layer-card:hover::before { opacity: 1; }
+        .layer-card:hover { transform: translateY(-4px); }
+
+        .layer-amber::before { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
+        .layer-emerald::before { background: linear-gradient(90deg, transparent, #10b981, transparent); }
+        .layer-cyan::before { background: linear-gradient(90deg, transparent, #06b6d4, transparent); }
+        .layer-purple::before { background: linear-gradient(90deg, transparent, #a855f7, transparent); }
+        .layer-rose::before { background: linear-gradient(90deg, transparent, #f43f5e, transparent); }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 48px; height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .light-mode .theme-toggle { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
+        .theme-toggle-circle {
+            width: 18px; height: 18px;
+            background: #f59e0b;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px; left: 3px;
+            transition: transform 0.3s ease, background 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .light-mode .theme-toggle-circle {
+            transform: translateX(23px);
+            background: #050507;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10 opacity-60"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius: 9999px;">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full bg-white/10 text-amber-400 text-sm font-medium">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Impact</a>
+                
+                <!-- Light/Dark Toggle -->
+                <div class="theme-toggle ml-2" id="theme-toggle" aria-label="Toggle light/dark mode">
+                    <div class="theme-toggle-circle">
+                        <svg class="w-3 h-3 text-white dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                        </svg>
+                        <svg class="w-3 h-3 text-white hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter: blur(40px);">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-white/10 text-amber-400 transition-all">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Impact</a>
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-sm font-medium">Light Mode</span>
+                    <div class="theme-toggle" id="theme-toggle-mobile">
+                        <div class="theme-toggle-circle"></div>
+                    </div>
+                </div>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="min-h-screen relative flex items-center pt-24 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span class="text-secondary">Next-Gen AI Core</span>
+                </div>
+
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight">
+                    Intelligence<br>
+                    That <span class="gradient-text-hela">Understands</span><br>
+                    Your Business
+                </h1>
+
+                <p class="text-lg md:text-xl text-secondary max-w-lg leading-relaxed">
+                    Helacore doesn't just analyze data—it understands context, learns causality, and explains its reasoning. Powered by advanced neural architectures designed for the complexities of emerging markets.
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+                    <a href="#core-tech" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Explore the AI</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </a>
+                    <button onclick="document.getElementById('neural-viz').scrollIntoView({behavior:'smooth'})" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Watch Neural Net</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Visualization Hero Card -->
+            <div class="relative">
+                <div class="liquid-glass p-6 animate-float relative overflow-hidden" style="padding: 24px;">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400"></div>
+                    
+                    <div class="flex items-center justify-between mb-6 relative z-20">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-amber-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-emerald-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                        </div>
+                        <span class="text-xs text-tertiary font-mono tracking-wider">CAUSAL AI ENGINE</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4 relative z-20">
+                        <div class="liquid-glass-dark p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs text-tertiary">Prediction Accuracy</span>
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="text-3xl font-bold font-display text-emerald-400">94.7%</div>
+                            <div class="text-xs text-tertiary">With Causal Layer</div>
+                        </div>
+                        <div class="liquid-glass-dark p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs text-tertiary">Explainability</span>
+                                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="text-3xl font-bold font-display text-amber-400">100%</div>
+                            <div class="text-xs text-tertiary">Transparent Logic</div>
+                        </div>
+                    </div>
+
+                    <div class="liquid-glass-dark p-4 mb-4 relative z-20 border-l-4 border-cyan-400">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-cyan-400 font-semibold">XAI REASONING TRACE</span>
+                            <span class="text-xs text-tertiary">Live</span>
+                        </div>
+                        <p class="text-sm text-secondary" id="xai-trace">
+                            → Detected: Cash reserve drop (18% this week)<br>
+                            → Cause: Delayed M-Pesa settlements + seasonal demand shift<br>
+                            → Action: Rebalance capital allocation to reserve +40%
+                        </p>
+                    </div>
+
+                    <div class="flex gap-3 relative z-20">
+                        <button class="flex-1 liquid-glass-dark py-2 px-4 rounded-xl text-sm font-medium hover:bg-white/10 transition-all">
+                            View Logic Graph
+                        </button>
+                        <button class="flex-1 bg-gradient-to-r from-amber-500/20 to-emerald-500/20 py-2 px-4 rounded-xl text-sm font-medium border border-amber-400/30 hover:border-amber-400/50 transition-all">
+                            Apply Decision
+                        </button>
+                    </div>
+                </div>
+
+                <div class="absolute -bottom-8 -left-8 liquid-glass p-4 animate-float-reverse" style="border-radius: var(--liquid-radius-xl);">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold font-display">5</p>
+                            <p class="text-xs text-tertiary">Advanced AI Models</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE AI INTELLIGENCE FEATURES -->
+    <section id="core-tech" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-secondary">Core Architecture</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">The <span class="gradient-text-hela">Neural Core</span></h2>
+                <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto">Five distinct AI paradigms working in concert—moving beyond basic prediction into causal understanding and transparent reasoning.</p>
+            </div>
+
+            <div class="space-y-5">
+                <!-- Causal AI -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-amber reveal group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Causal Artificial Intelligence</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full">Beyond Correlation</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-4 leading-relaxed">Traditional AI sees that sales drop when it rains and merely reports the correlation. Helacore's Causal AI understands <em>why</em>—rain reduces foot traffic, which reduces impulse buys. It identifies the true levers of your business, allowing recommendations that change outcomes rather than just predicting them.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Do-Calculus</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Counterfactuals</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Intervention Modeling</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Directed Acyclic Graphs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explainable AI (XAI) -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-emerald reveal delay-100 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Explainable AI (XAI)</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">Transparent Logic</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-4 leading-relaxed">Black-box AI destroys trust. Helacore's XAI layer provides a full reasoning trace for every recommendation. When it suggests reducing inventory, it shows the exact data points, the causal chain, and the confidence level. Entrepreneurs don't just get advice—they understand it.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">SHAP Values</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Logic Traces</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Confidence Scoring</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Audit Trails</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Federated Learning -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-cyan reveal delay-200 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Federated Learning</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded-full">Privacy-First</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-4 leading-relaxed">Your business data never leaves your device. Helacore trains its global intelligence by downloading the model to your phone, learning from your data locally, and only sending anonymous model updates back to the cloud. Collective intelligence without individual exposure.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">On-Device Training</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Differential Privacy</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Secure Aggregation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multimodal AI -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-purple reveal delay-300 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Multimodal AI Engine</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-purple-400 bg-purple-400/10 px-2.5 py-1 rounded-full">Vision + Voice + Data</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-4 leading-relaxed">Helacore processes the world as you do—through sight, sound, and data. Snap a photo of a receipt, ask a question in Swahili, or connect your M-Pesa. The Multimodal Engine fuses these distinct inputs into a unified business context, enabling guidance that understands your reality fully.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">OCR Receipt Scanning</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Swahili NLP</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Cross-Modal Fusion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RLHF -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-rose reveal delay-400 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Reinforcement Learning from Human Feedback (RLHF)</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-rose-400 bg-rose-400/10 px-2.5 py-1 rounded-full">Self-Improving</span>
+                            </div>
+                            <p class="text-secondary text-sm mb-4 leading-relaxed">The AI learns not just from data, but from human outcomes. When an entrepreneur accepts, modifies, or rejects a recommendation, that decision is fed back into the model. Over time, Helacore aligns itself with the specific cultural and business nuances of its users, becoming a personalized advisor rather than a generic engine.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Reward Modeling</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Policy Optimization</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Behavioral Cloning</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEURAL VISUALIZATION -->
+    <section id="neural-viz" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Watch the <span class="gradient-text-hela">Neural Net Think</span></h2>
+                <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto">Real-time visualization of Helacore's Causal AI mapping relationships between business variables.</p>
+            </div>
+
+            <div class="liquid-glass p-6 md:p-8 reveal">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-semibold font-display">Causal Graph Simulation</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="liquid-glass-dark px-3 py-1 rounded-full text-xs text-amber-400 animate-pulse">PROCESSING</span>
+                    </div>
+                </div>
+                <div class="relative h-96 liquid-glass-dark rounded-2xl overflow-hidden">
+                    <canvas id="neural-canvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div class="liquid-glass-dark p-3 text-center">
+                        <div class="text-xs text-tertiary mb-1">Nodes Active</div>
+                        <div class="text-lg font-bold text-amber-400 font-display" id="node-count">0</div>
+                    </div>
+                    <div class="liquid-glass-dark p-3 text-center">
+                        <div class="text-xs text-tertiary mb-1">Causal Links</div>
+                        <div class="text-lg font-bold text-emerald-400 font-display" id="link-count">0</div>
+                    </div>
+                    <div class="liquid-glass-dark p-3 text-center">
+                        <div class="text-xs text-tertiary mb-1">Inferences/sec</div>
+                        <div class="text-lg font-bold text-cyan-400 font-display">1,240</div>
+                    </div>
+                    <div class="liquid-glass-dark p-3 text-center">
+                        <div class="text-xs text-tertiary mb-1">Model Confidence</div>
+                        <div class="text-lg font-bold text-purple-400 font-display">97.2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IMPACT SECTION -->
+    <section id="impact" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Intelligence <span class="gradient-text-hela">Impact</span></h2>
+                <p class="text-lg md:text-xl text-secondary max-w-2xl mx-auto">Advanced AI translates directly to business survival and growth.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="liquid-glass p-6 text-center reveal">
+                    <div class="text-5xl font-bold font-display text-amber-400 mb-2" id="counter-accuracy">0</div>
+                    <p class="text-secondary">Prediction Accuracy</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-100">
+                    <div class="text-5xl font-bold font-display text-emerald-400 mb-2" id="counter-failures">0</div>
+                    <p class="text-secondary">Failure Points Prevented</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-200">
+                    <div class="text-5xl font-bold font-display text-cyan-400 mb-2" id="counter-decisions">0</div>
+                    <p class="text-secondary">Daily Decisions Guided</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-300">
+                    <div class="text-5xl font-bold font-display text-purple-400 mb-2" id="counter-trust">0</div>
+                    <p class="text-secondary">User Trust Score</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="liquid-glass p-8 md:p-12 reveal">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-3xl md:text-4xl font-bold mb-4">Request API Access</h2>
+                    <p class="text-secondary">Integrate Helacore's Intelligence Engine into your own applications.</p>
+                </div>
+                <form class="space-y-6" onsubmit="event.preventDefault(); handleFormSubmit();">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Company Name</label>
+                            <input type="text" class="w-full liquid-glass-dark p-4 border border-white/10 focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 outline-none transition-all rounded-xl" placeholder="Your company" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Your Name</label>
+                            <input type="text" class="w-full liquid-glass-dark p-4 border border-white/10 focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 outline-none transition-all rounded-xl" placeholder="Full name" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Email</label>
+                        <input type="email" class="w-full liquid-glass-dark p-4 border border-white/10 focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 outline-none transition-all rounded-xl" placeholder="email@company.com" required>
+                    </div>
+                    <button type="submit" class="w-full btn-liquid py-4 text-lg">Request Access</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-4 md:px-6 border-t border-white/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        </div>
+                        <span class="font-display font-bold text-xl">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs with next-generation AI intelligence.</p>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Ecosystem</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold mb-4">Developers</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">API Docs</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Causal AI SDK</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Status</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">About</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Privacy</a></li>
+                        <li><a href="#" class="text-tertiary hover:text-amber-400 transition-colors text-sm">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-tertiary">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-tertiary">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span>System Status: <span class="text-emerald-400">All Systems Operational</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Theme Toggle =====
+        const body = document.body;
+        const toggleDesktop = document.getElementById('theme-toggle');
+        const toggleMobile = document.getElementById('theme-toggle-mobile');
+
+        function toggleTheme() {
+            body.classList.toggle('light-mode');
+            updateThreeJsColors();
+        }
+
+        toggleDesktop.addEventListener('click', toggleTheme);
+        toggleMobile.addEventListener('click', toggleTheme);
+
+        // ===== Three.js Background =====
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 200;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        function setParticleColors() {
+            const isLight = body.classList.contains('light-mode');
+            for(let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+                const t = Math.random();
+                if (isLight) {
+                    // Darker particles for light mode
+                    colors[i] = 0.6 * (1 - t) + 0.02 * t;
+                    colors[i + 1] = 0.4 * (1 - t) + 0.45 * t;
+                    colors[i + 2] = 0.02 * (1 - t) + 0.4 * t;
+                } else {
+                    // Bright particles for dark mode
+                    colors[i] = 0.96 * (1 - t) + 0.06 * t;
+                    colors[i + 1] = 0.62 * (1 - t) + 0.73 * t;
+                    colors[i + 2] = 0.04 * (1 - t) + 0.51 * t;
+                }
+            }
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        }
+        
+        setParticleColors();
+
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true, opacity: 0.6 });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        function updateThreeJsColors() {
+            setParticleColors();
+            particlesGeometry.attributes.color.needsUpdate = true;
+        }
+
+        function animateBG() {
+            requestAnimationFrame(animateBG);
+            particles.rotation.y += 0.0003;
+            particles.rotation.x += 0.0001;
+            renderer.render(scene, camera);
+        }
+        animateBG();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ===== Neural Canvas Visualization =====
+        const neuralCanvas = document.getElementById('neural-canvas');
+        const nCtx = neuralCanvas.getContext('2d');
+        let nTime = 0;
+
+        function resizeNeuralCanvas() {
+            neuralCanvas.width = neuralCanvas.offsetWidth;
+            neuralCanvas.height = neuralCanvas.offsetHeight;
+        }
+        resizeNeuralCanvas();
+        window.addEventListener('resize', resizeNeuralCanvas);
+
+        // Create persistent nodes for the causal graph
+        const neuralNodes = [];
+        const nodeCount = 24;
+        for(let i=0; i<nodeCount; i++) {
+            neuralNodes.push({
+                x: Math.random(), y: Math.random(),
+                radius: 4 + Math.random() * 4,
+                speed: 0.0002 + Math.random() * 0.0005,
+                angle: Math.random() * Math.PI * 2,
+                color: ['#f59e0b', '#10b981', '#06b6d4', '#a855f7', '#f43f5e'][Math.floor(Math.random()*5)],
+                label: ['Sales', 'Rain', 'Stock', 'M-Pesa', 'Traffic', 'Price', 'Staff', 'Rent', 'Loan', 'Season'][Math.floor(Math.random()*10)]
+            });
+        }
+
+        function drawNeuralNet() {
+            requestAnimationFrame(drawNeuralNet);
+            nTime += 0.01;
+            const w = neuralCanvas.width;
+            const h = neuralCanvas.height;
+            const isLight = body.classList.contains('light-mode');
+            
+            nCtx.clearRect(0, 0, w, h);
+
+            // Draw connections
+            for(let i=0; i<neuralNodes.length; i++) {
+                for(let j=i+1; j<neuralNodes.length; j++) {
+                    const dist = Math.hypot(neuralNodes[i].x - neuralNodes[j].x, neuralNodes[i].y - neuralNodes[j].y);
+                    if(dist < 0.3) {
+                        nCtx.beginPath();
+                        nCtx.strokeStyle = isLight ? `rgba(0,0,0,${0.05 + Math.sin(nTime + i) * 0.02})` : `rgba(255,255,255,${0.05 + Math.sin(nTime + i) * 0.02})`;
+                        nCtx.lineWidth = 1;
+                        nCtx.moveTo(neuralNodes[i].x * w, neuralNodes[i].y * h);
+                        nCtx.lineTo(neuralNodes[j].x * w, neuralNodes[j].y * h);
+                        nCtx.stroke();
+                        
+                        // Traveling data packet
+                        const t = (Math.sin(nTime * 2 + i * j) + 1) / 2;
+                        const px = neuralNodes[i].x * w + (neuralNodes[j].x * w - neuralNodes[i].x * w) * t;
+                        const py = neuralNodes[i].y * h + (neuralNodes[j].y * h - neuralNodes[i].y * h) * t;
+                        nCtx.beginPath();
+                        nCtx.fillStyle = neuralNodes[i].color;
+                        nCtx.arc(px, py, 2, 0, Math.PI * 2);
+                        nCtx.fill();
+                    }
+                }
+            }
+
+            // Draw and update nodes
+            neuralNodes.forEach(node => {
+                node.angle += node.speed;
+                node.x += Math.sin(node.angle) * 0.001;
+                node.y += Math.cos(node.angle) * 0.001;
+                
+                // Bounce off edges
+                if(node.x < 0.05 || node.x > 0.95) node.speed *= -1;
+                if(node.y < 0.05 || node.y > 0.95) node.speed *= -1;
+                node.x = Math.max(0.05, Math.min(0.95, node.x));
+                node.y = Math.max(0.05, Math.min(0.95, node.y));
+
+                const pulse = Math.sin(nTime * 3 + node.x * 10) * 0.3 + 0.7;
+
+                // Glow
+                const gradient = nCtx.createRadialGradient(node.x*w, node.y*h, 0, node.x*w, node.y*h, 25);
+                gradient.addColorStop(0, node.color + '40');
+                gradient.addColorStop(1, node.color + '00');
+                nCtx.fillStyle = gradient;
+                nCtx.beginPath();
+                nCtx.arc(node.x*w, node.y*h, 25, 0, Math.PI * 2);
+                nCtx.fill();
+
+                // Core
+                nCtx.fillStyle = node.color;
+                nCtx.beginPath();
+                nCtx.arc(node.x*w, node.y*h, node.radius * pulse, 0, Math.PI * 2);
+                nCtx.fill();
+                
+                // Label
+                nCtx.fillStyle = isLight ? 'rgba(15,23,42,0.8)' : 'rgba(255,255,255,0.6)';
+                nCtx.font = '10px Inter';
+                nCtx.fillText(node.label, node.x*w + 10, node.y*h + 4);
+            });
+
+            document.getElementById('node-count').textContent = neuralNodes.length;
+            document.getElementById('link-count').textContent = Math.floor(neuralNodes.length * 1.5);
+        }
+        drawNeuralNet();
+
+        // ===== Reveal on Scroll & Counters =====
+        let countersAnimated = false;
+        function animateCounter(element, target, suffix = '') {
+            if(!element) return;
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if(current >= target) { current = target; clearInterval(timer); }
+                element.textContent = Math.floor(current).toLocaleString() + suffix;
+            }, 30);
+        }
+
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                    
+                    if(element.closest('#impact') && !countersAnimated) {
+                        countersAnimated = true;
+                        setTimeout(() => {
+                            animateCounter(document.getElementById('counter-accuracy'), 94, '%');
+                            animateCounter(document.getElementById('counter-failures'), 14200, '+');
+                            animateCounter(document.getElementById('counter-decisions'), 84000, '+');
+                            animateCounter(document.getElementById('counter-trust'), 98, '%');
+                        }, 300);
+                    }
+                }
+            });
+        }
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // ===== Mobile Menu =====
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+        closeMenuBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        });
+
+        // ===== Form Submit =====
+        function handleFormSubmit() {
+            const btn = document.querySelector('form button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Submitting...';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                alert('Thank you! Our AI team will review your application and send API credentials within 48 hours.');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
