@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Helacore AI-Powered Business Guidance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #fafaf9; --bg-secondary: #f5f5f4; --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e; --text-inverse: #ffffff;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-hover: rgba(255,255,255,0.85);
+            --glass-border: rgba(0,0,0,0.08); --glass-border-hover: rgba(0,0,0,0.15);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine: rgba(255,255,255,0.5);
+            --dark-glass-bg: rgba(255,255,255,0.5); --dark-glass-border: rgba(0,0,0,0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --input-bg: rgba(255,255,255,0.8); --input-border: rgba(0,0,0,0.12);
+            --input-focus-border: rgba(245,158,11,0.6); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.15);
+            --input-text: #1c1917; --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0,0,0,0.08); --border-footer: rgba(0,0,0,0.08);
+            --footer-bg: rgba(245,245,244,0.8); --scrollbar-track: #f5f5f4; --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --mobile-menu-bg: rgba(250,250,249,0.98);
+            --social-bg: rgba(0,0,0,0.05); --social-bg-hover: rgba(0,0,0,0.08);
+            --social-icon: #78716c; --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0,0,0,0.06); --stats-bg: rgba(255,255,255,0.6);
+            --tag-bg: rgba(0,0,0,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        .btn-liquid { position:relative; overflow:hidden; border-radius:9999px; padding:12px 28px; font-weight:600; background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); transition:all 0.3s ease; box-shadow:0 4px 15px rgba(245,158,11,0.15); cursor:pointer; }
+        [data-theme="light"] .btn-liquid { border:1px solid rgba(217,119,6,0.4); box-shadow:0 4px 15px rgba(217,119,6,0.12); }
+        .btn-liquid:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.3); background:var(--btn-gradient-hover); }
+        [data-theme="light"] .btn-liquid:hover { box-shadow:0 8px 25px rgba(217,119,6,0.2); }
+        .theme-toggle { position:relative; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(10px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; color:var(--text-primary); }
+        .theme-toggle:hover { background:var(--glass-bg-hover); transform:scale(1.05); }
+        .theme-toggle svg { width:20px; height:20px; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform:rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display:none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display:none; }
+        [data-theme="dark"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .moon-icon { display:block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes float-reverse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        .animate-float { animation:float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation:float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s infinite; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-100 { transition-delay:100ms; } .delay-200 { transition-delay:200ms; } .delay-300 { transition-delay:300ms; } .delay-400 { transition-delay:400ms; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--scrollbar-track); } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+        .mobile-menu { transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform:translateX(0); }
+        .text-theme-primary { color:var(--text-primary); } .text-theme-secondary { color:var(--text-secondary); } .text-theme-muted { color:var(--text-muted); }
+        .border-theme-subtle { border-color:var(--border-subtle); }
+        #bg-canvas { opacity:var(--canvas-opacity); transition:opacity 0.5s ease; }
+        .value-card { position:relative; padding:32px; border-radius:var(--liquid-radius-lg); overflow:hidden; }
+        .value-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; border-radius:4px 0 0 4px; }
+        .value-card.amber::before { background:linear-gradient(180deg,#f59e0b,#d97706); }
+        .value-card.emerald::before { background:linear-gradient(180deg,#10b981,#059669); }
+        .value-card.cyan::before { background:linear-gradient(180deg,#06b6d4,#0891b2); }
+        .value-card.purple::before { background:linear-gradient(180deg,#8b5cf6,#7c3aed); }
+        .value-card.rose::before { background:linear-gradient(180deg,#f43f5e,#e11d48); }
+        .value-card.indigo::before { background:linear-gradient(180deg,#6366f1,#4f46e5); }
+        .team-card { transition:transform 0.3s ease; }
+        .team-card:hover { transform:translateY(-8px); }
+        .timeline-item { position:relative; padding-left:40px; padding-bottom:40px; }
+        .timeline-item::before { content:''; position:absolute; left:15px; top:32px; bottom:0; width:2px; background:linear-gradient(180deg,var(--hela-amber),var(--hela-emerald),var(--hela-cyan)); opacity:0.3; }
+        .timeline-item:last-child::before { display:none; }
+        .timeline-dot { position:absolute; left:6px; top:6px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+        .timeline-dot::before { content:''; width:10px; height:10px; border-radius:50%; }
+        .timeline-dot.amber::before { background:#f59e0b; box-shadow:0 0 12px rgba(245,158,11,0.5); }
+        .timeline-dot.emerald::before { background:#10b981; box-shadow:0 0 12px rgba(16,185,129,0.5); }
+        .timeline-dot.cyan::before { background:#06b6d4; box-shadow:0 0 12px rgba(6,182,212,0.5); }
+        .timeline-dot.purple::before { background:#8b5cf6; box-shadow:0 0 12px rgba(139,92,246,0.5); }
+        .stat-card { text-align:center; }
+        .stat-card .stat-number { font-family:'Space Grotesk',sans-serif; font-size:3.5rem; font-weight:700; line-height:1; }
+        @media (max-width:768px) {
+            .stat-card .stat-number { font-size:2.5rem; }
+        }
+        *,*::before,*::after { transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform; transition-timing-function:cubic-bezier(0.4,0,0.2,1); transition-duration:0.3s; }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+                <a href="about us.html" class="px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/30 transition-all text-sm font-medium text-amber-400">About Us</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <a href="about us.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-400">About Us</a>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen relative flex items-center pt-24 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius:9999px">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">Our Story</span>
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight text-theme-primary">Building the <span class="gradient-text-hela">Future of African Business</span></h1>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-lg leading-relaxed">We started with a simple observation: the tools that power Fortune 500 companies should not be reserved for the privileged few. Every entrepreneur, regardless of education or capital, deserves access to intelligent business guidance.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#mission" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Our Mission</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="#team" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span>Meet the Team</span>
+                    </a>
+                </div>
+                <div class="pt-8 border-t border-theme-subtle">
+                    <p class="text-sm text-theme-muted mb-4">Backed by leading investors and partners</p>
+                    <div class="flex flex-wrap items-center gap-6 opacity-70">
+                        <div class="h-8 w-28 liquid-glass-dark rounded-lg flex items-center justify-center text-xs font-medium text-theme-secondary">TechStars</div>
+                        <div class="h-8 w-24 liquid-glass-dark rounded-lg flex items-center justify-center text-xs font-medium text-theme-secondary">Google</div>
+                        <div class="h-8 w-32 liquid-glass-dark rounded-lg flex items-center justify-center text-xs font-medium text-theme-secondary">World Bank</div>
+                        <div class="h-8 w-28 liquid-glass-dark rounded-lg flex items-center justify-center text-xs font-medium text-theme-secondary">CBK Kenya</div>
+                    </div>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="liquid-glass p-6 animate-float relative overflow-hidden" style="padding:24px">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400"></div>
+                    <div class="flex items-center justify-between mb-6 relative z-20">
+                        <span class="text-xs text-theme-muted font-mono tracking-wider">HELACORE ORIGIN</span>
+                        <span class="text-xs text-amber-400">2021 - Present</span>
+                    </div>
+                    <div class="relative z-20 space-y-4">
+                        <div class="liquid-glass-dark p-4 border-l-4 border-amber-400">
+                            <div class="text-xs text-amber-400 font-semibold mb-1">THE PROBLEM</div>
+                            <p class="text-sm text-theme-secondary">Millions of African entrepreneurs make critical business decisions based on guesswork, leading to high failure rates and lost economic potential.</p>
+                        </div>
+                        <div class="liquid-glass-dark p-4 border-l-4 border-emerald-400">
+                            <div class="text-xs text-emerald-400 font-semibold mb-1">OUR RESPONSE</div>
+                            <p class="text-sm text-theme-secondary">Build an AI system that understands local contexts—informal markets, mobile money, supply chains—and delivers actionable guidance anyone can use.</p>
+                        </div>
+                        <div class="liquid-glass-dark p-4 border-l-4 border-cyan-400">
+                            <div class="text-xs text-cyan-400 font-semibold mb-1">THE RESULT</div>
+                            <p class="text-sm text-theme-secondary">2.4M+ businesses now make data-informed decisions daily, with an average 34% profit increase and 850,000+ jobs supported across 47 counties.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -bottom-8 -left-8 liquid-glass p-4 animate-float-reverse" style="border-radius:var(--liquid-radius-xl)">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+                        </div>
+                        <div><p class="text-2xl font-bold font-display text-theme-primary">47</p><p class="text-xs text-theme-muted">Kenyan Counties</p></div>
+                    </div>
+                </div>
+                <div class="absolute -top-8 -right-8 liquid-glass p-4 animate-float" style="animation-delay:1.5s;border-radius:var(--liquid-radius-xl)">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div><p class="text-2xl font-bold font-display text-theme-primary">KES 2.1B</p><p class="text-xs text-theme-muted">Value Generated</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">The Problem We <span class="gradient-text-hela">Exist to Solve</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-3xl mx-auto">In emerging markets, the gap between having a business and running a successful one is wider than anywhere else in the world.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="liquid-glass p-6 reveal text-center">
+                    <div class="text-5xl font-bold font-display text-red-400 mb-3">80%</div>
+                    <p class="text-theme-secondary text-sm">Of African SMEs fail within the first 5 years due to poor financial decisions</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-100 text-center">
+                    <div class="text-5xl font-bold font-display text-orange-400 mb-3">60%</div>
+                    <p class="text-theme-secondary text-sm">Of entrepreneurs in informal economies rely on guesswork for daily decisions</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-200 text-center">
+                    <div class="text-5xl font-bold font-display text-amber-400 mb-3">95%</div>
+                    <p class="text-theme-secondary text-sm">Of business intelligence tools are designed for literate, tech-savvy users in developed markets</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-300 text-center">
+                    <div class="text-5xl font-bold font-display text-yellow-400 mb-3">0</div>
+                    <p class="text-theme-secondary text-sm">Affordable AI-powered guidance existed for street vendors and small shop owners—before Helacore</p>
+                </div>
+            </div>
+            <div class="liquid-glass p-8 md:p-12 reveal">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold mb-6 text-theme-primary">A Mother Selling Vegetables in Kisumu</h3>
+                        <p class="text-theme-secondary mb-4">Akeno wakes up at 5 AM, buys produce from the wholesale market, sets up her stall, and sells until evening. She has no formal business training. She doesn't know her profit margin. She can't predict which vegetables will sell faster next week.</p>
+                        <p class="text-theme-secondary mb-4">Her decisions—how much to buy, what to stock, when to save—are driven by intuition and tradition, not data. One bad week can wipe out months of earnings. A loan could help, but she doesn't know if she can repay it.</p>
+                        <p class="text-theme-secondary font-semibold text-amber-400">Akeno represents 40 million informal entrepreneurs across East Africa.</p>
+                    </div>
+                    <div class="liquid-glass-dark p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 opacity-60"></div>
+                        <h4 class="font-semibold text-theme-primary mb-4">The Daily Reality</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-start space-x-3">
+                                <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <p class="text-sm text-theme-secondary">No visibility into which products are actually profitable</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <p class="text-sm text-theme-secondary">Cannot assess whether a loan would help or hurt</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <p class="text-sm text-theme-secondary">No understanding of seasonal patterns affecting her business</p>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <p class="text-sm text-theme-secondary">No access to the kind of intelligence that large corporations use daily</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section id="mission" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="liquid-glass p-8 md:p-10 reveal">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="font-display text-2xl md:text-3xl font-bold mb-4 text-theme-primary">Our Mission</h3>
+                    <p class="text-lg text-theme-secondary leading-relaxed">To democratize business intelligence by making AI-powered guidance accessible, affordable, and actionable for every entrepreneur in emerging markets—regardless of their education level, technical skills, or starting capital.</p>
+                </div>
+                <div class="liquid-glass p-8 md:p-10 reveal delay-200">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <h3 class="font-display text-2xl md:text-3xl font-bold mb-4 text-theme-primary">Our Vision</h3>
+                    <p class="text-lg text-theme-secondary leading-relaxed">A world where every small business owner has the same quality of decision-making intelligence as a Fortune 500 CEO—where African entrepreneurs don't just survive, but systematically thrive and build generational wealth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Do -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">What <span class="gradient-text-hela">Helacore Does</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-3xl mx-auto">We don't replace human judgment—we augment it. Helacore transforms raw business data into clear, actionable guidance that any entrepreneur can understand and act on.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="liquid-glass p-8 reveal group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-3 text-theme-primary">We Listen</h3>
+                    <p class="text-theme-secondary text-sm leading-relaxed">Through simple inputs—voice, text, or automated data feeds—we capture the reality of your business: sales, expenses, inventory, debts, and local market conditions.</p>
+                </div>
+                <div class="liquid-glass p-8 reveal delay-100 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-3 text-theme-primary">We Analyze</h3>
+                    <p class="text-theme-secondary text-sm leading-relaxed">Our AI applies predictive analytics, behavioral modeling, and localized data integration to understand your unique business context—down to your neighborhood.</p>
+                </div>
+                <div class="liquid-glass p-8 reveal delay-200 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-3 text-theme-primary">We Guide</h3>
+                    <p class="text-theme-secondary text-sm leading-relaxed">We deliver hyper-personalized recommendations in your language—telling you exactly what to do, when to do it, and what to expect, in plain terms you can act on immediately.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Values -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Our <span class="gradient-text-hela">Values</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">These aren't just words on a wall. They shape every product decision, every hire, and every partnership we make.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="value-card amber liquid-glass-dark reveal">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Accessibility First</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">If a vegetable seller with a basic phone can't use it, we haven't done our job. We design for the most constrained user, and everyone benefits.</p>
+                </div>
+                <div class="value-card emerald liquid-glass-dark reveal delay-100">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Privacy by Design</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">Your business data is yours. We never sell it, share it individually, or compromise it. Market intelligence comes only from anonymized aggregation.</p>
+                </div>
+                <div class="value-card cyan liquid-glass-dark reveal delay-200">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Local Context, Global Intelligence</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">We build for African markets first. That means understanding mobile money, informal supply chains, seasonal patterns, and linguistic diversity.</p>
+                </div>
+                <div class="value-card purple liquid-glass-dark reveal delay-100">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Outcomes Over Features</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">We measure success not by how many features we ship, but by how much profit our users generate. If a recommendation doesn't move the needle, it doesn't ship.</p>
+                </div>
+                <div class="value-card rose liquid-glass-dark reveal delay-200">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Radical Transparency</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">We explain why we make each recommendation. Users should understand the reasoning, not blindly follow AI. Trust is built through clarity.</p>
+                </div>
+                <div class="value-card indigo liquid-glass-dark reveal delay-300">
+                    <h4 class="font-display text-lg font-semibold mb-2 text-theme-primary">Community Wealth</h4>
+                    <p class="text-theme-secondary text-sm leading-relaxed">Individual success is good. Community-scale economic transformation is the goal. Every feature should create value that ripples through neighborhoods.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Numbers -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Impact by the <span class="gradient-text-hela">Numbers</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">Real results from real businesses. Every number represents a family, a community, a future.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                <div class="stat-card liquid-glass p-6 reveal">
+                    <div class="stat-number gradient-text-hela mb-2" id="stat-users">0</div>
+                    <p class="text-theme-secondary text-sm">Active Businesses</p>
+                </div>
+                <div class="stat-card liquid-glass p-6 reveal delay-100">
+                    <div class="stat-number gradient-text-hela mb-2" id="stat-profit">0%</div>
+                    <p class="text-theme-secondary text-sm">Avg Profit Increase</p>
+                </div>
+                <div class="stat-card liquid-glass p-6 reveal delay-200">
+                    <div class="stat-number gradient-text-hela mb-2" id="stat-jobs">0</div>
+                    <p class="text-theme-secondary text-sm">Jobs Supported</p>
+                </div>
+                <div class="stat-card liquid-glass p-6 reveal delay-300">
+                    <div class="stat-number gradient-text-hela mb-2" id="stat-value">0</div>
+                    <p class="text-theme-secondary text-sm">KES Value Generated</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Team -->
+    <section id="team" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">The People Behind <span class="gradient-text-hela">Helacore</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-3xl mx-auto">A diverse team of AI researchers, local market experts, and social impact veterans united by one belief: African entrepreneurs deserve world-class tools.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="team-card liquid-glass p-6 text-center reveal">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl font-display">WO</div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary">Wanjiku Odera</h4>
+                    <p class="text-amber-400 text-sm mb-3">Co-Founder & CEO</p>
+                    <p class="text-theme-secondary text-sm">Former M-Pesa product lead. 12 years in African fintech. Raised in a family of small business owners in Kisumu.</p>
+                </div>
+                <div class="team-card liquid-glass p-6 text-center reveal delay-100">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl font-display">KM</div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary">Kamau Mutua</h4>
+                    <p class="text-emerald-400 text-sm mb-3">Co-Founder & CTO</p>
+                    <p class="text-theme-secondary text-sm">Ex-Google AI researcher. PhD in machine learning from MIT. Built AI systems used by 50M+ users globally.</p>
+                </div>
+                <div class="team-card liquid-glass p-6 text-center reveal delay-200">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl font-display">AN</div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary">Amina Njeri</h4>
+                    <p class="text-cyan-400 text-sm mb-3">Head of AI</p>
+                    <p class="text-theme-secondary text-sm">Specializes in NLP for low-resource languages. Led Swahili AI initiatives at Microsoft Research Africa.</p>
+                </div>
+                <div class="team-card liquid-glass p-6 text-center reveal delay-300">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-violet-500 flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl font-display">DK</div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary">David Kimani</h4>
+                    <p class="text-purple-400 text-sm mb-3">Head of Operations</p>
+                    <p class="text-theme-secondary text-sm">Former World Bank program manager. Led economic development projects across 15 African countries.</p>
+                </div>
+            </div>
+            <div class="mt-12 text-center reveal">
+                <p class="text-theme-secondary mb-6">And 85+ talented individuals across engineering, data science, design, and field operations.</p>
+                <a href="#" class="btn-liquid inline-flex items-center space-x-2">
+                    <span>Join Our Team</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Timeline -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Our <span class="gradient-text-hela">Journey</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary">From a napkin sketch in Nairobi to 2.4 million businesses across Kenya.</p>
+            </div>
+            <div class="reveal">
+                <div class="timeline-item">
+                    <div class="timeline-dot amber"></div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary mb-1">2021 — The Spark</h4>
+                    <p class="text-theme-secondary text-sm">Wanjiku and Kamau meet at a Nairobi tech hub. They share a frustration: the most powerful AI in the world is being used to optimize ads, not to help a mother feed her children through her small business.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot emerald"></div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary mb-1">2022 — Prototype & Pilot</h4>
+                    <p class="text-theme-secondary text-sm">Built the first prototype with 50 kiosk owners in Thika. The average pilot user saw a 22% profit increase within 3 months. Secured pre-seed funding from TechStars Nairobi.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot cyan"></div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary mb-1">2023 — Scale & Product-Market Fit</h4>
+                    <p class="text-theme-secondary text-sm">Launched voice interface in Swahili. Grew to 500K users across 20 counties. Partnered with M-Pesa for automatic transaction syncing. Raised $4.2M Series A.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot purple"></div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary mb-1">2024 — National Impact</h4>
+                    <p class="text-theme-secondary text-sm">Reached 2.4M active users across all 47 Kenyan counties. Launched Marketplace Connector and What-If Simulation Engine. Recognized by World Bank as a top fintech innovation.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot amber"></div>
+                    <h4 class="font-display font-semibold text-lg text-theme-primary mb-1">2025 — Pan-African Expansion</h4>
+                    <p class="text-theme-secondary text-sm">Expanding to Tanzania, Uganda, and Nigeria. Launching AI University Builder for institutional partners. Building the infrastructure for 10M African businesses by 2027.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners & Supporters -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Partners & <span class="gradient-text-hela">Supporters</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">We don't build alone. These organizations share our vision of economically empowered African communities.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 reveal">
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">TechStars</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">Google Africa</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">World Bank</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">CBK Kenya</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">Safaricom</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">USAID</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">AFCFTA</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">UNDP</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">M-Pesa</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">KCB Group</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">Equity Bank</span>
+                </div>
+                <div class="liquid-glass-dark p-6 flex items-center justify-center h-24">
+                    <span class="text-sm font-semibold text-theme-secondary">Mastercard</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial / Story -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="liquid-glass p-8 md:p-12 reveal">
+                <div class="text-center mb-8">
+                    <svg class="w-12 h-12 text-amber-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    <p class="text-xl md:text-2xl text-theme-primary leading-relaxed font-medium italic">"Before Helacore, I thought business intelligence was only for big companies. Now I know exactly which products make me money, when to stock up, and when to hold back. My profit increased by 40% in three months. My children eat better. I sleep better. That's what this is about."</p>
+                </div>
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center text-white font-bold text-lg font-display">JM</div>
+                    <div class="text-left">
+                        <p class="font-semibold text-theme-primary">John Mwangi</p>
+                        <p class="text-sm text-theme-muted">Kiosk Owner, Thika — Helacore user since 2022</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <div class="liquid-glass p-12 md:p-16" style="background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(16,185,129,0.1));border:1px solid rgba(245,158,11,0.2);">
+                <h2 class="font-display text-3xl md:text-5xl font-bold mb-6 text-theme-primary">Join the Movement</h2>
+                <p class="text-lg text-theme-secondary mb-10 max-w-2xl mx-auto">Whether you're an entrepreneur looking for guidance, a developer who wants to build with us, or an investor who shares our vision—there's a place for you.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="sign up.html" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Start Your Journey</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="documentation.html" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span>Read the Docs</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // THEME MANAGEMENT
+        (function(){
+            const themeToggle=document.getElementById('theme-toggle');
+            const html=document.documentElement;
+            const savedTheme=localStorage.getItem('helacore-theme');
+            const systemPrefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if(savedTheme){html.setAttribute('data-theme',savedTheme);}
+            else if(systemPrefersDark){html.setAttribute('data-theme','dark');}
+            else{html.setAttribute('data-theme','dark');}
+            function toggleTheme(){
+                const currentTheme=html.getAttribute('data-theme');
+                const newTheme=currentTheme==='light'?'dark':'light';
+                html.setAttribute('data-theme',newTheme);
+                localStorage.setItem('helacore-theme',newTheme);
+                updateParticleColors(newTheme);
+            }
+            if(themeToggle){themeToggle.addEventListener('click',toggleTheme);}
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',(e)=>{
+                if(!localStorage.getItem('helacore-theme')){
+                    html.setAttribute('data-theme',e.matches?'dark':'light');
+                    updateParticleColors(e.matches?'dark':'light');
+                }
+            });
+        })();
+
+        // THREE.JS BACKGROUND
+        const canvas=document.getElementById('bg-canvas');
+        const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+        camera.position.z=5;
+        const particlesGeometry=new THREE.BufferGeometry();
+        const particleCount=200;
+        const positions=new Float32Array(particleCount*3);
+        const colors=new Float32Array(particleCount*3);
+        let particlesMaterial,particles;
+        function initParticles(theme){
+            const isLight=theme==='light';
+            for(let i=0;i<particleCount*3;i+=3){
+                positions[i]=(Math.random()-0.5)*20;
+                positions[i+1]=(Math.random()-0.5)*20;
+                positions[i+2]=(Math.random()-0.5)*20;
+                if(isLight){
+                    const t=Math.random();
+                    colors[i]=0.85*(1-t)+0.02*t;
+                    colors[i+1]=0.47*(1-t)+0.60*t;
+                    colors[i+2]=0.02*(1-t)+0.40*t;
+                }else{
+                    const t=Math.random();
+                    colors[i]=0.96*(1-t)+0.06*t;
+                    colors[i+1]=0.62*(1-t)+0.73*t;
+                    colors[i+2]=0.04*(1-t)+0.51*t;
+                }
+            }
+            particlesGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+            particlesGeometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+            if(particlesMaterial){particlesMaterial.dispose();}
+            particlesMaterial=new THREE.PointsMaterial({size:isLight?0.04:0.05,vertexColors:true,transparent:true,opacity:isLight?0.4:0.6});
+            if(particles){scene.remove(particles);}
+            particles=new THREE.Points(particlesGeometry,particlesMaterial);
+            scene.add(particles);
+        }
+        function updateParticleColors(theme){initParticles(theme);}
+        const currentTheme=document.documentElement.getAttribute('data-theme')||'dark';
+        initParticles(currentTheme);
+        function animate(){
+            requestAnimationFrame(animate);
+            if(particles){particles.rotation.y+=0.0003;particles.rotation.x+=0.0001;}
+            renderer.render(scene,camera);
+        }
+        animate();
+        window.addEventListener('resize',()=>{
+            camera.aspect=window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth,window.innerHeight);
+        });
+
+        // MOBILE MENU
+        const mobileMenuBtn=document.getElementById('mobile-menu-btn');
+        const closeMenuBtn=document.getElementById('close-menu-btn');
+        const mobileMenu=document.getElementById('mobile-menu');
+        if(mobileMenuBtn){mobileMenuBtn.addEventListener('click',()=>{mobileMenu.classList.add('open');});}
+        if(closeMenuBtn){closeMenuBtn.addEventListener('click',()=>{mobileMenu.classList.remove('open');});}
+        document.querySelectorAll('.mobile-nav-link').forEach(link=>{link.addEventListener('click',()=>{mobileMenu.classList.remove('open');});});
+
+        // NAVBAR SCROLL
+        const navbar=document.getElementById('navbar');
+        window.addEventListener('scroll',()=>{
+            if(window.scrollY>50){navbar.classList.add('py-2');navbar.classList.remove('py-4');}
+            else{navbar.classList.add('py-4');navbar.classList.remove('py-2');}
+        });
+
+        // COUNTER ANIMATION
+        function animateCounter(element,target,suffix='',prefix=''){
+            if(!element)return;
+            let current=0;
+            const increment=target/60;
+            const timer=setInterval(()=>{
+                current+=increment;
+                if(current>=target){current=target;clearInterval(timer);}
+                element.textContent=prefix+Math.floor(current).toLocaleString()+suffix;
+            },30);
+        }
+
+        // SCROLL REVEAL + COUNTER TRIGGER
+        let statsAnimated=false;
+        function reveal(){
+            const reveals=document.querySelectorAll('.reveal');
+            reveals.forEach(element=>{
+                const windowHeight=window.innerHeight;
+                const elementTop=element.getBoundingClientRect().top;
+                const elementVisible=120;
+                if(elementTop<windowHeight-elementVisible){
+                    element.classList.add('active');
+                    if(element.querySelector('#stat-users')&&!statsAnimated){
+                        statsAnimated=true;
+                        setTimeout(()=>{
+                            animateCounter(document.getElementById('stat-users'),2400000,'+');
+                            animateCounter(document.getElementById('stat-profit'),34,'%');
+                            animateCounter(document.getElementById('stat-jobs'),850000,'+');
+                            animateCounter(document.getElementById('stat-value'),2.1,'B','KES ');
+                        },300);
+                    }
+                }
+            });
+        }
+        window.addEventListener('scroll',reveal);
+        reveal();
+    </script>
+</body>
+</html>

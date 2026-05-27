@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Ecosystem: How AI Features Integrate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b;
+            --hela-gold: #d97706;
+            --hela-emerald: #10b981;
+            --hela-cyan: #06b6d4;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --liquid-radius-sm: 12px;
+            --liquid-radius-md: 20px;
+            --liquid-radius-lg: 28px;
+            --liquid-radius-xl: 36px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050507;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+        .liquid-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2),
+                inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--liquid-radius-lg);
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .liquid-glass::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease-out;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .liquid-glass:hover::after { left: 100%; }
+
+        .liquid-glass-dark {
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border-radius: var(--liquid-radius-md);
+        }
+
+        .btn-liquid {
+            position: relative;
+            overflow: hidden;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+        }
+
+        .btn-liquid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(16, 185, 129, 0.3));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(15px); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+        @keyframes chart-draw {
+            0% { stroke-dashoffset: 1000; }
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes data-flow {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        @keyframes orbit-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        @keyframes dash-march {
+            to { stroke-dashoffset: -20; }
+        }
+        @keyframes node-breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes slide-in-left {
+            0% { opacity: 0; transform: translateX(-40px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slide-in-right {
+            0% { opacity: 0; transform: translateX(40px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fade-up {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+        .animate-node-breathe { animation: node-breathe 3s ease-in-out infinite; }
+
+        .gradient-text-hela {
+            background: linear-gradient(135deg, #f59e0b 0%, #10b981 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+        .delay-500 { transition-delay: 500ms; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
+
+        .form-input-liquid {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--liquid-radius-md);
+            padding: 16px 20px;
+            color: white;
+            transition: all 0.3s;
+        }
+        .form-input-liquid:focus {
+            outline: none;
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+        }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        .ecosystem-node {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .ecosystem-node:hover {
+            transform: scale(1.12);
+            z-index: 10;
+        }
+
+        .flow-line {
+            stroke-dasharray: 8 4;
+            animation: dash-march 1s linear infinite;
+        }
+
+        .integration-connector {
+            position: relative;
+        }
+        .integration-connector::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 50%;
+            width: 24px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4));
+        }
+
+        .layer-card {
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        .layer-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .layer-card:hover::before { opacity: 1; }
+        .layer-card:hover { transform: translateY(-4px); }
+
+        .layer-amber::before { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
+        .layer-emerald::before { background: linear-gradient(90deg, transparent, #10b981, transparent); }
+        .layer-cyan::before { background: linear-gradient(90deg, transparent, #06b6d4, transparent); }
+        .layer-purple::before { background: linear-gradient(90deg, transparent, #a855f7, transparent); }
+        .layer-rose::before { background: linear-gradient(90deg, transparent, #f43f5e, transparent); }
+        .layer-indigo::before { background: linear-gradient(90deg, transparent, #6366f1, transparent); }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(16, 185, 129, 0.15));
+            border-color: rgba(245, 158, 11, 0.4);
+            color: #f59e0b;
+        }
+
+        .pulse-ring-container {
+            position: relative;
+        }
+        .pulse-ring-container::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        .data-stream {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(180deg, transparent, #f59e0b, transparent);
+            animation: data-flow 3s linear infinite;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            position: relative;
+        }
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            opacity: 0.4;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        .status-online { background: #10b981; color: #10b981; }
+        .status-warning { background: #f59e0b; color: #f59e0b; }
+
+        .health-meter {
+            background: conic-gradient(from 180deg, #ef4444 0deg, #f59e0b 90deg, #10b981 180deg, #10b981 360deg);
+            border-radius: 50%;
+        }
+
+        .metric-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (max-width: 768px) {
+            .ecosystem-orbit-container { transform: scale(0.7); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10 opacity-60"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius: 9999px;">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full bg-white/10 text-amber-400 text-sm font-medium">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Impact</a>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter: blur(40px);">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-white/10 text-amber-400 transition-all">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all">Impact</a>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- =============================== HERO SECTION =============================== -->
+    <section id="home" class="min-h-screen relative flex items-center pt-24 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">Ecosystem Architecture</span>
+                </div>
+
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight">
+                    Every Feature<br>
+                    <span class="gradient-text-hela">Connected</span><br>
+                    Everything Works
+                </h1>
+
+                <p class="text-lg md:text-xl text-gray-400 max-w-lg leading-relaxed">
+                    Helacore isn't a collection of isolated tools — it's a living ecosystem where AI intelligence, financial guidance, market data, and voice interfaces feed into each other to create compounding value for every business we serve.
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+                    <a href="#architecture" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Explore Architecture</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </a>
+                    <a href="#live-status" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                        <span>Live Status</span>
+                    </a>
+                </div>
+
+                <div class="pt-8 border-t border-white/10">
+                    <p class="text-sm text-gray-500 mb-4">Ecosystem integration metrics</p>
+                    <div class="grid grid-cols-3 gap-6">
+                        <div>
+                            <div class="text-2xl font-bold font-display text-amber-400">6</div>
+                            <div class="text-xs text-gray-500">Core Modules</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold font-display text-emerald-400">14</div>
+                            <div class="text-xs text-gray-500">Integration Points</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold font-display text-cyan-400">99.7%</div>
+                            <div class="text-xs text-gray-500">Sync Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ecosystem Orbital Visualization -->
+            <div class="relative flex items-center justify-center">
+                <div class="relative w-[420px] h-[420px] mx-auto ecosystem-orbit-container">
+                    <!-- Orbit Rings -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[380px] h-[380px] rounded-full border border-white/5" style="animation: orbit-spin 30s linear infinite;"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[280px] h-[280px] rounded-full border border-dashed border-white/[0.07]" style="animation: orbit-spin 22s linear infinite reverse;"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[180px] h-[180px] rounded-full border border-white/10" style="animation: orbit-spin 15s linear infinite;"></div>
+                    </div>
+
+                    <!-- Center: AI Engine -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="relative pulse-ring-container animate-node-breathe">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orbiting Feature Nodes -->
+                    <div class="absolute top-[2%] left-1/2 -translate-x-1/2 ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/30 flex items-center justify-center" id="node-health">
+                            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-[22%] right-[2%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 flex items-center justify-center" id="node-simulation">
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[22%] right-[5%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center" id="node-capital">
+                            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[2%] left-1/2 -translate-x-1/2 ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30 flex items-center justify-center" id="node-voice">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[22%] left-[5%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-400/30 flex items-center justify-center" id="node-market">
+                            <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-[22%] left-[2%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/30 flex items-center justify-center" id="node-marketplace">
+                            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- SVG Connection Lines -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 420 420" fill="none">
+                        <line x1="210" y1="160" x2="210" y2="55" class="flow-line" stroke="rgba(245,158,11,0.2)" stroke-width="1.5"/>
+                        <line x1="260" y1="170" x2="365" y2="118" class="flow-line" stroke="rgba(16,185,129,0.2)" stroke-width="1.5"/>
+                        <line x1="260" y1="250" x2="355" y2="300" class="flow-line" stroke="rgba(6,182,212,0.2)" stroke-width="1.5"/>
+                        <line x1="210" y1="260" x2="210" y2="365" class="flow-line" stroke="rgba(168,85,247,0.2)" stroke-width="1.5"/>
+                        <line x1="160" y1="250" x2="65" y2="300" class="flow-line" stroke="rgba(244,63,94,0.2)" stroke-width="1.5"/>
+                        <line x1="160" y1="170" x2="55" y2="118" class="flow-line" stroke="rgba(99,102,241,0.2)" stroke-width="1.5"/>
+                        <!-- Cross connections -->
+                        <line x1="350" y1="140" x2="350" y2="290" class="flow-line" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                        <line x1="70" y1="140" x2="70" y2="290" class="flow-line" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                    </svg>
+
+                    <!-- Tooltip -->
+                    <div id="node-tooltip" class="absolute hidden liquid-glass-dark px-4 py-2 text-xs font-medium text-amber-400 pointer-events-none z-20 whitespace-nowrap border border-amber-400/20" style="border-radius: 12px;"></div>
+                </div>
+
+                <!-- Floating Stats -->
+                <div class="absolute -bottom-4 -left-4 liquid-glass p-4 animate-float-reverse" style="border-radius: var(--liquid-radius-xl);">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold font-display">14</p>
+                            <p class="text-xs text-gray-400">Active Integrations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute -top-4 -right-4 liquid-glass p-4 animate-float" style="animation-delay: 1.5s; border-radius: var(--liquid-radius-xl);">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold font-display">94%</p>
+                            <p class="text-xs text-gray-400">Sync Accuracy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== ARCHITECTURE LAYERS =============================== -->
+    <section id="architecture" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">System Architecture</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">How <span class="gradient-text-hela">Everything Connects</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">The Helacore ecosystem is built in integrated layers — each feature doesn't just work alone, it feeds data into and draws intelligence from every other layer.</p>
+            </div>
+
+            <!-- Architecture Layer Cards -->
+            <div class="space-y-5">
+                <!-- Layer 1: Data Ingestion -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-amber reveal group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Data Ingestion Layer</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full">Foundation</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Every interaction — a voice command in Swahili, a manual expense entry, an SMS transaction alert — feeds into the unified data pipeline. The Financial Health Score, What-If Engine, and Market Intelligence all draw from this single source of truth.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Voice Input</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">SMS Parsing</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Manual Entry</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">M-Pesa Hooks</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Bank Sync</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-amber-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer1-details">
+                                View data flow
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer1-details" class="hidden mt-5 pt-5 border-t border-white/5">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-amber-400 font-display mb-1">2.4M+</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Data Points / Day</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">< 200ms</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Ingestion Latency</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">AES-256</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Encryption</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 2: AI Decision Engine -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-emerald reveal delay-100 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">AI Decision Engine</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">Core</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">The brain of the ecosystem. Receives processed data from the ingestion layer, applies predictive analytics and behavioral modeling, then outputs personalized guidance. It powers both the Financial Health Score calculations and the What-If Simulation scenarios simultaneously.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Predictive Analytics</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Behavioral Modeling</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Context Analysis</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Adaptive Learning</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-emerald-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer2-details">
+                                View processing metrics
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer2-details" class="hidden mt-5 pt-5 border-t border-white/5">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-emerald-400 font-display mb-1">94%</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Prediction Accuracy</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">1.2s</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Avg Response Time</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">Continuous</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Learning Loop</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 3: Intelligence Output -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-cyan reveal delay-200 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Intelligence Output Layer</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded-full">Delivery</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">The AI Engine's outputs are distributed across three channels simultaneously: the Financial Health Score dashboard, the What-If Simulation results, and Smart Capital Allocation recommendations. All three stay in perfect sync — a simulation that changes your inventory strategy automatically updates your health score and capital allocation.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Health Score</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Simulation Results</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Capital Advice</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Market Alerts</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-cyan-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer3-details">
+                                View output channels
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer3-details" class="hidden mt-5 pt-5 border-t border-white/5">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-cyan-400 font-display mb-1">3-Way</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Sync Broadcast</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">Real-time</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Propogation</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-white font-display mb-1">Zero</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-white/40">Stale Data</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 4: Voice & Accessibility -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-purple reveal delay-300 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Voice & Accessibility Interface</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-purple-400 bg-purple-400/10 px-2.5 py-1 rounded-full">Access</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">The multilingual voice interface isn't just an input method — it's a bidirectional bridge. When a farmer speaks in Swahili about their harvest, the NLP engine parses intent, feeds it to the AI Engine, and the response is delivered back as spoken guidance. This same input enriches the Market Intelligence Network with anonymized agricultural data.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Swahili NLP</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">English NLP</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Text-to-Speech</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Intent Parsing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 5: Market Intelligence Network -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-rose reveal delay-400 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Market Intelligence Network</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-rose-400 bg-rose-400/10 px-2.5 py-1 rounded-full">Collective</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Creates a feedback loop: anonymized data from all users feeds trend analysis, which then improves the AI Engine's contextual understanding for every individual business. A price shift detected in Nakuru automatically informs inventory recommendations for a kiosk owner in Thika — all privacy-preserved.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Anonymized Aggregation</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Trend Detection</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Regional Signals</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Privacy-First</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 6: Marketplace Connector -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-indigo reveal delay-500 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold">Marketplace Connector</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 bg-indigo-400/10 px-2.5 py-1 rounded-full">Network</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4 leading-relaxed">The action layer — where AI guidance becomes real-world transactions. When Smart Capital Allocation recommends reducing inventory, the Marketplace Connector surfaces verified suppliers with better prices. When the Health Score signals strong cash flow, credit partners are notified for pre-approval. Intelligence triggers action automatically.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Supplier Matching</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Credit Pre-approval</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Customer Discovery</span>
+                                <span class="text-[10px] font-medium text-white/40 bg-white/5 px-2.5 py-1 rounded-md">Auto-Transact</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== INTEGRATION FLOW MAP =============================== -->
+    <section id="features" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">Feature Integration</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">How Features <span class="gradient-text-hela">Feed Each Other</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">No feature works in isolation. See the specific data pathways that connect each capability into a unified intelligence system.</p>
+            </div>
+
+            <!-- Integration Flow Cards -->
+            <div class="grid md:grid-cols-2 gap-6 mb-12">
+                <!-- Flow 1 -->
+                <div class="liquid-glass p-6 reveal group hover:scale-[1.01] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-lg font-semibold">Health Score → Capital Allocation</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">When the Financial Health Score detects declining cash reserves, it automatically triggers the Smart Capital Allocation engine to rebalance budget recommendations — reducing discretionary spend and increasing savings allocation in real-time.</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-3 py-1.5 rounded-lg bg-amber-400/10 text-[10px] text-amber-400 font-medium font-mono">Health Score Drops</span>
+                        <svg class="w-4 h-4 text-white/20 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span class="px-3 py-1.5 rounded-lg bg-cyan-400/10 text-[10px] text-cyan-400 font-medium font-mono">Capital Rebalance</span>
+                    </div>
+                </div>
+
+                <!-- Flow 2 -->
+                <div class="liquid-glass p-6 reveal delay-100 group hover:scale-[1.01] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-lg font-semibold">Simulation → Market Intelligence</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">When a user runs a What-If simulation for expanding to a new location, the engine queries the Market Intelligence Network for regional demand data, competitor density, and seasonal patterns — making simulations grounded in real market conditions, not guesswork.</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-3 py-1.5 rounded-lg bg-emerald-400/10 text-[10px] text-emerald-400 font-medium font-mono">What-If Query</span>
+                        <svg class="w-4 h-4 text-white/20 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span class="px-3 py-1.5 rounded-lg bg-rose-400/10 text-[10px] text-rose-400 font-medium font-mono">Market Data Pull</span>
+                    </div>
+                </div>
+
+                <!-- Flow 3 -->
+                <div class="liquid-glass p-6 reveal delay-200 group hover:scale-[1.01] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-rose-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-lg font-semibold">Voice Input → AI Engine → Voice Output</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">A farmer asks in Swahili: "Should I plant maize this season?" The NLP engine parses intent, the AI Engine combines their historical yields with Market Intelligence seasonal data, and responds with spoken guidance — all in under 2 seconds.</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-3 py-1.5 rounded-lg bg-purple-400/10 text-[10px] text-purple-400 font-medium font-mono">Swahili Voice</span>
+                        <svg class="w-4 h-4 text-white/20 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span class="px-3 py-1.5 rounded-lg bg-emerald-400/10 text-[10px] text-emerald-400 font-medium font-mono">AI Processing</span>
+                        <svg class="w-4 h-4 text-white/20 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span class="px-3 py-1.5 rounded-lg bg-purple-400/10 text-[10px] text-purple-400 font-medium font-mono">Spoken Reply</span>
+                    </div>
+                </div>
+
+                <!-- Flow 4 -->
+                <div class="liquid-glass p-6 reveal delay-300 group hover:scale-[1.01] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-indigo-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-lg font-semibold">Capital Advice → Marketplace Execution</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">When Smart Capital Allocation identifies surplus funds, it doesn't just suggest saving — the Marketplace Connector surfaces pre-negotiated supplier deals and pre-approved micro-credit opportunities, turning advice into one-tap action.</p>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-3 py-1.5 rounded-lg bg-cyan-400/10 text-[10px] text-cyan-400 font-medium font-mono">Surplus Detected</span>
+                        <svg class="w-4 h-4 text-white/20 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span class="px-3 py-1.5 rounded-lg bg-indigo-400/10 text-[10px] text-indigo-400 font-medium font-mono">Deal Matching</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== LIVE INTERACTIVE ECOSYSTEM =============================== -->
+    <section id="intelligence" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">Live Ecosystem</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Watch the <span class="gradient-text-hela">Ecosystem Think</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">See real-time how data flows through the Helacore ecosystem — from raw input to actionable guidance.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <!-- Live Dashboard -->
+                <div class="space-y-5 reveal">
+                    <div class="liquid-glass p-6">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="font-semibold font-display">Ecosystem Activity Feed</h3>
+                            <span class="liquid-glass-dark px-3 py-1 rounded-full text-xs text-emerald-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                                Live
+                            </span>
+                        </div>
+                        <div id="activity-feed" class="space-y-3 max-h-[420px] overflow-y-auto pr-2" style="scrollbar-width: thin; scrollbar-color: rgba(245,158,11,0.3) transparent;">
+                            <!-- Activities will be injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Metrics -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="liquid-glass p-5 text-center">
+                            <div class="text-3xl font-bold font-display text-amber-400 mb-1" id="metric-decisions">0</div>
+                            <div class="text-[10px] uppercase tracking-widest text-white/40">Decisions Today</div>
+                        </div>
+                        <div class="liquid-glass p-5 text-center">
+                            <div class="text-3xl font-bold font-display text-emerald-400 mb-1" id="metric-insights">0</div>
+                            <div class="text-[10px] uppercase tracking-widest text-white/40">Insights Generated</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Canvas -->
+                <div class="reveal delay-200">
+                    <div class="liquid-glass p-6 animate-float">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="font-semibold font-display">Neural Processing Visualization</h3>
+                            <span class="liquid-glass-dark px-3 py-1 rounded-full text-xs text-amber-400 animate-pulse">PROCESSING</span>
+                        </div>
+                        <div class="relative h-72 liquid-glass-dark rounded-2xl overflow-hidden mb-5">
+                            <canvas id="ecosystem-canvas" class="w-full h-full"></canvas>
+                        </div>
+
+                        <!-- Integration Health Indicators -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="status-dot status-online"></div>
+                                    <span class="text-sm">Financial Health Engine</span>
+                                </div>
+                                <span class="text-xs text-emerald-400">Operational</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="status-dot status-online"></div>
+                                        <span class="text-sm">What-If Simulation</span>
+                                    </div>
+                                    <span class="text-xs text-emerald-400">Operational</span>
+                                </div>
+                                <div class="metric-bar"><div class="metric-bar-fill bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: 94%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="status-dot status-online"></div>
+                                        <span class="text-sm">Voice NLP Pipeline</span>
+                                    </div>
+                                    <span class="text-xs text-emerald-400">Operational</span>
+                                </div>
+                                <div class="metric-bar"><div class="metric-bar-fill bg-gradient-to-r from-purple-500 to-purple-400" style="width: 89%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="status-dot status-warning"></div>
+                                        <span class="text-sm">Market Intelligence</span>
+                                    </div>
+                                    <span class="text-xs text-amber-400">High Load</span>
+                                </div>
+                                <div class="metric-bar"><div class="metric-bar-fill bg-gradient-to-r from-amber-500 to-amber-400" style="width: 76%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <div class="flex items-center gap-2">
+                                        <div class="status-dot status-online"></div>
+                                        <span class="text-sm">Marketplace Connector</span>
+                                    </div>
+                                    <span class="text-xs text-emerald-400">Operational</span>
+                                </div>
+                                <div class="metric-bar"><div class="metric-bar-fill bg-gradient-to-r from-indigo-500 to-indigo-400" style="width: 91%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== DATA FLOW TABS =============================== -->
+    <section id="ecosystem" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">Deep Dive</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Integration <span class="gradient-text-hela">Deep Dive</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">Explore how each integration pathway works in detail — from trigger to action.</p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex flex-wrap justify-center gap-2 mb-10 reveal">
+                <button class="tab-btn active liquid-glass-dark px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider border border-white/10" data-tab="pathways">Data Pathways</button>
+                <button class="tab-btn liquid-glass-dark px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider border border-white/10 text-white/50" data-tab="api">API Layer</button>
+                <button class="tab-btn liquid-glass-dark px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider border border-white/10 text-white/50" data-tab="security">Security Mesh</button>
+                <button class="tab-btn liquid-glass-dark px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider border border-white/10 text-white/50" data-tab="offline">Offline Sync</button>
+            </div>
+
+            <!-- Tab Panels -->
+            <div id="tab-content" class="reveal">
+                <!-- Data Pathways -->
+                <div class="tab-panel" data-panel="pathways" style="display: block;">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="liquid-glass p-6">
+                            <h4 class="font-display font-semibold mb-4 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xs">1</span>
+                                Financial Health ↔ Capital Allocation
+                            </h4>
+                            <p class="text-gray-400 text-sm mb-4">Bidirectional sync: Health Score changes trigger capital rebalancing, and capital allocation outcomes feed back into health score recalculations.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>Health Score onChange → {
+  if (score.delta < -5) {
+    CapitalEngine.rebalance({
+      prioritize: "savings",
+      reduce: "discretionary"
+    });
+  }
+}
+
+CapitalEngine.onRebalance → {
+  HealthScore.recalculate({
+    include: newAllocation
+  });
+}</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <h4 class="font-display font-semibold mb-4 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs">2</span>
+                                Voice → AI Engine → All Outputs
+                            </h4>
+                            <p class="text-gray-400 text-sm mb-4">Voice inputs are treated as first-class data. Every spoken query updates the user's behavioral model, which improves all subsequent recommendations across every feature.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>VoiceInput.parse("Swahili") → {
+  intent: "inventory_query",
+  entity: "maize_flour",
+  urgency: "medium"
+} → AIEngine.process() → {
+  HealthScore.update(context),
+  Simulation.preload(scenarios),
+  Capital.adjust(recommendation),
+  Market.alert_if_trending(entity)
+}</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <h4 class="font-display font-semibold mb-4 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-400 text-xs">3</span>
+                                Market Intel → Simulation Context
+                            </h4>
+                            <p class="text-gray-400 text-sm mb-4">Every What-If simulation is enriched with live Market Intelligence data. Simulations don't run in a vacuum — they reflect current market realities.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>Simulation.run("expand_location") → {
+  MarketIntel.fetch({
+    region: target_region,
+    metrics: [
+      "demand_index",
+      "competitor_density",
+      "seasonal_forecast",
+      "price_volatility"
+    ]
+  }),
+  simulate_with: real_market_data
+}</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <h4 class="font-display font-semibold mb-4 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs">4</span>
+                                AI Guidance → Marketplace Action
+                            </h4>
+                            <p class="text-gray-400 text-sm mb-4">When AI produces a high-confidence recommendation, the Marketplace Connector can pre-fetch relevant suppliers, credit options, or customer segments — turning insight into immediate action.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>AIEngine.output(confidence > 0.85) → {
+  Marketplace.preFetch({
+    type: recommendation.type,
+    budget: user.capital.available,
+    location: user.location,
+    preferences: user.history
+  }),
+  notify: "one_tap_action_ready"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Layer -->
+                <div class="tab-panel" data-panel="api" style="display: none;">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="liquid-glass p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-amber-400/10 flex items-center justify-center"><svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+                                <h4 class="font-display font-semibold">REST API</h4>
+                                <span class="text-[9px] font-semibold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">v2.4</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4">All ecosystem features are accessible via RESTful endpoints. Partners integrate financial health checks, simulation triggers, and marketplace queries through standardized APIs.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>GET /v2/health-score/{business_id}
+POST /v2/simulation/run
+GET /v2/market/intel?region=nakuru
+POST /v2/capital/allocate
+GET /v2/marketplace/deals</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-400/10 flex items-center justify-center"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+                                <h4 class="font-display font-semibold">WebSocket Stream</h4>
+                                <span class="text-[9px] font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">Real-time</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4">Live ecosystem events stream via WebSocket. Health score changes, market alerts, and AI recommendations push to connected clients instantly — no polling required.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>ws://api.helacore.africa/v2/stream
+  → { event: "health_score_change",
+      data: { score: 87, delta: +3 }}
+  → { event: "market_alert",
+      data: { commodity: "maize",
+              trend: "price_increase" }}</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-purple-400/10 flex items-center justify-center"><svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg></div>
+                                <h4 class="font-display font-semibold">Voice API</h4>
+                                <span class="text-[9px] font-semibold text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded-full">Swahili + EN</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4">Dedicated voice processing pipeline with Swahili and English NLP. Handles speech-to-intent parsing and text-to-speech response generation for the voice interface layer.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>POST /v2/voice/process
+  body: { audio: base64,
+          lang: "sw" }
+  → { intent: "check_inventory",
+      entity: "maize_flour",
+      response_audio: base64 }</pre>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-cyan-400/10 flex items-center justify-center"><svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+                                <h4 class="font-display font-semibold">M-Pesa Integration</h4>
+                                <span class="text-[9px] font-semibold text-cyan-400 bg-cyan-400/10 px-2 py-0.5 rounded-full">Payments</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-4">Direct integration with Safaricom's M-Pesa API for transaction data ingestion and marketplace payment processing. The Capital Allocation engine uses this data for cash flow analysis.</p>
+                            <div class="liquid-glass-dark p-4 font-mono text-[11px] text-white/60 overflow-x-auto" style="border-radius: var(--liquid-radius-md);">
+                                <pre>POST /v2/mpesa/stk-push
+  body: { phone: "+254...",
+          amount: 5000,
+          reference: "inventory" }
+  → CapitalEngine.sync(txn)</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Mesh -->
+                <div class="tab-panel" data-panel="security" style="display: none;">
+                    <div class="liquid-glass p-8">
+                        <h4 class="font-display text-2xl font-semibold mb-6">Zero-Trust Security Architecture</h4>
+                        <p class="text-gray-400 text-sm mb-8 leading-relaxed">Every data pathway in the Helacore ecosystem is protected by a zero-trust security mesh. Data flowing between the Voice Interface, AI Engine, and Marketplace Connector is encrypted at every hop, and access is authenticated per-request — not just at the perimeter.</p>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="liquid-glass-dark p-5">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4">
+                                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                </div>
+                                <h5 class="font-semibold text-sm mb-2">End-to-End Encryption</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">AES-256 encryption for data at rest. TLS 1.3 for all data in transit between ecosystem modules. Voice data is encrypted before leaving the device.</p>
+                            </div>
+                            <div class="liquid-glass-dark p-5">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center mb-4">
+                                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </div>
+                                <h5 class="font-semibold text-sm mb-2">Differential Privacy</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">Market Intelligence uses differential privacy — individual business data is never exposed. Only aggregate trends with mathematical privacy guarantees feed the collective intelligence.</p>
+                            </div>
+                            <div class="liquid-glass-dark p-5">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <h5 class="font-semibold text-sm mb-2">Per-Request Auth</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">Every internal API call between ecosystem modules is authenticated. Even if one module is compromised, lateral movement is impossible without valid per-request tokens.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offline Sync -->
+                <div class="tab-panel" data-panel="offline" style="display: none;">
+                    <div class="liquid-glass p-8">
+                        <h4 class="font-display text-2xl font-semibold mb-6">Offline-First Architecture</h4>
+                        <p class="text-gray-400 text-sm mb-8 leading-relaxed">Rural entrepreneurs can't rely on constant connectivity. The Helacore ecosystem uses a local-first sync engine that allows full feature operation offline, with intelligent conflict resolution when connectivity returns.</p>
+                        <div class="space-y-5">
+                            <div class="liquid-glass-dark p-5 border-l-4 border-amber-400">
+                                <h5 class="font-semibold text-sm mb-2">Local AI Inference</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">A lightweight AI model runs on-device for basic health score calculations and capital allocation. No internet needed for day-to-day guidance. The full model syncs when connectivity returns.</p>
+                            </div>
+                            <div class="liquid-glass-dark p-5 border-l-4 border-emerald-400">
+                                <h5 class="font-semibold text-sm mb-2">CRDT-Based Sync</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">Conflict-free Replicated Data Types ensure that offline changes merge seamlessly. If you record expenses offline and the Market Intelligence updates online, both changes merge without data loss.</p>
+                            </div>
+                            <div class="liquid-glass-dark p-5 border-l-4 border-cyan-400">
+                                <h5 class="font-semibold text-sm mb-2">SMS Fallback</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">When internet is unavailable, critical AI recommendations are delivered via SMS. Voice interface works through USSD codes — no smartphone required for basic ecosystem access.</p>
+                            </div>
+                            <div class="liquid-glass-dark p-5 border-l-4 border-purple-400">
+                                <h5 class="font-semibold text-sm mb-2">Predictive Pre-Cache</h5>
+                                <p class="text-gray-400 text-xs leading-relaxed">The ecosystem predicts what data you'll need based on your patterns and pre-caches it during connectivity windows. Going offline during market hours? Your relevant data is already on-device.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== LIVE SYSTEM STATUS =============================== -->
+    <section id="live-status" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius: 9999px;">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span class="text-gray-300">System Status</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Ecosystem <span class="gradient-text-hela">Health</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-xl mx-auto">Real-time monitoring of every integration point in the Helacore ecosystem.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8 reveal">
+                <!-- Status Cards -->
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            <span class="text-sm font-medium">Health Score Engine</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-medium"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>Active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Avg Latency</span><span class="text-white/70">180ms</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-amber-400/60" style="width: 18%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Accuracy</span><span class="text-white/70">94.2%</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-emerald-400/60" style="width: 94%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            <span class="text-sm font-medium">Simulation Engine</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-medium"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>Active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Avg Compute</span><span class="text-white/70">1.2s</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-emerald-400/60" style="width: 24%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Scenarios/Day</span><span class="text-white/70">8,400+</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-emerald-400/60" style="width: 67%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+                            <span class="text-sm font-medium">Capital Engine</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-medium"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>Active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Rebalancing</span><span class="text-white/70">Real-time</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-cyan-400/60" style="width: 99%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Optimization Rate</span><span class="text-white/70">91%</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-cyan-400/60" style="width: 91%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            <span class="text-sm font-medium">Voice Pipeline</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-medium"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>Active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>NLP Accuracy</span><span class="text-white/70">89.4%</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-purple-400/60" style="width: 89%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Languages</span><span class="text-white/70">SW / EN</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-purple-400/60" style="width: 100%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="text-sm font-medium">Market Intel</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-amber-400 font-medium"><span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>High Load</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Data Freshness</span><span class="text-white/70">4 min ago</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-amber-400/60" style="width: 76%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Regions Active</span><span class="text-white/70">47 counties</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-amber-400/60" style="width: 100%;"></div></div>
+                    </div>
+                </div>
+
+                <div class="liquid-glass p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span class="text-sm font-medium">Marketplace API</span>
+                        </div>
+                        <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-medium"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>Active</span>
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Match Rate</span><span class="text-white/70">91%</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-indigo-400/60" style="width: 91%;"></div></div>
+                        <div class="flex justify-between text-[10px] text-white/40"><span>Transactions/Day</span><span class="text-white/70">3,200+</span></div>
+                        <div class="metric-bar"><div class="metric-bar-fill bg-indigo-400/60" style="width: 55%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uptime Bar -->
+            <div class="liquid-glass p-6 reveal">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm font-medium font-display">90-Day Ecosystem Uptime</span>
+                    <span class="text-sm text-emerald-400 font-display">99.97%</span>
+                </div>
+                <div class="flex gap-[2px] h-8 items-end" id="uptime-graph"></div>
+                <div class="flex justify-between mt-2 text-[9px] text-white/30">
+                    <span>90 days ago</span>
+                    <span>Today</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== IMPACT SECTION =============================== -->
+    <section id="impact" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">Ecosystem <span class="gradient-text-hela">Impact</span></h2>
+                <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">When features work together, the impact compounds. See how the integrated ecosystem delivers results no single feature could achieve alone.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="liquid-glass p-6 text-center reveal">
+                    <div class="text-5xl font-bold font-display text-amber-400 mb-2" id="counter-users">0</div>
+                    <p class="text-gray-400">Active Businesses</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-100">
+                    <div class="text-5xl font-bold font-display text-emerald-400 mb-2" id="counter-syncs">0</div>
+                    <p class="text-gray-400">Daily Sync Operations</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-200">
+                    <div class="text-5xl font-bold font-display text-cyan-400 mb-2" id="counter-profit">0%</div>
+                    <p class="text-gray-400">Avg Profit Increase</p>
+                </div>
+                <div class="liquid-glass p-6 text-center reveal delay-300">
+                    <div class="text-5xl font-bold font-display text-purple-400 mb-2" id="counter-uptime">0%</div>
+                    <p class="text-gray-400">Ecosystem Uptime</p>
+                </div>
+            </div>
+
+            <!-- Impact Story -->
+            <div class="liquid-glass p-8 reveal">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <span class="text-xs text-amber-400 font-semibold tracking-wider">ECOSYSTEM IN ACTION</span>
+                        <h3 class="font-display text-2xl font-semibold mt-2 mb-4">Six Features, One Decision</h3>
+                        <p class="text-gray-400 mb-6">
+                            "I asked Helacore in Swahili if I should expand my vegetable stand. The Voice Interface understood my question, the AI Engine checked my Financial Health Score, the What-If Simulation modeled the expansion, Market Intelligence confirmed demand in my area, Capital Allocation showed me how to fund it, and the Marketplace Connector found me a wholesale supplier — all in one conversation. I expanded within two weeks and profits doubled."
+                        </p>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center text-white font-bold">AW</div>
+                            <div>
+                                <p class="font-semibold">Amina Wanjiru</p>
+                                <p class="text-sm text-gray-400">Vegetable Vendor, Nakuru</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="liquid-glass-dark p-6 relative overflow-hidden" style="border-radius: var(--liquid-radius-lg);">
+                        <div class="grid grid-cols-2 gap-4 text-center relative z-10">
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <div class="text-3xl font-bold text-amber-400 mb-1 font-display">6</div>
+                                <div class="text-xs text-gray-400">Features Activated</div>
+                            </div>
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <div class="text-3xl font-bold text-emerald-400 mb-1 font-display">2x</div>
+                                <div class="text-xs text-gray-400">Profit Growth</div>
+                            </div>
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <div class="text-3xl font-bold text-cyan-400 mb-1 font-display">1</div>
+                                <div class="text-xs text-gray-400">Conversation</div>
+                            </div>
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <div class="text-3xl font-bold text-purple-400 mb-1 font-display">2wk</div>
+                                <div class="text-xs text-gray-400">Time to Action</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== CONTACT SECTION =============================== -->
+    <section id="contact" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="liquid-glass p-8 md:p-12 reveal">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-3xl md:text-4xl font-bold mb-4">Join the Ecosystem</h2>
+                    <p class="text-gray-400">Connect your business to the integrated intelligence platform that transforms how entrepreneurs make decisions.</p>
+                </div>
+
+                <form class="space-y-6" onsubmit="event.preventDefault(); handleFormSubmit();">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Business Name</label>
+                            <input type="text" class="w-full form-input-liquid" placeholder="Your business name" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Your Name</label>
+                            <input type="text" class="w-full form-input-liquid" placeholder="Full name" required>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" class="w-full form-input-liquid" placeholder="email@example.com" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Business Type</label>
+                            <select class="w-full form-input-liquid">
+                                <option>Retail / Kiosk</option>
+                                <option>Food Vendor</option>
+                                <option>Startup</option>
+                                <option>Farming</option>
+                                <option>Service Business</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">What ecosystem features interest you most?</label>
+                        <textarea rows="4" class="w-full form-input-liquid" placeholder="Tell us which integrations matter most to your business..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full btn-liquid py-4 text-lg">Connect to Helacore</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =============================== JAVASCRIPT =============================== -->
+    <script>
+        // ===== Three.js Background =====
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particleCount = 200;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        for(let i = 0; i < particleCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 20;
+            positions[i + 1] = (Math.random() - 0.5) * 20;
+            positions[i + 2] = (Math.random() - 0.5) * 20;
+            const t = Math.random();
+            colors[i] = 0.96 * (1 - t) + 0.06 * t;
+            colors[i + 1] = 0.62 * (1 - t) + 0.73 * t;
+            colors[i + 2] = 0.04 * (1 - t) + 0.51 * t;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true, opacity: 0.6 });
+        const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particles);
+
+        function animateBG() {
+            requestAnimationFrame(animateBG);
+            particles.rotation.y += 0.0003;
+            particles.rotation.x += 0.0001;
+            renderer.render(scene, camera);
+        }
+        animateBG();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ===== Ecosystem Canvas Visualization =====
+        const ecoCanvas = document.getElementById('ecosystem-canvas');
+        const ecoCtx = ecoCanvas.getContext('2d');
+        let ecoTime = 0;
+
+        function resizeEcoCanvas() {
+            ecoCanvas.width = ecoCanvas.offsetWidth;
+            ecoCanvas.height = ecoCanvas.offsetHeight;
+        }
+        resizeEcoCanvas();
+        window.addEventListener('resize', resizeEcoCanvas);
+
+        function drawEcosystem() {
+            requestAnimationFrame(drawEcosystem);
+            ecoTime += 0.015;
+            const w = ecoCanvas.width;
+            const h = ecoCanvas.height;
+            ecoCtx.clearRect(0, 0, w, h);
+
+            // Data streams
+            for(let i = 0; i < 8; i++) {
+                const x = (w / 8) * i + 20;
+                const amplitude = 30 + Math.sin(ecoTime + i) * 10;
+                ecoCtx.beginPath();
+                ecoCtx.strokeStyle = `rgba(245, 158, 11, ${0.3 + Math.sin(ecoTime + i) * 0.2})`;
+                ecoCtx.lineWidth = 2;
+                for(let y = 0; y < h; y += 5) {
+                    const offsetX = Math.sin(y * 0.02 + ecoTime + i) * amplitude;
+                    if(y === 0) ecoCtx.moveTo(x + offsetX, y);
+                    else ecoCtx.lineTo(x + offsetX, y);
+                }
+                ecoCtx.stroke();
+            }
+
+            // Central node
+            const nodeX = w / 2;
+            const nodeY = h / 2;
+            const pulse = Math.sin(ecoTime * 2) * 0.3 + 0.7;
+
+            const gradient = ecoCtx.createRadialGradient(nodeX, nodeY, 0, nodeX, nodeY, 60);
+            gradient.addColorStop(0, `rgba(16, 185, 129, ${0.5 * pulse})`);
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            ecoCtx.fillStyle = gradient;
+            ecoCtx.beginPath();
+            ecoCtx.arc(nodeX, nodeY, 60, 0, Math.PI * 2);
+            ecoCtx.fill();
+
+            ecoCtx.fillStyle = `rgba(16, 185, 129, ${pulse})`;
+            ecoCtx.beginPath();
+            ecoCtx.arc(nodeX, nodeY, 15, 0, Math.PI * 2);
+            ecoCtx.fill();
+
+            // Orbiting nodes
+            for(let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2 + ecoTime * 0.5;
+                const lineLength = 80;
+                const endX = nodeX + Math.cos(angle) * lineLength;
+                const endY = nodeY + Math.sin(angle) * lineLength;
+
+                ecoCtx.beginPath();
+                const nodeColors = ['rgba(245,158,11,', 'rgba(16,185,129,', 'rgba(6,182,212,', 'rgba(168,85,247,', 'rgba(244,63,94,', 'rgba(99,102,241,'];
+                ecoCtx.strokeStyle = nodeColors[i] + (0.4 + Math.sin(ecoTime + i) * 0.3) + ')';
+                ecoCtx.lineWidth = 1;
+                ecoCtx.moveTo(nodeX, nodeY);
+                ecoCtx.lineTo(endX, endY);
+                ecoCtx.stroke();
+
+                ecoCtx.fillStyle = nodeColors[i] + '0.8)';
+                ecoCtx.beginPath();
+                ecoCtx.arc(endX, endY, 5, 0, Math.PI * 2);
+                ecoCtx.fill();
+            }
+        }
+        drawEcosystem();
+
+        // ===== Node Tooltips =====
+        const nodeTooltip = document.getElementById('node-tooltip');
+        const nodeLabels = {
+            'node-health': 'Financial Health Score',
+            'node-simulation': 'What-If Simulation',
+            'node-capital': 'Smart Capital Allocation',
+            'node-voice': 'Voice Interface',
+            'node-market': 'Market Intelligence',
+            'node-marketplace': 'Marketplace Connector'
+        };
+
+        Object.keys(nodeLabels).forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('mouseenter', (e) => {
+                nodeTooltip.textContent = nodeLabels[id];
+                nodeTooltip.classList.remove('hidden');
+                const rect = el.getBoundingClientRect();
+                const parentRect = el.closest('.ecosystem-orbit-container').getBoundingClientRect();
+                nodeTooltip.style.left = (rect.left - parentRect.left + rect.width / 2 - nodeTooltip.offsetWidth / 2) + 'px';
+                nodeTooltip.style.top = (rect.top - parentRect.top - 40) + 'px';
+            });
+            el.addEventListener('mouseleave', () => {
+                nodeTooltip.classList.add('hidden');
+            });
+        });
+
+        // ===== Activity Feed =====
+        const activities = [
+            { icon: 'amber', text: 'Health Score updated for Kiosk #4,821 — Score: 87', time: '2s ago' },
+            { icon: 'emerald', text: 'What-If Simulation completed: expansion scenario for Vendor #1,204', time: '5s ago' },
+            { icon: 'purple', text: 'Voice query processed (Swahili): "Should I restock maize flour?"', time: '8s ago' },
+            { icon: 'cyan', text: 'Capital rebalance triggered: savings allocation +8% for Business #3,392', time: '12s ago' },
+            { icon: 'rose', text: 'Market Intel: maize flour price increase detected in Nakuru County', time: '15s ago' },
+            { icon: 'indigo', text: 'Marketplace match: supplier deal found for Business #7,541', time: '18s ago' },
+            { icon: 'amber', text: 'Health Score alert: cash reserve declining for Vendor #921', time: '22s ago' },
+            { icon: 'emerald', text: 'Simulation→Market sync: demand data pulled for Kisumu region', time: '25s ago' },
+            { icon: 'purple', text: 'Voice response delivered (Swahili): inventory guidance', time: '28s ago' },
+            { icon: 'cyan', text: 'Capital optimization saved KES 4,200 for Business #2,104', time: '31s ago' },
+        ];
+
+        const iconColors = {
+            amber: '#f59e0b', emerald: '#10b981', purple: '#a855f7',
+            cyan: '#06b6d4', rose: '#f43f5e', indigo: '#6366f1'
+        };
+
+        const feedContainer = document.getElementById('activity-feed');
+
+        function renderFeed() {
+            feedContainer.innerHTML = '';
+            activities.forEach((act, i) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 liquid-glass-dark p-3 rounded-xl';
+                div.style.animation = `fade-up 0.4s ${i * 50}ms both`;
+                div.innerHTML = `
+                    <div class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style="background: ${iconColors[act.icon]}"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[11px] text-white/70 leading-relaxed">${act.text}</p>
+                        <p class="text-[9px] text-white/30 mt-1">${act.time}</p>
+                    </div>
+                `;
+                feedContainer.appendChild(div);
+            });
+        }
+        renderFeed();
+
+        // Rotate feed
+        setInterval(() => {
+            const first = activities.shift();
+            first.time = 'just now';
+            activities.push(first);
+            activities.forEach((a, i) => {
+                const secs = (i + 1) * 3;
+                a.time = secs + 's ago';
+            });
+            renderFeed();
+        }, 4000);
+
+        // ===== Metric Counters =====
+        let decisionCount = 14832;
+        let insightCount = 52419;
+
+        function updateMetrics() {
+            decisionCount += Math.floor(Math.random() * 3);
+            insightCount += Math.floor(Math.random() * 8);
+            const dEl = document.getElementById('metric-decisions');
+            const iEl = document.getElementById('metric-insights');
+            if (dEl) dEl.textContent = decisionCount.toLocaleString();
+            if (iEl) iEl.textContent = insightCount.toLocaleString();
+        }
+        setInterval(updateMetrics, 3000);
+        updateMetrics();
+
+        // ===== Architecture Toggles =====
+        document.querySelectorAll('.arch-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.getElementById(btn.dataset.target);
+                if (target) {
+                    target.classList.toggle('hidden');
+                    const svg = btn.querySelector('svg');
+                    if (!target.classList.contains('hidden')) {
+                        svg.style.transform = 'rotate(90deg)';
+                        btn.querySelector('span') && (btn.childNodes[0].textContent = 'Hide details ');
+                    } else {
+                        svg.style.transform = 'rotate(0deg)';
+                    }
+                    svg.style.transition = 'transform 0.3s';
+                }
+            });
+        });
+
+        // ===== Tab Switching =====
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active');
+                                        b.classList.add('text-white/50');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-white/50');
+
+                document.querySelectorAll('.tab-panel').forEach(panel => {
+                    if (panel.dataset.panel === tabId) {
+                        panel.style.display = 'block';
+                        panel.style.animation = 'fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both';
+                    } else {
+                        panel.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // ===== Counter Animation =====
+        function animateCounter(element, target, suffix = '') {
+            if(!element) return;
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if(current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString() + suffix;
+            }, 30);
+        }
+
+        // ===== Reveal on Scroll =====
+        let countersAnimated = false;
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                    
+                    if(element.closest('#impact') && !countersAnimated) {
+                        countersAnimated = true;
+                        setTimeout(() => {
+                            animateCounter(document.getElementById('counter-users'), 2400000, '+');
+                            animateCounter(document.getElementById('counter-syncs'), 840000, '+');
+                            animateCounter(document.getElementById('counter-profit'), 34, '%');
+                            animateCounter(document.getElementById('counter-uptime'), 99.97, '%');
+                        }, 300);
+                    }
+                }
+            });
+        }
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // ===== Uptime Graph =====
+        const uptimeGraph = document.getElementById('uptime-graph');
+        if (uptimeGraph) {
+            for (let i = 0; i < 90; i++) {
+                const bar = document.createElement('div');
+                const uptime = Math.random() > 0.03 ? 100 : (75 + Math.random() * 24);
+                const height = (uptime / 100) * 32;
+                bar.style.height = height + 'px';
+                bar.style.flex = '1';
+                bar.style.borderRadius = '2px';
+                bar.style.transition = 'all 0.2s';
+                bar.style.opacity = '0.6';
+
+                if (uptime >= 99.9) {
+                    bar.style.background = 'rgba(16, 185, 129, 0.6)';
+                } else if (uptime >= 99) {
+                    bar.style.background = 'rgba(245, 158, 11, 0.6)';
+                } else {
+                    bar.style.background = 'rgba(239, 68, 68, 0.6)';
+                }
+
+                bar.addEventListener('mouseenter', () => {
+                    bar.style.opacity = '1';
+                    bar.style.transform = 'scaleY(1.3)';
+                });
+                bar.addEventListener('mouseleave', () => {
+                    bar.style.opacity = '0.6';
+                    bar.style.transform = 'scaleY(1)';
+                });
+
+                const day = 90 - i;
+                bar.title = `Day ${day}: ${uptime.toFixed(3)}% uptime`;
+                uptimeGraph.appendChild(bar);
+            }
+        }
+
+        // ===== Mobile Menu =====
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if(mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.add('open');
+            });
+        }
+
+        if(closeMenuBtn) {
+            closeMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        }
+
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // ===== Navbar Background on Scroll =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.add('py-4');
+                navbar.classList.remove('py-2');
+            }
+        });
+
+        // ===== Form Submit Handler =====
+        function handleFormSubmit() {
+            const btn = document.querySelector('form button[type="submit"]');
+            if(btn) {
+                const originalText = btn.textContent;
+                btn.textContent = 'Connecting...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    alert('Thank you for your interest! Our team will contact you within 24 hours to discuss how the Helacore ecosystem can transform your business.');
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

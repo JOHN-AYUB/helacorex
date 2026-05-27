@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - Helacore AI-Powered Business Guidance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #fafaf9; --bg-secondary: #f5f5f4; --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e; --text-inverse: #ffffff;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-hover: rgba(255,255,255,0.85);
+            --glass-border: rgba(0,0,0,0.08); --glass-border-hover: rgba(0,0,0,0.15);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine: rgba(255,255,255,0.5);
+            --dark-glass-bg: rgba(255,255,255,0.5); --dark-glass-border: rgba(0,0,0,0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --input-bg: rgba(255,255,255,0.8); --input-border: rgba(0,0,0,0.12);
+            --input-focus-border: rgba(245,158,11,0.6); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.15);
+            --input-text: #1c1917; --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0,0,0,0.08); --border-footer: rgba(0,0,0,0.08);
+            --footer-bg: rgba(245,245,244,0.8); --scrollbar-track: #f5f5f4; --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --mobile-menu-bg: rgba(250,250,249,0.98);
+            --social-bg: rgba(0,0,0,0.05); --social-bg-hover: rgba(0,0,0,0.08);
+            --social-icon: #78716c; --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0,0,0,0.06); --stats-bg: rgba(255,255,255,0.6);
+            --tag-bg: rgba(0,0,0,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        .btn-liquid { position:relative; overflow:hidden; border-radius:9999px; padding:12px 28px; font-weight:600; background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); transition:all 0.3s ease; box-shadow:0 4px 15px rgba(245,158,11,0.15); cursor:pointer; }
+        [data-theme="light"] .btn-liquid { border:1px solid rgba(217,119,6,0.4); box-shadow:0 4px 15px rgba(217,119,6,0.12); }
+        .btn-liquid:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.3); background:var(--btn-gradient-hover); }
+        [data-theme="light"] .btn-liquid:hover { box-shadow:0 8px 25px rgba(217,119,6,0.2); }
+        .theme-toggle { position:relative; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(10px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; color:var(--text-primary); }
+        .theme-toggle:hover { background:var(--glass-bg-hover); transform:scale(1.05); }
+        .theme-toggle svg { width:20px; height:20px; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform:rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display:none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display:none; }
+        [data-theme="dark"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .moon-icon { display:block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes float-reverse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        @keyframes blink { 0%,50%{opacity:1}51%,100%{opacity:0} }
+        .animate-float { animation:float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation:float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s infinite; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-100 { transition-delay:100ms; } .delay-200 { transition-delay:200ms; } .delay-300 { transition-delay:300ms; } .delay-400 { transition-delay:400ms; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--scrollbar-track); } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+        .mobile-menu { transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform:translateX(0); }
+        .text-theme-primary { color:var(--text-primary); } .text-theme-secondary { color:var(--text-secondary); } .text-theme-muted { color:var(--text-muted); }
+        .border-theme-subtle { border-color:var(--border-subtle); }
+        #bg-canvas { opacity:var(--canvas-opacity); transition:opacity 0.5s ease; }
+        .form-input-liquid { background:var(--input-bg); border:1px solid var(--input-border); border-radius:var(--liquid-radius-md); padding:16px 20px; color:var(--input-text); transition:all 0.3s; font-family:'Inter',sans-serif; font-size:0.95rem; width:100%; }
+        .form-input-liquid::placeholder { color:var(--input-placeholder); }
+        .form-input-liquid:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        .forum-card { transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .forum-card:hover { transform:translateY(-4px); border-color:rgba(245,158,11,0.25); box-shadow:0 20px 40px rgba(245,158,11,0.1); }
+        .forum-tag { display:inline-flex; align-items:center; padding:4px 12px; border-radius:9999px; font-size:0.75rem; font-weight:600; border:1px solid var(--glass-border); color:var(--text-muted); transition:all 0.2s; cursor:pointer; }
+        .forum-tag:hover { border-color:rgba(245,158,11,0.3); color:var(--hela-amber); background:rgba(245,158,11,0.08); }
+        .forum-tag.active { border-color:rgba(245,158,11,0.4); color:var(--hela-amber); background:rgba(245,158,11,0.15); }
+        .member-avatar { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:700; font-size:0.875rem; }
+        .reply-indicator { width:2px; background:linear-gradient(180deg,var(--hela-amber),var(--hela-emerald)); border-radius:2px; flex-shrink:0; align-self:stretch; }
+        .event-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+        .event-dot.live { background:var(--hela-emerald); box-shadow:0 0 10px rgba(16,185,129,0.5); animation:pulse-glow 2s infinite; }
+        .event-dot.upcoming { background:var(--hela-amber); }
+        .event-dot.past { background:var(--text-muted); }
+        .leaderboard-row { transition:all 0.3s; }
+        .leaderboard-row:hover { background:rgba(255,255,255,0.05); }
+        .activity-item { padding:16px 0; border-bottom:1px solid var(--border-subtle); }
+        .activity-item:last-child { border-bottom:none; }
+        .category-bar { height:6px; border-radius:3px; background:rgba(255,255,255,0.1); overflow:hidden; }
+        .category-fill { height:100%; border-radius:3px; transition:width 1s ease; }
+        *,*::before,*::after { transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform; transition-timing-function:cubic-bezier(0.4,0,0.2,1); transition-duration:0.3s; }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+                <a href="community.html" class="px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/30 transition-all text-sm font-medium text-amber-400">Community</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <a href="community.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-400">Community</a>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="min-h-[70vh] relative flex items-center pt-28 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius:9999px">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">2.4M+ entrepreneurs helping each other</span>
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-theme-primary">Join the <span class="gradient-text-hela">Community</span></h1>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-lg leading-relaxed">Connect with fellow entrepreneurs, share insights, solve problems together, and grow your business with support from people who understand your challenges firsthand.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#forums" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Browse Forums</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="#events" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span>Find Events</span>
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="liquid-glass p-6 animate-float relative overflow-hidden" style="padding:24px">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400"></div>
+                    <div class="flex items-center justify-between mb-6 relative z-20">
+                        <span class="text-xs text-theme-muted font-mono tracking-wider">COMMUNITY ACTIVITY</span>
+                        <span class="text-xs text-emerald-400">Live</span>
+                    </div>
+                    <div class="space-y-4 relative z-20">
+                        <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15)">
+                            <div class="member-avatar bg-gradient-to-br from-amber-400 to-orange-500 text-white">JO</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="font-semibold text-sm text-theme-primary truncate">James Odhiambo</h5>
+                                    <span class="text-xs text-emerald-400 ml-auto flex-shrink-0">2m ago</span>
+                                </div>
+                                <p class="text-xs text-theme-muted truncate">Shared a technique for reducing food waste that cut losses by 18%. Anyone tried something similar?</p>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span class="text-xs text-theme-muted">12 replies</span>
+                                    <span class="text-xs text-amber-400 font-medium">23 helpful votes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15)">
+                            <div class="member-avatar bg-gradient-to-br from-emerald-400 to-teal-500 text-white">AN</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="font-semibold text-sm text-theme-primary truncate">Amina Njeri</h5>
+                                    <span class="text-xs text-cyan-400 ml-auto flex-shrink-0">5m ago</span>
+                                </div>
+                                <p class="text-xs text-theme-muted truncate">Helacore just recommended I switch from retail to wholesale. Any wholesale distributors here?</p>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span class="text-xs text-theme-muted">34 replies</span>
+                                    <span class="text-xs text-emerald-400 font-medium">47 helpful votes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.15)">
+                            <div class="member-avatar bg-gradient-to-br from-cyan-400 to-blue-500 text-white">DK</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="font-semibold text-sm text-theme-primary truncate">David Kamau</h5>
+                                    <span class="text-xs text-cyan-400 ml-auto flex-shrink-0">12m ago</span>
+                                </div>
+                                <p class="text-xs text-theme-muted truncate">Pro tip: Use the What-If simulator BEFORE making pricing decisions. It saved me from a KES 40K mistake last month.</p>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span class="text-xs text-theme-muted">89 replies</span>
+                                    <span class="text-xs text-cyan-400 font-medium">112 helpful votes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl" style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15)">
+                            <div class="member-avatar bg-gradient-to-br from-purple-400 to-violet-500 text-white">FM</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h5 class="font-semibold text-sm text-theme-primary truncate">Fatima Mohammed</h5>
+                                    <span class="text-xs text-purple-400 ml-auto flex-shrink-0">18m ago</span>
+                                </div>
+                                <p class="text-xs text-theme-muted truncate">The Swahili voice interface is incredible. I can now navigate the entire platform without reading English.</p>
+                                <div class="flex items-center gap-3 mt-2">
+                                    <span class="text-xs text-theme-muted">56 replies</span>
+                                    <span class="text-xs text-purple-400 font-medium">203 helpful votes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-6 -left-8 liquid-glass p-4 animate-float-reverse" style="border-radius:var(--liquid-radius-xl)">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div><p class="text-2xl font-bold font-display text-theme-primary">18K+</p><p class="text-xs text-theme-muted">Active Members</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Stats -->
+    <section class="py-16 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
+                <div class="liquid-glass p-6 text-center">
+                    <div class="text-4xl font-bold font-display gradient-text-hela mb-1">18,240+</div>
+                    <p class="text-theme-secondary text-sm">Registered Members</p>
+                </div>
+                <div class="liquid-glass p-6 text-center">
+                    <div class="text-4xl font-bold font-display gradient-text-hela mb-1">3,400+</div>
+                    <p class="text-theme-secondary text-sm">Topics Discussed</p>
+                </div>
+                <div class="liquid-glass p-6 text-center">
+                    <div class="text-4xl font-bold font-display gradient-text-hela mb-1">12,800+</div>
+                    <p class="text-theme-secondary text-sm">Questions Answered</p>
+                </div>
+                <div class="liquid-glass p-6 text-center">
+                    <div class="text-4xl font-bold font-display gradient-text-hela mb-1">847</div>
+                    <p class="text-theme-secondary text-sm">Contributors</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Discussion Forums -->
+    <section id="forums" class="py-16 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Discussion <span class="gradient-text-hela">Forums</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">Ask questions, share experiences, and learn from entrepreneurs facing the same challenges you are.</p>
+            </div>
+
+            <!-- Category Tags -->
+            <div class="flex flex-wrap gap-3 justify-center mb-10 reveal">
+                <button class="forum-tag active" data-forum="all" onclick="filterForum('all',this)">All Topics</button>
+                <button class="forum-tag" data-forum="general" onclick="filterForum('general',this)">General</button>
+                <button class="forum-tag" data-forum="pricing" onclick="filterForum('pricing',this)">Pricing & Revenue</button>
+                <button class="forum-tag" data-forum="ai" onclick="filterForum('ai',this)">AI Guidance</button>
+                <button class="forum-tag" data-forum="market" onclick="filterForum('market',this)">Market Intelligence</button>
+                <button class="forum-tag" data-forum="tech" onclick="filterForum('tech',this)">Technical</button>
+                <button class="forum-tag" data-forum="success" onclick="filterForum('success',this)">Success Stories</button>
+            </div>
+
+            <!-- Forum Posts -->
+            <div id="forum-list" class="space-y-4 reveal">
+                <div class="forum-card liquid-glass p-6" data-category="success">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br from-amber-400 to-orange-500 text-white">JK</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">How I Transitioned from Teaching to Running a Tech Startup</h4>
+                                <span class="text-xs text-amber-400 ml-auto flex-shrink-0">Success Story</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">After 12 years as a secondary school teacher, I used Helacore's career engine to plan my transition into tech. In 14 months I launched my own SaaS product. AMA about the journey.</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m0 0l-3 3"/><path d="M12 8V4"/><circle cx="12" cy="12" r="3"/></svg><span>56 replies</span></div>
+                            <span class="flex items-center gap-1 text-amber-400 font-medium"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983z"/></svg><span>128 votes</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="forum-card liquid-glass p-6" data-category="pricing">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br from-emerald-400 to-teal-500 text-white">NW</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">Optimal pricing for a M-pesa kiosk in Nairobi CBD?</h4>
+                                    <span class="text-xs text-emerald-400 ml-auto flex-shrink-0">1h ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">I'm setting up a small kiosk in Nairobi CBD. Helacore recommends KES 45K starting inventory. Has anyone done this? What did you learn?</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><span>34 replies</span></div>
+                            <span class="flex items-center gap-1 text-emerald-400 font-medium"><span>89 votes</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="forum-card liquid-glass p-6" data-category="ai">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br from-cyan-400 to-blue-500 text-white">SK</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">Helacore AI keeps giving me wrong advice</h4>
+                                    <span class="text-xs text-cyan-400 ml-auto flex-shrink-0">2h ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">I run a farm in Kisumu. Helacore keeps suggesting things that don't make sense for agricultural contexts. Are there settings to tune it?</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><span>47 replies</span></div>
+                            <span class="flex items-center gap-1 text-cyan-400 font-medium"><span>102 votes</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="forum-card liquid-glass p-6" data-category="general">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br from-purple-400 to-violet-500 text-white">EM</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">Tips for saving while earning daily income?</h4>
+                                    <span class="text-xs text-purple-400 ml-auto flex-shrink-0">3h ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">I'm a casual laborer and save 200 daily but don't feel like I'm making progress. Any advice from those who've been using Helacore for a while?</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><span>28 replies</span></div>
+                            <span class="flex items-center gap-1 text-purple-400 font-medium"><span>76 votes</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="forum-card liquid-glass p-6" data-category="market">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br from-rose-500 to-pink-500 text-white">GO</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">Nairobi market trends this week?</h4>
+                                    <span class="text-xs text-rose-400 ml-auto flex-shrink-0">5h ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">Market insights shows unusual patterns this week. Anyone else noticed? My kiosk sales dropped 15% unexpectedly.</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><span>19 replies</span></div>
+                            <span class="flex items-center gap-1 text-rose-400 font-medium"><span>31 votes</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-6 reveal">
+                    <button onclick="loadMorePosts()" class="liquid-glass-dark px-6 py-3 rounded-xl font-semibold text-theme-primary hover:bg-white/10 transition-all inline-flex items-center space-x-2">
+                        <span>View All Discussions</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Events -->
+    <section id="events" class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Community <span class="gradient-text-hela">Events</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">Monthly meetups, quarterly hackathons, annual partner summit. Connect face-to-face with fellow entrepreneurs and the Helacore team.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+                <div class="liquid-glass p-6 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="event-dot live"></div>
+                        <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Live Now</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Monthly Town Hall</h4>
+                    <p class="text-theme-secondary text-sm mb-4">Live Q&A with Helacore founders every first Wednesday of the month.</p>
+                    <div class="glass-card p-4 mb-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m0 0l-3-3"/><circle cx="12" cy="12" r="3"/></svg>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-theme-primary">Next Session: Wednesday, Feb 5, 7:00 PM EAT</p>
+                            <p class="text-xs text-theme-muted">Topic: "Optimizing Your Financial Health Score"</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="text-amber-400 text-sm font-semibold flex items-center gap-2 group-hover:gap-3">
+                        <span>Join Session</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l-7 7-7 7 7"/></svg>
+                    </a>
+                </div>
+                <div class="liquid-glass p-6 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="event-dot upcoming"></div>
+                        <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Upcoming</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Nairobi Hackathon 2025</h4>
+                    <p class="text-theme-secondary text-sm mb-4">48-hour challenge to build the next big fintech innovation using Helacore APIs.</p>
+                    <div class="glass-card p-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-theme-primary">March 15-16, 2025</p>
+                                <p class="text-xs text-amber-400">200+ registrations</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="text-amber-400 text-sm font-semibold flex items-center gap-2 group-hover:gap-3">
+                        <span>Register</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7 7"/></svg>
+                    </a>
+                </div>
+                <div class="liquid-glass p-6 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="event-dot upcoming"></div>
+                        <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Upcoming</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Partner Summit 2025</h4>
+                    <p class="text-theme-secondary text-sm mb-4">Annual partner-only event with keynotes, workshops, and networking at a resort. Invitation only.</p>
+                    <div class="glass-card p-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-theme-primary">June 20-22, 2025</p>
+                                <p class="text-xs text-amber-400">120+ organizations</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="partner program.html" class="text-amber-400 text-sm font-semibold flex items-center gap-2 group-hover:gap-3">
+                        <span>Request Invite</span>
+                        <svg class="w-4 h-4 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7 7"/></svg>
+                    </a>
+                </div>
+                <div class="liquid-glass p-6 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="event-dot past"></div>
+                        <span class="text-xs text-theme-muted font-semibold uppercase tracking-wider">Completed</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">December Town Hall Recap</h4>
+                    <p class="text-theme-secondary text-sm mb-4">"From Side Hustle to Scalable Business" session with 340+ attendees and 89 questions answered live.</p>
+                    <div class="glass-card p-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-theme-primary">December 4, 2024</p>
+                                <p class="text-xs text-emerald-400">340 attended</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Community <span class="gradient-text-hela">Leaderboard</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">Recognizing the most helpful community members who go above and beyond to help others succeed.</p>
+            </div>
+            <div class="reveal">
+                <div class="liquid-glass overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr style="background:rgba(245,158,11,0.06)">
+                                <th class="p-4 text-left text-theme-primary font-semibold">Rank</th>
+                                <th class="p-4 text-left text-theme-primary font-semibold">Member</th>
+                                <th class="p-4 text-left text-theme-primary font-semibold">Helpful Votes</th>
+                                <th class="p-4 text-left text-theme-primary font-semibold">Topics Started</th>
+                                <th class="p-4 text-left text-theme-primary font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-theme-subtle leaderboard-row">
+                                <td class="p-4 font-display font-bold gradient-text-hela">1</td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="member-avatar bg-gradient-to-br from-amber-400 to-orange-500 text-white">FM</div>
+                                        <span class="font-medium text-theme-primary">Fatima Mohammed</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 font-mono text-amber-400">203</td>
+                                <td class="p-4 text-theme-secondary">47</td>
+                                <td><span class="px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(16,185,129,0.15);color:var(--hela-emerald);border:1px solid rgba(16,185,129,0.3);">Top Contributor</span></td>
+                            </tr>
+                            <tr class="border-b border-theme-subtle leaderboard-row">
+                                <td class="p-4 font-display font-bold gradient-text-hela">2</td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="member-avatar bg-gradient-to-br from-cyan-400 to-blue-500 text-white">SK</div>
+                                        <span class="font-medium text-theme-primary">Samuel Kariuki</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 font-mono text-cyan-400">102</td>
+                                <td class="p-4 text-theme-secondary">38</td>
+                                <td><span class="px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(16,185,129,0.15);color:var(--hela-emerald);border:1px solid rgba(16,185,129,0.3);">Top Contributor</span></td>
+                            </tr>
+                            <tr class="border-b border-theme-subtle leaderboard-row">
+                                <td class="p-4 font-display font-bold gradient-text-hela">3</td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="member-avatar bg-gradient-to-br from-purple-400 to-violet-500 text-white">EM</div>
+                                        <span class="font-medium text-theme-primary">Esther Mwangi</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 font-mono text-purple-400">89</td>
+                                <td class="p-4 text-theme-secondary">56</td>
+                                <td><span class="px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(16,185,129,0.15);color:var(--hela-emerald);border:1px solid rgba(16,185,129,0.3);">Top Contributor</span></td>
+                            </tr>
+                            <tr class="border-b border-theme-subtle leaderboard-row">
+                                <td class="p-4 font-display font-bold text-theme-muted">4</td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="member-avatar bg-gradient-to-br from-rose-500 to-pink-500 text-white">GO</div>
+                                        <span class="font-medium text-theme-secondary">Grace Odhiambo</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 font-mono text-rose-400">76</td>
+                                <td class="p-4 text-theme-muted">23</td>
+                                <td><span class="px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(245,158,11,0.1);color:var(--hela-amber);border:1px solid rgba(245,158,11,0.25);">Rising Star</span></td>
+                            </tr>
+                            <tr class="border-b border-theme-subtle leaderboard-row">
+                                <td class="p-4 font-display font-bold text-theme-muted">5</td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="member-avatar bg-gradient-to-br from-amber-500 to-yellow-500 text-black">JK</div>
+                                        <span class="font-medium text-theme-secondary">James Odhiambo</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 font-mono text-amber-400">56</td>
+                                </td>
+                                <td class="p-4 text-theme-muted">19</td>
+                                <td><span class="px-3 py-1 rounded-full text-xs font-semibold" style="background:rgba(245,158,11,0.1);color:var(--hela-amber);border:1px solid rgba(245,158,11,0.25);">Rising Star</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Guidelines -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Community <span class="gradient-text-hela">Guidelines</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">We keep the community safe, respectful, and valuable. These guidelines ensure every member has a positive experience.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4 4m6-6a2 2 0 002-2h2a2 2 0 002 2v6a2 2 0 002 2v-2a2 2 0 00-2-2h-2a2 2 0 00-2-2h-2a2 2 0 002 2v-2a2 2 0 002 2h2a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Be Respectful</h4>
+                    <p class="text-theme-secondary text-sm">Treat every member with respect regardless of their experience level, education level, or business size. No question is too basic.</p>
+                </div>
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 011-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Be Helpful</h4>
+                    <p class="text-theme-secondary text-sm">Prioritize being useful. Share specific, actionable advice based on real experience rather than generic advice.</p>
+                </div>
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 011-7 7m0 0a7 7 0 017 7m0 0a7 7 0 01-7-7m0 0a7 7 0 017-7 7"/><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983z"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Be Constructive</h4>
+                    <p class="text-theme-secondary text-sm">Frame feedback as "I tried X, it helped me with Y" rather than "That doesn't work." Give context and share what you actually did.</p>
+                </div>
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-violet-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2-2 2 0 01.5.5 8h.5a2 2 0 012 2 2 2v2a2 2 0 01-2-2h-2a2 2 0 01-1-1m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.754-3.464 0z"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Be Inclusive</h4>
+                    <p class="text-theme-secondary text-sm">Use language that welcomes everyone—English, Swahili, Sheng, Kikuyu, Luganda, Dholuo. Avoid jargon that excludes.</p>
+                </div>
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.754-3.464 0z"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Report Problems</h4>
+                    <p class="text-theme-secondary text-sm">If you see harmful, misleading, or spam content, report it. We handle reports within 4 hours.</p>
+                </div>
+                <div class="liquid-glass p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-blue-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M12 8v4l3 3m0 0l-3 3"/><circle cx="12" cy="16" r="1"/></svg>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Share Context</h4>
+                    <p class="text-theme-secondary text-sm">Always include your business type, location, and relevant details. Context helps others understand if advice applies to them.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <div class="liquid-glass p-12" style="background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(16,185,129,0.1));border:1px solid rgba(245,158,11,0.2);">
+                <h2 class="font-display text-3xl md:text-4xl font-bold mb-4 text-theme-primary">Join the Conversation</h2>
+                <p class="text-theme-secondary mb-8 max-w-lg mx-auto">2.4 million entrepreneurs are waiting to help you. Your question might be the one that changes someone's business trajectory.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#forums" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Start a Discussion</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="sign up.html" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span>Create Free Account</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+   <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // THEME MANAGEMENT
+        (function(){
+            const themeToggle=document.getElementById('theme-toggle');
+            const html=document.documentElement;
+            const savedTheme=localStorage.getItem('helacore-theme');
+            const systemPrefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if(savedTheme){html.setAttribute('data-theme',savedTheme);}
+            else if(systemPrefersDark){html.setAttribute('data-theme','dark');}
+            else{html.setAttribute('data-theme','dark');}
+            function toggleTheme(){
+                const currentTheme=html.getAttribute('data-theme');
+                const newTheme=currentTheme==='light'?'dark':'light';
+                html.setAttribute('data-theme',newTheme);
+                localStorage.setItem('helacore-theme',newTheme);
+                updateParticleColors(newTheme);
+            }
+            if(themeToggle){themeToggle.addEventListener('click',toggleTheme);}
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',(e)=>{
+                if(!localStorage.getItem('helacore-theme')){
+                    html.setAttribute('data-theme',e.matches?'dark':'light');
+                    updateParticleColors(e.matches?'dark':'light');
+                }
+            });
+        })();
+
+        // THREE.JS BACKGROUND
+        const canvas=document.getElementById('bg-canvas');
+        const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+        camera.position.z=5;
+        const particlesGeometry=new THREE.BufferGeometry();
+        const particleCount=200;
+        const positions=new Float32Array(particleCount*3);
+        const colors=new Float32Array(particleCount*3);
+        let particlesMaterial,particles;
+        function initParticles(theme){
+            const isLight=theme==='light';
+            for(let i=0;i<particleCount*3;i+=3){
+                positions[i]=(Math.random()-0.5)*20;
+                positions[i+1]=(Math.random()-0.5)*20;
+                positions[i+2]=(Math.random()-0.5)*20;
+                if(isLight){const t=Math.random();colors[i]=0.85*(1-t)+0.02*t;colors[i+1]=0.47*(1-t)+0.60*t;colors[i+2]=0.02*(1-t)+0.40*t;}
+                else{const t=Math.random();colors[i]=0.96*(1-t)+0.06*t;colors[i+1]=0.62*(1-t)+0.73*t;colors[i+2]=0.04*(1-t)+0.51*t;}
+            }
+            particlesGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+            particlesGeometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+            if(particlesMaterial){particlesMaterial.dispose();}
+            particlesMaterial=new THREE.PointsMaterial({size:isLight?0.04:0.05,vertexColors:true,transparent:true,opacity:isLight?0.4:0.6});
+            if(particles){scene.remove(particles);}
+            particles=new THREE.Points(particlesGeometry,particlesMaterial);
+            scene.add(particles);
+        }
+        function updateParticleColors(theme){initParticles(theme);}
+        initParticles(document.documentElement.getAttribute('data-theme')||'dark');
+        function animate(){requestAnimationFrame(animate);if(particles){particles.rotation.y+=0.0003;particles.rotation.x+=0.0001;}renderer.render(scene,camera);}
+        animate();
+        window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+
+        // MOBILE MENU
+        const mobileMenuBtn=document.getElementById('mobile-menu-btn');
+        const closeMenuBtn=document.getElementById('close-menu-btn');
+        const mobileMenu=document.getElementById('mobile-menu');
+        if(mobileMenuBtn){mobileMenuBtn.addEventListener('click',()=>{mobileMenu.classList.add('open');});}
+        if(closeMenuBtn){closeMenuBtn.addEventListener('click',()=>{mobileMenu.classList.remove('open');});}
+        document.querySelectorAll('.mobile-nav-link').forEach(link=>{link.addEventListener('click',()=>{mobileMenu.classList.remove('open');});});
+
+        // NAVBAR SCROLL
+        const navbar=document.getElementById('navbar');
+        window.addEventListener('scroll',()=>{
+            if(window.scrollY>50){navbar.classList.add('py-2');navbar.classList.remove('py-4');}
+            else{navbar.classList.add('py-4');navbar.classList.remove('py-2');}
+        });
+
+        // SCROLL REVEAL
+        function reveal(){
+            document.querySelectorAll('.reveal').forEach(el=>{
+                if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('active');}
+            });
+        }
+        window.addEventListener('scroll',reveal);
+        reveal();
+
+        // FORUM FILTER
+        function filterForum(category,btn){
+            const cards=document.querySelectorAll('.forum-card');
+            const tags=document.querySelectorAll('.forum-tag');
+            tags.forEach(t=>t.classList.remove('active'));
+            btn.classList.add('active');
+            cards.forEach(card=>{
+                const cardCat=card.dataset.category;
+                card.style.display=(category==='all'||cardCat===category)?'block':'none';
+            });
+        }
+
+        // FAQ TOGGLE
+        function toggleFaq(header){
+            const item=header.closest('.faq-item');
+            item.classList.toggle('open');
+        }
+
+        // LOAD MORE POSTS
+        let morePostsLoaded=false;
+        function loadMorePosts(){
+            if(morePostsLoaded)return;
+            morePosts=true;
+            const container=document.getElementById('forum-list');
+            const additional=[
+                {name:"MW",color:"from-amber-400 to-orange-500",initials:"MO",cat:"general",title:"How do I convince my supplier to use Helacore?",votes:18,replies:7,time:"1 day ago",content:"They don't want to use another platform. Any tips for convincing them it's worth the learning curve?"},
+                {name:"LO",color:"from-indigo-400 to-blue-500",initials:"LO",cat:"tech",title:"Helacore vs other AI business tools comparison?",votes:32,replies:14,time:"3 days ago",content:"I've tried 5 different tools. Helacore wins on simplicity. Period. What makes it different for a solo business owner with no tech background?"},
+                {name:"WK",color:"from-rose-500 to-pink-500",initials:"WK",cat:"ai",title:"AI keeps telling me to use simulations but I don't want to code. Thoughts?",votes:24,replies:11,time:"5 days ago",content:"You don't need to code. All simulations work via voice or simple inputs. Just speak naturally in Swahili and let Helacore handle the technical side."},
+                {name:"KN",color:"from-cyan-400 to-blue-500",initials:"KN",cat:"ai",title:"What happens if my AI recommendations keep being wrong?",votes:19,replies:8,time:"1 week ago",content:"Report wrong recommendations through the feedback mechanism. The system adapts over time based on your outcomes."},
+                {name:"TM",color:"from-teal-500 to-green-500",initials:"TM",cat:"pricing",title:"Monthly subscription too expensive for a kiosk owner?",votes:41,replies:23,time:"1 week ago",content:"Try the free tier first. You might find the basic plan sufficient for daily decision support."}
+            ];
+            additional.forEach(post=>{
+                const div=document.createElement('div');
+                div.className='forum-card liquid-glass p-6';
+                div.dataset.category=post.cat;
+                div.innerHTML=`
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="member-avatar bg-gradient-to-br(${post.color}) text-white">${post.initials}</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-semibold text-theme-primary truncate">${post.name}</h4>
+                                    <span class="text-xs text-amber-400 ml-auto flex-shrink-0">${post.time}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-theme-secondary text-sm mb-4">${post.content}</p>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="flex items-center gap-1 text-theme-muted"><span>${post.replies} replies</span></div>
+                            <span class="flex items-center gap-1 font-medium" style="color:${post.color.replace('from-','rgb(')}">${post.votes} votes</span></span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // SCROLL REVEAL
+        function reveal(){
+            document.querySelectorAll('.reveal').forEach(el=>{
+                if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('active');}
+            });
+        }
+        window.addEventListener('scroll',reveal);
+        reveal();
+    </script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Privacy Policy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b;
+            --hela-emerald: #10b981;
+            --hela-cyan: #06b6d4;
+            --liquid-radius-md: 20px;
+            --liquid-radius-lg: 28px;
+            --liquid-radius-xl: 36px;
+
+            --bg-primary: #050507;
+            --text-primary: #ffffff;
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glass-dark-bg: rgba(10, 10, 15, 0.6);
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+        }
+
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --text-primary: #0f172a;
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.6) 100%);
+            --glass-border: rgba(148, 163, 184, 0.3);
+            --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            --glass-dark-bg: rgba(241, 245, 249, 0.8);
+            --text-secondary: #475569;
+            --text-tertiary: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+        .liquid-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            position: relative; overflow: hidden;
+            border-radius: var(--liquid-radius-lg);
+            transition: background 0.5s, border-color 0.5s, box-shadow 0.5s;
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            pointer-events: none; z-index: 1;
+        }
+
+        .liquid-glass-dark {
+            background: var(--glass-dark-bg);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: var(--liquid-radius-md);
+            transition: background 0.5s, border-color 0.5s;
+        }
+
+        .btn-liquid {
+            position: relative; overflow: hidden; border-radius: 9999px;
+            padding: 14px 28px; font-weight: 600;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+            color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-liquid:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3); background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(16, 185, 129, 0.3)); }
+
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+        .gradient-text-hela {
+            background: linear-gradient(135deg, #f59e0b 0%, #10b981 50%, #06b6d4 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .text-secondary { color: var(--text-secondary); }
+        .text-tertiary { color: var(--text-tertiary); }
+
+        /* Theme Toggle with Sun/Moon */
+        .theme-toggle {
+            width: 48px; height: 24px; background: rgba(255,255,255,0.1); border-radius: 9999px; 
+            position: relative; cursor: pointer; transition: background 0.3s; border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 4px;
+        }
+        .light-mode .theme-toggle { background: rgba(100, 116, 139, 0.2); border-color: rgba(100, 116, 139, 0.3); }
+        
+        .theme-icon { width: 16px; height: 16px; transition: opacity 0.3s, transform 0.3s; }
+        .sun-icon { color: #f59e0b; opacity: 0.3; transform: scale(0.8); }
+        .moon-icon { color: #94a3b8; opacity: 1; transform: scale(1); }
+        
+        .light-mode .sun-icon { opacity: 1; transform: scale(1); }
+        .light-mode .moon-icon { opacity: 0.3; transform: scale(0.8); }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 100ms; }
+
+        /* ToC Styling */
+        .toc-link {
+            display: block; padding: 0.5rem 1rem; border-left: 2px solid var(--glass-border);
+            color: var(--text-tertiary); font-size: 0.8rem; transition: all 0.2s;
+        }
+        .toc-link:hover, .toc-link.active {
+            border-left-color: var(--hela-emerald); color: var(--text-primary); background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* Legal Section Styling */
+        .legal-section { scroll-margin-top: 100px; padding-top: 2rem; margin-bottom: 2rem; }
+        .legal-card {
+            border-left: 2px solid var(--glass-border);
+            padding-left: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .legal-card:hover { border-left-color: var(--hela-emerald); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10 opacity-60"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius: 9999px;">
+            <div class="flex items-center space-x-3 z-10">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-2 z-10">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Features</a>
+                <a href="intelligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium">Impact</a>
+                
+                <div class="theme-toggle ml-2" id="theme-toggle" aria-label="Toggle light/dark mode">
+                    <svg class="theme-icon sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg class="theme-icon moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 z-10">
+                <a href="login.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold py-2 px-5">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="pt-36 pb-12 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto text-center relative z-10 reveal active">
+            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+                Privacy <span class="gradient-text-hela">Policy</span>
+            </h1>
+            <p class="text-lg text-secondary max-w-2xl mx-auto mb-4">Last Updated: October 24, 2024</p>
+            <p class="text-sm text-tertiary max-w-xl mx-auto">Your business data is your most valuable asset. This policy outlines exactly how we protect it, process it, and ensure your privacy remains absolute while using our AI ecosystem.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT SECTION -->
+    <section class="py-12 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="grid lg:grid-cols-4 gap-8">
+                
+                <!-- Sidebar Table of Contents -->
+                <div class="lg:col-span-1 hidden lg:block">
+                    <div class="sticky top-28 liquid-glass-dark p-4 rounded-xl">
+                        <h4 class="text-xs font-semibold uppercase tracking-widest text-tertiary mb-4 px-2">Quick Nav</h4>
+                        <nav class="flex flex-col gap-1">
+                            <a href="#section-1" class="toc-link active">1. Introduction</a>
+                            <a href="#section-2" class="toc-link">2. Data We Collect</a>
+                            <a href="#section-3" class="toc-link">3. How We Use Data</a>
+                            <a href="#section-4" class="toc-link">4. Federated Learning</a>
+                            <a href="#section-5" class="toc-link">5. Data Sharing</a>
+                            <a href="#section-6" class="toc-link">6. Data Security</a>
+                            <a href="#section-7" class="toc-link">7. Data Retention</a>
+                            <a href="#section-8" class="toc-link">8. Your Rights</a>
+                            <a href="#section-9" class="toc-link">9. Cookies</a>
+                            <a href="#section-10" class="toc-link">10. Contact</a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="lg:col-span-3 space-y-6">
+
+                    <!-- 1. Introduction -->
+                    <div id="section-1" class="legal-section reveal">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">1. Introduction</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>Helacore Inc. ("Helacore," "we," "us," or "our") operates the AI-powered business guidance platform available at helacore.africa and associated mobile applications (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.</p>
+                                    <p>We operate under the principles of data minimization and privacy-by-design. Given the sensitive nature of financial and business data processed on our platform, we hold ourselves to standards that meet or exceed the Kenya Data Protection Act, 2019, and international best practices such as the GDPR.</p>
+                                    <p>By using the Service, you consent to the data practices described in this policy. If you do not agree with the terms of this privacy policy, please do not access the Service.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Data We Collect -->
+                    <div id="section-2" class="legal-section reveal delay-100">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">2. Information We Collect</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>We collect information that you provide directly to us, information collected automatically when you use the Service, and information from third-party sources.</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li><strong>Account Data:</strong> Name, email address, phone number, business name, and business type provided during registration.</li>
+                                        <li><strong>Business Data:</strong> Sales records, expense logs, inventory levels, loan details, and cash flow data you input or connect via integrations (e.g., M-Pesa).</li>
+                                        <li><strong>Voice Data:</strong> Audio inputs processed via the Voice Interface for intent parsing. Audio is processed ephemerally and not stored persistently.</li>
+                                        <li><strong>Usage Data:</strong> Log data, device information, IP address, browser type, operating system, and interaction patterns with the platform.</li>
+                                        <li><strong>Marketplace Data:</strong> Transaction records and communications facilitated through the Marketplace Connector.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. How We Use Data -->
+                    <div id="section-3" class="legal-section reveal">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">3. How We Use Your Information</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>We use the data we collect to operate, maintain, and improve the Service, including:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li>To calculate your Financial Health Score and provide actionable AI recommendations.</li>
+                                        <li>To run What-If Simulations tailored to your specific business context.</li>
+                                        <li>To facilitate connections between you and third-party service providers (credit, suppliers) via the Marketplace.</li>
+                                        <li>To communicate with you regarding product updates, security alerts, and support inquiries.</li>
+                                        <li>To enforce our Terms of Service and prevent fraudulent or illegal activity.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Federated Learning (CRITICAL) -->
+                    <div id="section-4" class="legal-section reveal delay-100">
+                        <div class="liquid-glass p-8" style="border-left: 4px solid var(--hela-emerald);">
+                            <div class="legal-card" style="border-left: none; padding-left: 0;">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <svg class="w-6 h-6 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    <h2 class="font-display text-2xl font-semibold text-emerald-400">4. Federated Learning & AI Privacy</h2>
+                                </div>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p><strong>YOUR RAW BUSINESS DATA DOES NOT LEAVE YOUR DEVICE.</strong></p>
+                                    <p>Helacore utilizes a Federated Learning architecture to train our global AI models. This means:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li>The AI model is downloaded to your local device (phone or browser).</li>
+                                        <li>The model learns from your business data locally, on your hardware.</li>
+                                        <li>Only the mathematical "weight updates" (how the model should adjust its parameters)—not your raw data—are sent to our secure servers.</li>
+                                        <li>We apply Secure Aggregation and Differential Privacy to these updates, ensuring that your specific data points cannot be reverse-engineered from the model updates.</li>
+                                    </ul>
+                                    <p>This approach ensures that the Market Intelligence Network gets smarter for everyone, while your individual sales, expenses, and customer data remain strictly private on your device.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Data Sharing -->
+                    <div id="section-5" class="legal-section reveal">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">5. Data Sharing & Third Parties</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>We do not sell, trade, or rent your personal identification information or raw business data to third parties. We may share generic, anonymized, or aggregated information with third parties for the purposes outlined below:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li><strong>Service Providers:</strong> We may employ third-party companies and individuals to facilitate our Service (e.g., cloud hosting, M-Pesa integration APIs). These third parties have access to your Personal Data only to perform specific tasks on our behalf and are obligated not to disclose or use it for any other purpose.</li>
+                                        <li><strong>Marketplace Connectors:</strong> If you explicitly opt-in to connect with a credit provider or supplier, we will share the minimum necessary data (e.g., Health Score, verification status) to facilitate that introduction.</li>
+                                        <li><strong>Legal Requirements:</strong> Helacore may disclose your Personal Data in the good faith belief that such action is necessary to comply with a legal obligation, protect the rights or property of Helacore, or act in urgent circumstances to protect the personal safety of users or the public.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Data Security -->
+                    <div id="section-6" class="legal-section reveal delay-100">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">6. Data Security</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>The security of your data is critical to us. We implement a zero-trust security architecture and industry-standard measures, including:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li><strong>Encryption:</strong> All data is encrypted at rest using AES-256 and in transit using TLS 1.3.</li>
+                                        <li><strong>On-Device Processing:</strong> Federated Learning ensures raw data remains on your device behind your personal device security (biometrics/PIN).</li>
+                                        <li><strong>Access Controls:</strong> Strict internal access controls ensure our own engineers cannot view your raw business data.</li>
+                                        <li><strong>Regular Audits:</strong> We undergo regular third-party security audits and penetration testing.</li>
+                                    </ul>
+                                    <p>However, no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. Data Retention -->
+                    <div id="section-7" class="legal-section reveal">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">7. Data Retention</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>Helacore will retain your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use your Personal Data to the extent necessary to comply with our legal obligations, resolve disputes, and enforce our legal agreements.</p>
+                                    <p>For business data, we retain active data on our servers for the duration your account is active. Data used for AI model training via Federated Learning is processed ephemerally and is not retained on central servers.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Your Rights -->
+                    <div id="section-8" class="legal-section reveal delay-100">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">8. Your Data Protection Rights</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>Depending on your location, you may have the following rights regarding your personal data:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li><strong>The right to access:</strong> You have the right to request copies of your personal data.</li>
+                                        <li><strong>The right to rectification:</strong> You have the right to request that we correct any information you believe is inaccurate or complete information you believe is incomplete.</li>
+                                        <li><strong>The right to erasure:</strong> You have the right to request that we erase your personal data, under certain conditions.</li>
+                                        <li><strong>The right to restrict processing:</strong> You have the right to request that we restrict the processing of your personal data, under certain conditions.</li>
+                                        <li><strong>The right to data portability:</strong> You have the right to request the transfer of your data to another organization, or directly to you, under certain conditions.</li>
+                                    </ul>
+                                    <p>You can exercise these rights by navigating to Account Settings within the app or by contacting us at <a href="mailto:privacy@helacore.africa" class="text-emerald-400 hover:underline">privacy@helacore.africa</a>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 9. Cookies -->
+                    <div id="section-9" class="legal-section reveal">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">9. Cookies & Tracking Technologies</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>We use cookies and similar tracking technologies to track activity on our Service and we hold certain information.</p>
+                                    <p>Cookies are files with a small amount of data which may include an anonymous unique identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p>
+                                    <p>Examples of Cookies we use:</p>
+                                    <ul class="list-disc list-inside space-y-2 pl-2">
+                                        <li><strong>Strictly Necessary:</strong> Required for the Service to function (e.g., authentication session).</li>
+                                        <li><strong>Performance:</strong> To understand how users interact with the Service (anonymized).</li>
+                                        <li><strong>Functionality:</strong> To remember your preferences (e.g., Light/Dark mode).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 10. Contact -->
+                    <div id="section-10" class="legal-section reveal delay-100">
+                        <div class="liquid-glass p-8">
+                            <div class="legal-card">
+                                <h2 class="font-display text-2xl font-semibold mb-4">10. Changes & Contact Information</h2>
+                                <div class="space-y-4 text-secondary text-sm leading-relaxed">
+                                    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.</p>
+                                    <p>If you have any questions about this Privacy Policy, please contact us:</p>
+                                    <ul class="list-none space-y-2 pl-2">
+                                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> <a href="mailto:privacy@helacore.africa" class="text-emerald-400 hover:underline">privacy@helacore.africa</a></li>
+                                        <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Helacore Inc., Nairobi, Kenya</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Theme Toggle =====
+        const body = document.body;
+        document.getElementById('theme-toggle').addEventListener('click', () => body.classList.toggle('light-mode'));
+
+        // ===== Three.js Background =====
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+        const pGeo = new THREE.BufferGeometry();
+        const pCount = 100;
+        const pos = new Float32Array(pCount * 3);
+        const cols = new Float32Array(pCount * 3);
+        for(let i = 0; i < pCount * 3; i += 3) {
+            pos[i] = (Math.random() - 0.5) * 15; pos[i+1] = (Math.random() - 0.5) * 15; pos[i+2] = (Math.random() - 0.5) * 15;
+            const t = Math.random(); cols[i] = 0.96*(1-t)+0.06*t; cols[i+1] = 0.62*(1-t)+0.73*t; cols[i+2] = 0.04*(1-t)+0.51*t;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+        const pMat = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true, opacity: 0.3 });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+        function animateBG() { requestAnimationFrame(animateBG); particles.rotation.y += 0.0003; renderer.render(scene, camera); }
+        animateBG();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+        // ===== Scroll Reveal =====
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                const top = el.getBoundingClientRect().top;
+                if (top < window.innerHeight - 80) el.classList.add('active');
+            });
+        }
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // ===== Table of Contents Active State =====
+        const tocLinks = document.querySelectorAll('.toc-link');
+        const sections = document.querySelectorAll('.legal-section');
+
+        function updateToc() {
+            let index = sections.length;
+            while(--index && window.scrollY + 150 < sections[index].offsetTop) {}
+            tocLinks.forEach(link => link.classList.remove('active'));
+            if (tocLinks[index]) tocLinks[index].classList.add('active');
+        }
+
+        window.addEventListener('scroll', updateToc);
+        updateToc();
+    </script>
+</body>
+</html>

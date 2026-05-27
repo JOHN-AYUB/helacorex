@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Program - Helacore AI-Powered Business Guidance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #fafaf9; --bg-secondary: #f5f5f4; --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e; --text-inverse: #ffffff;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-hover: rgba(255,255,255,0.85);
+            --glass-border: rgba(0,0,0,0.08); --glass-border-hover: rgba(0,0,0,0.15);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine: rgba(255,255,255,0.5);
+            --dark-glass-bg: rgba(255,255,255,0.5); --dark-glass-border: rgba(0,0,0,0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --input-bg: rgba(255,255,255,0.8); --input-border: rgba(0,0,0,0.12);
+            --input-focus-border: rgba(245,158,11,0.6); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.15);
+            --input-text: #1c1917; --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0,0,0,0.08); --border-footer: rgba(0,0,0,0.08);
+            --footer-bg: rgba(245,245,244,0.8); --scrollbar-track: #f5f5f4; --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --mobile-menu-bg: rgba(250,250,249,0.98);
+            --social-bg: rgba(0,0,0,0.05); --social-bg-hover: rgba(0,0,0,0.08);
+            --social-icon: #78716c; --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0,0,0,0.06); --stats-bg: rgba(255,255,255,0.6);
+            --tag-bg: rgba(0,0,0,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        .btn-liquid { position:relative; overflow:hidden; border-radius:9999px; padding:12px 28px; font-weight:600; background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); transition:all 0.3s ease; box-shadow:0 4px 15px rgba(245,158,11,0.15); cursor:pointer; }
+        [data-theme="light"] .btn-liquid { border:1px solid rgba(217,119,6,0.4); box-shadow:0 4px 15px rgba(217,119,6,0.12); }
+        .btn-liquid:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.3); background:var(--btn-gradient-hover); }
+        [data-theme="light"] .btn-liquid:hover { box-shadow:0 8px 25px rgba(217,119,6,0.2); }
+        .theme-toggle { position:relative; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(10px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; color:var(--text-primary); }
+        .theme-toggle:hover { background:var(--glass-bg-hover); transform:scale(1.05); }
+        .theme-toggle svg { width:20px; height:20px; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform:rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display:none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display:none; }
+        [data-theme="dark"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .moon-icon { display:block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes float-reverse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        .animate-float { animation:float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation:float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s infinite; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-100 { transition-delay:100ms; } .delay-200 { transition-delay:200ms; } .delay-300 { transition-delay:300ms; } .delay-400 { transition-delay:400ms; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--scrollbar-track); } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+        .mobile-menu { transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform:translateX(0); }
+        .text-theme-primary { color:var(--text-primary); } .text-theme-secondary { color:var(--text-secondary); } .text-theme-muted { color:var(--text-muted); }
+        .border-theme-subtle { border-color:var(--border-subtle); }
+        #bg-canvas { opacity:var(--canvas-opacity); transition:opacity 0.5s ease; }
+        .form-input-liquid { background:var(--input-bg); border:1px solid var(--input-border); border-radius:var(--liquid-radius-md); padding:16px 20px; color:var(--input-text); transition:all 0.3s; font-family:'Inter',sans-serif; font-size:0.95rem; width:100%; }
+        .form-input-liquid::placeholder { color:var(--input-placeholder); }
+        .form-input-liquid:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        .partner-type-card { position:relative; overflow:hidden; cursor:pointer; transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .partner-type-card:hover { transform:translateY(-8px) scale(1.02); }
+        .partner-type-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:4px 4px 0 0; }
+        .partner-type-card.fintech::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
+        .partner-type-card.telco::before { background:linear-gradient(90deg,#10b981,#059669); }
+        .partner-type-card.institution::before { background:linear-gradient(90deg,#06b6d4,#0891b2); }
+        .partner-type-card.ngo::before { background:linear-gradient(90deg,#8b5cf6,#7c3aed); }
+        .partner-type-card.tech::before { background:linear-gradient(90deg,#f43f5e,#e11d48); }
+        .partner-type-card.retail::before { background:linear-gradient(90deg,#6366f1,#4f46e5); }
+        .benefit-number { font-family:'Space Grotesk',sans-serif; font-size:3rem; font-weight:700; line-height:1; }
+        .step-connector { position:relative; }
+        .step-connector::after { content:''; position:absolute; top:28px; left:28px; width:calc(100% - 28px); height:2px; background:linear-gradient(90deg,rgba(245,158,11,0.4),rgba(16,185,129,0.4),rgba(6,182,212,0.4)); }
+        .step-connector:last-child::after { display:none; }
+        .faq-item { cursor:pointer; }
+        .faq-answer { max-height:0; overflow:hidden; transition:max-height 0.4s ease, padding 0.4s ease; }
+        .faq-item.open .faq-answer { max-height:300px; padding-top:12px; }
+        .faq-item.open .faq-chevron { transform:rotate(180deg); }
+        .faq-chevron { transition:transform 0.3s; }
+        .perk-badge { display:inline-flex; align-items:center; padding:4px 12px; border-radius:9999px; font-size:0.75rem; font-weight:600; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:var(--hela-amber); }
+        *,*::before,*::after { transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform; transition-timing-function:cubic-bezier(0.4,0,0.2,1); transition-duration:0.3s; }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+                <a href="partner program.html" class="px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/30 transition-all text-sm font-medium text-amber-400">Partner Program</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <a href="partner program.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-400">Partner Program</a>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="min-h-[75vh] relative flex items-center pt-24 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius:9999px">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">Partner Program</span>
+                </div>
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-theme-primary">Grow Together,<br><span class="gradient-text-hela">Scale Together</span></h1>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-lg leading-relaxed">Join a network of organizations accelerating financial inclusion across Africa. Whether you're a bank, telecom, NGO, or tech company—there's a partnership model built for your impact goals.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#apply" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Apply to Partner</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="#types" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-white/10 transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span>Explore Tiers</span>
+                    </a>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="liquid-glass p-6 animate-float relative overflow-hidden" style="padding:24px">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400"></div>
+                    <div class="flex items-center justify-between mb-6 relative z-20">
+                        <span class="text-xs text-theme-muted font-mono tracking-wider">PARTNER IMPACT</span>
+                        <span class="text-xs text-emerald-400">Live Data</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4 relative z-20">
+                        <div class="liquid-glass-dark p-4 text-center">
+                            <div class="text-3xl font-bold font-display text-amber-400">120+</div>
+                            <div class="text-xs text-theme-muted">Active Partners</div>
+                        </div>
+                        <div class="liquid-glass-dark p-4 text-center">
+                            <div class="text-3xl font-bold font-display text-emerald-400">15M+</div>
+                            <div class="text-xs text-theme-muted">Users via Partners</div>
+                        </div>
+                        <div class="liquid-glass-dark p-4 text-center">
+                            <div class="text-3xl font-bold font-display text-cyan-400">KES 890M</div>
+                            <div class="text-xs text-theme-muted">Revenue Shared</div>
+                        </div>
+                        <div class="liquid-glass-dark p-4 text-center">
+                            <div class="text-3xl font-bold font-display text-purple-400">23</div>
+                            <div class="text-xs text-theme-muted">Countries Reached</div>
+                        </div>
+                    </div>
+                    <div class="liquid-glass-dark p-4 relative z-20 border-l-4 border-emerald-400">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-emerald-400 font-semibold">LATEST PARTNER ONBOARD</span>
+                            <span class="text-xs text-theme-muted">2 hours ago</span>
+                        </div>
+                        <p class="text-sm text-theme-secondary">Equity Bank Kenya — Integrated Helacore AI scoring into their SME lending pipeline. Expected to serve 50,000+ businesses in Q1 2025.</p>
+                    </div>
+                </div>
+                <div class="absolute -bottom-6 -left-8 liquid-glass p-4 animate-float-reverse" style="border-radius:var(--liquid-radius-xl)">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <div><p class="text-2xl font-bold font-display text-theme-primary">120+</p><p class="text-xs text-theme-muted">Partner Organizations</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Partner -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Why Partner with <span class="gradient-text-hela">Helacore</span></h2>
+                <p class="text-lg text-theme-secondary max-w-3xl mx-auto">Our partners aren't just logos on a page. They're deeply integrated collaborators who share revenue, expand reach, and drive measurable impact.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="liquid-glass p-6 reveal text-center">
+                    <div class="benefit-number gradient-text-hela mb-3">30-40%</div>
+                    <p class="text-theme-secondary text-sm">Revenue share on every user you bring to Helacore</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-100 text-center">
+                    <div class="benefit-number gradient-text-hela mb-3">3x</div>
+                    <p class="text-theme-secondary text-sm">Faster user activation with co-branded onboarding flows</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-200 text-center">
+                    <div class="benefit-number gradient-text-hela mb-3">White-label</div>
+                    <p class="text-theme-secondary text-sm">Offer Helacore features under your own brand</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-300 text-center">
+                    <div class="benefit-number gradient-text-hela mb-3">Dedicated</div>
+                    <p class="text-theme-secondary text-sm">Partner success manager and priority engineering support</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partner Types -->
+    <section id="types" class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Partnership <span class="gradient-text-hela">Tiers</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">Tailored models for every organization type. Choose the partnership that aligns with your mission and business model.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="partner-type-card fintech liquid-glass p-8 reveal">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">Financial Institutions</h3>
+                    <p class="text-theme-secondary text-sm mb-5">Banks, MFIs, SACCOs, and fintechs integrating AI scoring into lending and credit products.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>AI credit scoring API</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Alternative data for underbanked</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Revenue share on loan originations</span></div>
+                    </div>
+                </div>
+                <div class="partner-type-card telco liquid-glass p-8 reveal delay-100">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">Telecom Operators</h3>
+                    <p class="text-theme-secondary text-sm mb-5">Mobile network operators embedding business intelligence into USSD, app bundles, and value-added services.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>USSD integration (zero-data users)</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Bundled subscription offering</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Airtime-to-insights conversion</span></div>
+                    </div>
+                </div>
+                <div class="partner-type-card institution liquid-glass p-8 reveal delay-200">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">Institutions & Governments</h3>
+                    <p class="text-theme-secondary text-sm mb-5">Universities, government agencies, and development organizations deploying Helacore at scale.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>White-label campus deployment</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Programmatic access for research</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Economic impact measurement</span></div>
+                    </div>
+                </div>
+                <div class="partner-type-card ngo liquid-glass p-8 reveal">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">NGOs & Development Partners</h3>
+                    <p class="text-theme-secondary text-sm mb-5">Impact organizations distributing Helacore to beneficiary communities through funded programs.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Subsidized access grants</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Impact reporting dashboards</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Bulk enrollment tools</span></div>
+                    </div>
+                </div>
+                <div class="partner-type-card tech liquid-glass p-8 reveal delay-100">
+                    <div class="w-14 h-14 rounded-2xl bg-rose-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">Technology Companies</h3>
+                    <p class="text-theme-secondary text-sm mb-5">SaaS platforms, POS providers, and fintech apps embedding Helacore intelligence into their products.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>API-first integration</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Embedded analytics widgets</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Co-marketing opportunities</span></div>
+                    </div>
+                </div>
+                <div class="partner-type-card retail liquid-glass p-8 reveal delay-200">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 flex items-center justify-center mb-5">
+                        <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4 8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2m-4 0h4m-4 0a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold mb-2 text-theme-primary">Retail & Supply Chain</h3>
+                    <p class="text-theme-secondary text-sm mb-5">Supplier networks, distributors, and retail chains using Helacore for demand forecasting and supply optimization.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Demand forecasting integration</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Supply chain visibility</span></div>
+                        <div class="flex items-center gap-2 text-sm text-theme-secondary"><svg class="w-4 h-4 text-indigo-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span>Marketplace connector access</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">How It <span class="gradient-text-hela">Works</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">From application to impact in four straightforward steps.</p>
+            </div>
+            <div class="reveal">
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="step-connector">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-4">
+                            <span class="font-display font-bold text-amber-400 text-xl">1</span>
+                        </div>
+                        <h4 class="font-display font-semibold text-theme-primary mb-2">Apply</h4>
+                        <p class="text-theme-secondary text-sm">Submit your partnership application with details about your organization, goals, and expected scale.</p>
+                    </div>
+                    <div class="step-connector">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center mb-4">
+                            <span class="font-display font-bold text-emerald-400 text-xl">2</span>
+                        </div>
+                        <h4 class="font-display font-semibold text-theme-primary mb-2">Design</h4>
+                        <p class="text-theme-secondary text-sm">Work with our team to design the integration model, revenue structure, and co-branding approach.</p>
+                    </div>
+                    <div class="step-connector">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mb-4">
+                            <span class="font-display font-bold text-cyan-400 text-xl">3</span>
+                        </div>
+                        <h4 class="font-display font-semibold text-theme-primary mb-2">Integrate</h4>
+                        <p class="text-theme-secondary text-sm">Deploy using our APIs, SDKs, or white-label tools. Full engineering support included.</p>
+                    </div>
+                    <div class="step-connector">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-violet-500/20 flex items-center justify-center mb-4">
+                            <span class="font-display font-bold text-purple-400 text-xl">4</span>
+                        </div>
+                        <h4 class="font-display font-semibold text-theme-primary mb-2">Grow</h4>
+                        <p class="text-theme-secondary text-sm">Launch, measure impact, optimize, and scale. Quarterly business reviews with your dedicated success manager.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Perks & Benefits Detail -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Partner <span class="gradient-text-hela">Perks</span></h2>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="liquid-glass p-6 reveal">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Revenue</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Revenue Sharing</h4>
+                    <p class="text-theme-secondary text-sm">Earn 30-40% of subscription revenue from every user you refer to Helacore, tracked automatically through your unique partner link or API key.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Branding</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Co-Branded Experience</h4>
+                    <p class="text-theme-secondary text-sm">Custom landing pages, onboarding flows, and dashboards featuring both your brand and Helacore's intelligence.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">White-Label</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">White-Label Solution</h4>
+                    <p class="text-theme-secondary text-sm">For enterprise partners: embed Helacore entirely under your brand with custom domain, logo, and feature configuration.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Data</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Shared Insights</h4>
+                    <p class="text-theme-secondary text-sm">Access aggregated, anonymized insights about your user base—adoption patterns, popular features, and engagement metrics.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Support</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Dedicated Support</h4>
+                    <p class="text-theme-secondary text-sm">Priority engineering support with guaranteed SLA, a named partner success manager, and quarterly business reviews.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-300">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Marketing</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Co-Marketing</h4>
+                    <p class="text-theme-secondary text-sm">Joint case studies, conference speaking slots, co-branded content, and access to Helacore's media network.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Access</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Early Access</h4>
+                    <p class="text-secondary text-sm">Get early access to new features, beta programs, and product roadmap influence before general availability.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-100">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Training</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Training & Certification</h4>
+                    <p class="text-secondary text-sm">Free partner certification program, technical workshops, and sales enablement materials for your team.</p>
+                </div>
+                <div class="liquid-glass p-6 reveal delay-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="perk-badge">Events</span>
+                    </div>
+                    <h4 class="font-display text-lg font-semibold text-theme-primary mb-2">Partner Events</h4>
+                    <p class="text-secondary text-sm">Invitations to annual partner summit, exclusive networking events, and executive roundtables with Helacore leadership.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Current Partners -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Trusted by Leading <span class="gradient-text-hela">Organizations</span></h2>
+                <p class="text-lg text-theme-secondary max-w-2xl mx-auto">From global banks to local SACCOs, our partners represent the full spectrum of Africa's financial and technology ecosystem.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 reveal">
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">Safaricom</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">Equity Bank</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">KCB Group</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">NCBA Bank</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">Airtel Money</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">World Bank</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">USAID</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">UNDP</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">M-Pesa</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">AFCFTA</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">KCB M-Pesa</span></div>
+                <div class="liquid-glass-dark p-5 flex items-center justify-center h-20"><span class="text-sm font-semibold text-theme-secondary">Mastercard</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="liquid-glass p-8 md:p-12 reveal">
+                <svg class="w-12 h-12 text-amber-400 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                <p class="text-xl md:text-2xl text-theme-primary leading-relaxed font-medium italic text-center mb-8">"Partnering with Helacore transformed our SME lending division. Within 6 months, loan default rates dropped by 28% for customers using Helacore scoring, and we expanded our SME portfolio by 40%. The revenue sharing model has also created a meaningful new income stream for us."</p>
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center text-white font-bold text-lg font-display">GM</div>
+                    <div class="text-left">
+                        <p class="font-semibold text-theme-primary">Grace Mwangi</p>
+                        <p class="text-sm text-theme-muted">Head of Digital Partnerships, Equity Bank Kenya</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-24 px-4 md:px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12 reveal">
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Common <span class="gradient-text-hela">Questions</span></h2>
+            </div>
+            <div class="space-y-4 reveal">
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">What does it cost to become a partner?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>Nothing upfront. Helacore partnerships are free to join. We earn when you earn. You receive a percentage of revenue generated from users you bring to the platform—there is no cost or risk to you at any point.</p>
+                    </div>
+                </div>
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">How is revenue sharing calculated?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>When a user signs up through your partner link or API key and subscribes to a paid plan, you receive 30-40% of that subscription revenue (tier depends on volume and integration depth). Payments are made monthly via bank transfer or M-Pesa with full transparency through your partner dashboard.</p>
+                    </div>
+                </div>
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">How long does onboarding take?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>Simple referral partnerships can be live in 48 hours. API integrations typically take 2-4 weeks. White-label deployments take 4-8 weeks depending on customization requirements. Every partner gets a dedicated integration engineer throughout.</p>
+                    </div>
+                </div>
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">Can we white-label Helacore?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>Yes, white-label is available to Enterprise-tier partners. You can deploy Helacore under your own brand, custom domain, and feature set. We handle all infrastructure, updates, and maintenance while your users see only your brand. Additional customization fees may apply depending on scope.</p>
+                    </div>
+                </div>
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">Do you partner with organizations outside Kenya?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>Yes. We are actively expanding across East Africa (Tanzania, Uganda, Rwanda) and have pilot partnerships in Nigeria, Ghana, and South Africa. If your organization operates in any African market, we want to talk.</p>
+                    </div>
+                </div>
+                <div class="faq-item liquid-glass-dark p-6">
+                    <div class="flex items-center justify-between" onclick="toggleFaq(this)">
+                        <h4 class="font-semibold text-theme-primary pr-4">What's the minimum user volume?</h4>
+                        <svg class="faq-chevron w-5 h-5 text-theme-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                    <div class="faq-answer text-theme-secondary text-sm">
+                        <p>There is no minimum volume for referral partnerships. For API and white-label integrations, we recommend a pilot of at least 100 users to validate the model before scaling. Revenue share percentages increase at higher volume tiers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Application CTA -->
+    <section id="apply" class="py-24 px-4 md:px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="liquid-glass p-8 md:p-12 reveal" style="background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(16,185,129,0.08));border:1px solid rgba(245,158,11,0.2);">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-3xl md:text-4xl font-bold mb-4 text-theme-primary">Apply to Become a Partner</h2>
+                    <p class="text-theme-secondary">Tell us about your organization and we'll get back within 48 hours with a tailored partnership proposal.</p>
+                </div>
+                <form class="space-y-5" onsubmit="event.preventDefault(); handlePartnerSubmit();">
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Organization Name</label>
+                            <input type="text" class="form-input-liquid" placeholder="Your organization" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Partner Type</label>
+                            <select class="form-input-liquid" required>
+                                <option>Select partner type...</option>
+                                <option>Financial Institution</option>
+                                <option>Telecom Operator</option>
+                                <option>University / Institution</option>
+                                <option>NGO / Development</option>
+                                <option>Technology Company</option>
+                                <option>Retail / Supply Chain</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Your Name</label>
+                            <input type="text" class="form-input-liquid" placeholder="Full name" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Work Email</label>
+                            <input type="email" class="form-input-liquid" placeholder="you@organization.com" required>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Country</label>
+                            <select class="form-input-liquid" required>
+                                <option>Select country...</option>
+                                <option>Kenya</option>
+                                <option>Tanzania</option>
+                                <option>Uganda</option>
+                                <option>Rwanda</option>
+                                <option>Nigeria</option>
+                                <option>Ghana</option>
+                                <option>South Africa</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-theme-primary">Expected User Volume</label>
+                            <select class="form-input-liquid" required>
+                                <option>Select range...</option>
+                                <option>Under 100</option>
+                                <option>100 - 1,000</option>
+                                <option>1,000 - 10,000</option>
+                                <option>10,000 - 100,000</option>
+                                <option>100,000+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-theme-primary">Tell us about your partnership goals</label>
+                        <textarea rows="4" class="form-input-liquid" placeholder="What are you hoping to achieve through a Helacore partnership?"></textarea>
+                    </div>
+                    <button type="submit" class="w-full btn-liquid py-4 text-lg" id="partner-submit-btn">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+   <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // THEME MANAGEMENT
+        (function(){
+            const themeToggle=document.getElementById('theme-toggle');
+            const html=document.documentElement;
+            const savedTheme=localStorage.getItem('helacore-theme');
+            const systemPrefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if(savedTheme){html.setAttribute('data-theme',savedTheme);}
+            else if(systemPrefersDark){html.setAttribute('data-theme','dark');}
+            else{html.setAttribute('data-theme','dark');}
+            function toggleTheme(){
+                const currentTheme=html.getAttribute('data-theme');
+                const newTheme=currentTheme==='light'?'dark':'light';
+                html.setAttribute('data-theme',newTheme);
+                localStorage.setItem('helacore-theme',newTheme);
+                updateParticleColors(newTheme);
+            }
+            if(themeToggle){themeToggle.addEventListener('click',toggleTheme);}
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',(e)=>{
+                if(!localStorage.getItem('helacore-theme')){
+                    html.setAttribute('data-theme',e.matches?'dark':'light');
+                    updateParticleColors(e.matches?'dark':'light');
+                }
+            });
+        })();
+
+        // THREE.JS BACKGROUND
+        const canvas=document.getElementById('bg-canvas');
+        const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+        camera.position.z=5;
+        const particlesGeometry=new THREE.BufferGeometry();
+        const particleCount=200;
+        const positions=new Float32Array(particleCount*3);
+        const colors=new Float32Array(particleCount*3);
+        let particlesMaterial,particles;
+        function initParticles(theme){
+            const isLight=theme==='light';
+            for(let i=0;i<particleCount*3;i+=3){
+                positions[i]=(Math.random()-0.5)*20;
+                positions[i+1]=(Math.random()-0.5)*20;
+                positions[i+2]=(Math.random()-0.5)*20;
+                if(isLight){const t=Math.random();colors[i]=0.85*(1-t)+0.02*t;colors[i+1]=0.47*(1-t)+0.60*t;colors[i+2]=0.02*(1-t)+0.40*t;}
+                else{const t=Math.random();colors[i]=0.96*(1-t)+0.06*t;colors[i+1]=0.62*(1-t)+0.73*t;colors[i+2]=0.04*(1-t)+0.51*t;}
+            }
+            particlesGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+            particlesGeometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+            if(particlesMaterial){particlesMaterial.dispose();}
+            particlesMaterial=new THREE.PointsMaterial({size:isLight?0.04:0.05,vertexColors:true,transparent:true,opacity:isLight?0.4:0.6});
+            if(particles){scene.remove(particles);}
+            particles=new THREE.Points(particlesGeometry,particlesMaterial);
+            scene.add(particles);
+        }
+        function updateParticleColors(theme){initParticles(theme);}
+        initParticles(document.documentElement.getAttribute('data-theme')||'dark');
+        function animate(){requestAnimationFrame(animate);if(particles){particles.rotation.y+=0.0003;particles.rotation.x+=0.0001;}renderer.render(scene,camera);}
+        animate();
+        window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+
+        // MOBILE MENU
+        const mobileMenuBtn=document.getElementById('mobile-menu-btn');
+        const closeMenuBtn=document.getElementById('close-menu-btn');
+        const mobileMenu=document.getElementById('mobile-menu');
+        if(mobileMenuBtn){mobileMenuBtn.addEventListener('click',()=>{mobileMenu.classList.add('open');});}
+        if(closeMenuBtn){closeMenuBtn.addEventListener('click',()=>{mobileMenu.classList.remove('open');});}
+        document.querySelectorAll('.mobile-nav-link').forEach(link=>{link.addEventListener('click',()=>{mobileMenu.classList.remove('open');});});
+
+        // NAVBAR SCROLL
+        const navbar=document.getElementById('navbar');
+        window.addEventListener('scroll',()=>{
+            if(window.scrollY>50){navbar.classList.add('py-2');navbar.classList.remove('py-4');}
+            else{navbar.classList.add('py-4');navbar.classList.remove('py-2');}
+        });
+
+        // SCROLL REVEAL
+        function reveal(){
+            document.querySelectorAll('.reveal').forEach(el=>{
+                if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('active');}
+            });
+        }
+        window.addEventListener('scroll',reveal);
+        reveal();
+
+        // FAQ TOGGLE
+        function toggleFaq(header){
+            const item=header.closest('.faq-item');
+            const answer=item.querySelector('.faq-answer');
+            item.classList.toggle('open');
+        }
+
+        // PARTNER FORM SUBMIT
+        function handlePartnerSubmit(){
+            const btn=document.getElementById('partner-submit-btn');
+            if(btn){
+                const originalText=btn.textContent;
+                btn.innerHTML='<svg class="inline-block animate-spin mr-2 w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 0 0 8h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></svg></svg>Submitting...';
+                btn.disabled=true;
+                setTimeout(()=>{
+                    btn.innerHTML='<svg class="inline-block mr-2 w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5-6 6"/></svg>Application Submitted';
+                    btn.style.background='linear-gradient(135deg,#059669,#10b981)';
+                    btn.disabled=false;
+                    setTimeout(()=>{
+                        btn.textContent=originalText;
+                        btn.style.background='';
+                        alert('Thank you for your partnership interest! Our partnerships team will review your application and respond within 48 hours.');
+                    },3000);
+                },2000);
+            }
+        }
+    </script>
+</body>
+</html>

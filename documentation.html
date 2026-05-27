@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Helacore AI-Powered Business Guidance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --chart-grid: rgba(255,255,255,0.05); --chart-line: rgba(245,158,11,0.6); --chart-fill: rgba(245,158,11,0.1);
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+            --code-bg: rgba(0,0,0,0.4); --code-border: rgba(255,255,255,0.1);
+            --doc-sidebar-bg: rgba(10,10,15,0.8); --doc-sidebar-border: rgba(255,255,255,0.08);
+            --doc-active-bg: rgba(245,158,11,0.15); --doc-active-border: rgba(245,158,11,0.3);
+        }
+        [data-theme="light"] {
+            --bg-primary: #fafaf9; --bg-secondary: #f5f5f4; --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e; --text-inverse: #ffffff;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-hover: rgba(255,255,255,0.85);
+            --glass-border: rgba(0,0,0,0.08); --glass-border-hover: rgba(0,0,0,0.15);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine: rgba(255,255,255,0.5);
+            --dark-glass-bg: rgba(255,255,255,0.5); --dark-glass-border: rgba(0,0,0,0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --input-bg: rgba(255,255,255,0.8); --input-border: rgba(0,0,0,0.12);
+            --input-focus-border: rgba(245,158,11,0.6); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.15);
+            --input-text: #1c1917; --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0,0,0,0.08); --border-footer: rgba(0,0,0,0.08);
+            --footer-bg: rgba(245,245,244,0.8); --scrollbar-track: #f5f5f4; --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --chart-grid: rgba(0,0,0,0.06); --chart-line: rgba(217,119,6,0.7); --chart-fill: rgba(217,119,6,0.08);
+            --mobile-menu-bg: rgba(250,250,249,0.98);
+            --social-bg: rgba(0,0,0,0.05); --social-bg-hover: rgba(0,0,0,0.08);
+            --social-icon: #78716c; --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0,0,0,0.06); --stats-bg: rgba(255,255,255,0.6);
+            --tag-bg: rgba(0,0,0,0.06);
+            --code-bg: rgba(0,0,0,0.05); --code-border: rgba(0,0,0,0.12);
+            --doc-sidebar-bg: rgba(255,255,255,0.7); --doc-sidebar-border: rgba(0,0,0,0.08);
+            --doc-active-bg: rgba(217,119,6,0.12); --doc-active-border: rgba(217,119,6,0.3);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        [data-theme="light"] .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); }
+        .btn-liquid { position:relative; overflow:hidden; border-radius:9999px; padding:12px 28px; font-weight:600; background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); transition:all 0.3s ease; box-shadow:0 4px 15px rgba(245,158,11,0.15); cursor:pointer; }
+        [data-theme="light"] .btn-liquid { border:1px solid rgba(217,119,6,0.4); box-shadow:0 4px 15px rgba(217,119,6,0.12); }
+        .btn-liquid:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.3); background:var(--btn-gradient-hover); }
+        [data-theme="light"] .btn-liquid:hover { box-shadow:0 8px 25px rgba(217,119,6,0.2); }
+        .theme-toggle { position:relative; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(10px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; color:var(--text-primary); }
+        .theme-toggle:hover { background:var(--glass-bg-hover); transform:scale(1.05); }
+        .theme-toggle svg { width:20px; height:20px; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform:rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display:none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display:none; }
+        [data-theme="dark"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .moon-icon { display:block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        .animate-float { animation:float 6s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s infinite; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-100 { transition-delay:100ms; } .delay-200 { transition-delay:200ms; } .delay-300 { transition-delay:300ms; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--scrollbar-track); } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+        .mobile-menu { transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform:translateX(0); }
+        .text-theme-primary { color:var(--text-primary); } .text-theme-secondary { color:var(--text-secondary); } .text-theme-muted { color:var(--text-muted); }
+        .bg-theme-primary { background:var(--bg-primary); } .border-theme-subtle { border-color:var(--border-subtle); }
+        #bg-canvas { opacity:var(--canvas-opacity); transition:opacity 0.5s ease; }
+        
+        /* Documentation Styles */
+        .doc-sidebar { position:fixed; left:0; top:80px; bottom:0; width:280px; background:var(--doc-sidebar-bg); backdrop-filter:blur(20px); border-right:1px solid var(--doc-sidebar-border); overflow-y:auto; z-index:40; transition:transform 0.3s ease; }
+        .doc-sidebar::-webkit-scrollbar { width:4px; }
+        .doc-sidebar::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:2px; }
+        .doc-nav-item { display:block; padding:10px 20px; color:var(--text-secondary); font-size:0.875rem; transition:all 0.2s ease; border-left:3px solid transparent; text-decoration:none; }
+        .doc-nav-item:hover { color:var(--text-primary); background:rgba(255,255,255,0.05); }
+        .doc-nav-item.active { color:var(--hela-amber); background:var(--doc-active-bg); border-left-color:var(--hela-amber); }
+        .doc-nav-category { padding:12px 20px 6px; font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+        .doc-content { margin-left:280px; padding:100px 40px 60px; max-width:900px; }
+        .doc-section { margin-bottom:60px; scroll-margin-top:100px; }
+        .doc-section h2 { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:700; margin-bottom:20px; color:var(--text-primary); display:flex; align-items:center; gap:12px; }
+        .doc-section h2 .section-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .doc-section h3 { font-family:'Space Grotesk',sans-serif; font-size:1.375rem; font-weight:600; margin:32px 0 16px; color:var(--text-primary); }
+        .doc-section h4 { font-size:1.125rem; font-weight:600; margin:24px 0 12px; color:var(--text-primary); }
+        .doc-section p { color:var(--text-secondary); line-height:1.75; margin-bottom:16px; }
+        .doc-section ul, .doc-section ol { color:var(--text-secondary); line-height:1.75; margin:16px 0; padding-left:24px; }
+        .doc-section li { margin-bottom:8px; }
+        .doc-section li::marker { color:var(--hela-amber); }
+        .doc-code { background:var(--code-bg); border:1px solid var(--code-border); border-radius:var(--liquid-radius-md); padding:20px; margin:16px 0; font-family:'Courier New',monospace; font-size:0.875rem; line-height:1.6; color:var(--text-secondary); overflow-x:auto; position:relative; }
+        .doc-code::before { content:'Code'; position:absolute; top:8px; right:12px; font-size:0.7rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+        .doc-code .keyword { color:var(--hela-amber); }
+        .doc-code .string { color:var(--hela-emerald); }
+        .doc-code .comment { color:var(--text-muted); font-style:italic; }
+        .doc-code .function { color:var(--hela-cyan); }
+        .doc-callout { padding:20px; border-radius:var(--liquid-radius-md); margin:20px 0; display:flex; gap:16px; }
+        .doc-callout.info { background:rgba(6,182,212,0.1); border-left:4px solid var(--hela-cyan); }
+        .doc-callout.warning { background:rgba(245,158,11,0.1); border-left:4px solid var(--hela-amber); }
+        .doc-callout.success { background:rgba(16,185,129,0.1); border-left:4px solid var(--hela-emerald); }
+        .doc-callout-icon { flex-shrink:0; width:24px; height:24px; }
+        .doc-table { width:100%; border-collapse:collapse; margin:16px 0; }
+        .doc-table th { background:rgba(245,158,11,0.1); padding:12px 16px; text-align:left; font-weight:600; color:var(--text-primary); border-bottom:2px solid var(--glass-border); }
+        .doc-table td { padding:12px 16px; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary); }
+        .doc-table tr:hover td { background:rgba(255,255,255,0.03); }
+        .doc-badge { display:inline-flex; align-items:center; padding:4px 12px; border-radius:9999px; font-size:0.75rem; font-weight:600; }
+        .doc-badge.amber { background:rgba(245,158,11,0.15); color:var(--hela-amber); border:1px solid rgba(245,158,11,0.3); }
+        .doc-badge.emerald { background:rgba(16,185,129,0.15); color:var(--hela-emerald); border:1px solid rgba(16,185,129,0.3); }
+        .doc-badge.cyan { background:rgba(6,182,212,0.15); color:var(--hela-cyan); border:1px solid rgba(6,182,212,0.3); }
+        .doc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin:20px 0; }
+        .doc-card { padding:20px; border-radius:var(--liquid-radius-md); background:var(--glass-bg); border:1px solid var(--glass-border); }
+        .doc-card h4 { margin:0 0 8px; font-size:1rem; }
+        .doc-card p { margin:0; font-size:0.875rem; }
+        .doc-inline-code { background:var(--code-bg); border:1px solid var(--code-border); padding:2px 8px; border-radius:6px; font-family:'Courier New',monospace; font-size:0.85em; color:var(--hela-amber); }
+        .doc-link { color:var(--hela-amber); text-decoration:none; border-bottom:1px solid transparent; transition:border-color 0.2s; }
+        .doc-link:hover { border-bottom-color:var(--hela-amber); }
+        
+        @media (max-width:1024px) {
+            .doc-sidebar { transform:translateX(-100%); }
+            .doc-sidebar.open { transform:translateX(0); }
+            .doc-content { margin-left:0; padding:90px 20px 40px; }
+        }
+        
+        *,*::before,*::after { transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform; transition-timing-function:cubic-bezier(0.4,0,0.2,1); transition-duration:0.3s; }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+                <a href="documentation.html" class="px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/30 transition-all text-sm font-medium text-amber-400">Documentation</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="sign up.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI Intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <a href="documentation.html" class="mobile-nav-link px-4 py-3 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-400">Documentation</a>
+                <a href="sign up.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Documentation Sidebar -->
+    <aside id="doc-sidebar" class="doc-sidebar">
+        <div class="py-6">
+            <div class="doc-nav-category">Getting Started</div>
+            <a href="#introduction" class="doc-nav-item active">Introduction</a>
+            <a href="#quick-start" class="doc-nav-item">Quick Start</a>
+            <a href="#core-concepts" class="doc-nav-item">Core Concepts</a>
+            
+            <div class="doc-nav-category">Platform Features</div>
+            <a href="#financial-health" class="doc-nav-item">Financial Health Score</a>
+            <a href="#simulation-engine" class="doc-nav-item">What-If Simulation</a>
+            <a href="#capital-allocation" class="doc-nav-item">Smart Capital Allocation</a>
+            <a href="#voice-interface" class="doc-nav-item">Voice Interface</a>
+            <a href="#market-intelligence" class="doc-nav-item">Market Intelligence</a>
+            <a href="#marketplace" class="doc-nav-item">Marketplace Connector</a>
+            
+            <div class="doc-nav-category">Technical</div>
+            <a href="#api-reference" class="doc-nav-item">API Reference</a>
+            <a href="#data-models" class="doc-nav-item">Data Models</a>
+            <a href="#authentication" class="doc-nav-item">Authentication</a>
+            <a href="#webhooks" class="doc-nav-item">Webhooks</a>
+            
+            <div class="doc-nav-category">Integration</div>
+            <a href="#mobile-sdk" class="doc-nav-item">Mobile SDK</a>
+            <a href="#offline-mode" class="doc-nav-item">Offline Mode</a>
+            <a href="#third-party" class="doc-nav-item">Third-Party Integration</a>
+            
+            <div class="doc-nav-category">Resources</div>
+            <a href="#best-practices" class="doc-nav-item">Best Practices</a>
+            <a href="#troubleshooting" class="doc-nav-item">Troubleshooting</a>
+            <a href="#faq" class="doc-nav-item">FAQ</a>
+            <a href="#glossary" class="doc-nav-item">Glossary</a>
+        </div>
+    </aside>
+
+    <!-- Documentation Content -->
+    <main class="doc-content">
+        
+        <!-- Introduction -->
+        <section id="introduction" class="doc-section reveal active">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                Introduction
+            </h2>
+            <p>Welcome to the Helacore Documentation. This comprehensive guide will help you understand, integrate, and maximize the value of our AI-powered business guidance ecosystem.</p>
+            
+            <div class="doc-callout info">
+                <svg class="doc-callout-icon text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">What is Helacore?</strong>
+                    <p class="mt-1">Helacore is an AI-powered platform that bridges the critical gap in modern economies by embedding artificial intelligence into everyday business decisions. From street vendors to scaling startups, we provide personalized guidance that transforms uncertainty into profitable clarity.</p>
+                </div>
+            </div>
+            
+            <h3>Who is Helacore For?</h3>
+            <p>Our platform serves diverse business segments across emerging markets, with particular focus on African economies:</p>
+            
+            <div class="doc-grid">
+                <div class="doc-card">
+                    <h4 class="text-amber-400">SME Owners</h4>
+                    <p>Clothes sellers, kiosk operators, food vendors, and informal traders relying on daily cash flow decisions.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-emerald-400">Startup Founders</h4>
+                    <p>Entrepreneurs seeking structured guidance for scaling operations and managing burn rates.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-cyan-400">Loan Recipients</h4>
+                    <p>Individuals needing disciplined financial planning to ensure repayment while generating profit.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-purple-400">Farmers</h4>
+                    <p>Agricultural businesses navigating unpredictable weather and market fluctuations.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-rose-400">Rural Entrepreneurs</h4>
+                    <p>Business owners in areas with limited internet connectivity requiring offline capabilities.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-indigo-400">Expanding Businesses</h4>
+                    <p>Companies ready to scale their operations with optimized logistics and staffing.</p>
+                </div>
+            </div>
+            
+            <h3>Key Platform Metrics</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+                <div class="liquid-glass-dark p-4 text-center">
+                    <div class="text-3xl font-bold font-display text-amber-400 mb-1">2.4M+</div>
+                    <div class="text-xs text-theme-muted">Active Users</div>
+                </div>
+                <div class="liquid-glass-dark p-4 text-center">
+                    <div class="text-3xl font-bold font-display text-emerald-400 mb-1">94%</div>
+                    <div class="text-xs text-theme-muted">Accuracy Rate</div>
+                </div>
+                <div class="liquid-glass-dark p-4 text-center">
+                    <div class="text-3xl font-bold font-display text-cyan-400 mb-1">47</div>
+                    <div class="text-xs text-theme-muted">Counties Covered</div>
+                </div>
+                <div class="liquid-glass-dark p-4 text-center">
+                    <div class="text-3xl font-bold font-display text-purple-400 mb-1">34%</div>
+                    <div class="text-xs text-theme-muted">Avg Profit Increase</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quick-start" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </span>
+                Quick Start
+            </h2>
+            <p>Get up and running with Helacore in under 5 minutes with these simple steps.</p>
+            
+            <h3>Step 1: Create Your Account</h3>
+            <p>Visit <a href="sign up.html" class="doc-link">our signup page</a> and provide your basic business information.</p>
+            
+            <div class="doc-code">
+<span class="keyword">Required Information:</span>
+- Business name
+- Business type (Retail, Food, Service, etc.)
+- Your name and contact details
+- Location (county/region)
+- Initial capital range
+            </div>
+            
+            <h3>Step 2: Connect Your Data</h3>
+            <p>Helacore can integrate with various data sources to provide accurate insights:</p>
+            <ul>
+                <li><strong class="text-theme-primary">Manual Entry:</strong> Input daily sales, expenses, and inventory through our intuitive interface</li>
+                <li><strong class="text-theme-primary">M-Pesa Integration:</strong> Automatically sync mobile money transactions</li>
+                <li><strong class="text-theme-primary">Bank Statements:</strong> Upload CSV files from your bank</li>
+                <li><strong class="text-theme-primary">POS Systems:</strong> Connect compatible point-of-sale systems</li>
+            </ul>
+            
+            <h3>Step 3: Receive Your First Recommendation</h3>
+            <p>Within 24 hours of connecting data, Helacore's AI will provide your first personalized business recommendation.</p>
+            
+            <div class="doc-callout success">
+                <svg class="doc-callout-icon text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Pro Tip:</strong>
+                    <p class="mt-1">The more data you provide, the more accurate and personalized your recommendations become. Aim for at least 2 weeks of consistent data entry for optimal results.</p>
+                </div>
+            </div>
+            
+            <h3>Step 4: Take Action</h3>
+            <p>Review recommendations in your dashboard, use the What-If Simulator to test scenarios, and apply suggestions directly to your business operations.</p>
+        </section>
+
+        <!-- Core Concepts -->
+        <section id="core-concepts" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </span>
+                Core Concepts
+            </h2>
+            <p>Understanding these foundational concepts will help you leverage Helacore effectively.</p>
+            
+            <h3>The AI Decision Engine</h3>
+            <p>Helacore's intelligence operates through a four-stage process:</p>
+            
+            <div class="space-y-4 my-6">
+                <div class="liquid-glass-dark p-6 border-l-4 border-amber-400">
+                    <h4 class="text-amber-400 mb-2">1. Data Collection</h4>
+                    <p class="text-sm">Continuous interpretation of your inputs—sales, expenses, inventory levels, loan obligations, and local market conditions.</p>
+                </div>
+                <div class="liquid-glass-dark p-6 border-l-4 border-emerald-400">
+                    <h4 class="text-emerald-400 mb-2">2. Context Analysis</h4>
+                    <p class="text-sm">Predictive analytics, behavioral modeling, and localized data integration to understand your unique business context.</p>
+                </div>
+                <div class="liquid-glass-dark p-6 border-l-4 border-cyan-400">
+                    <h4 class="text-cyan-400 mb-2">3. Personalized Guidance</h4>
+                    <p class="text-sm">Hyper-personalized recommendations that directly influence profitability, sustainability, and growth.</p>
+                </div>
+                <div class="liquid-glass-dark p-6 border-l-4 border-purple-400">
+                    <h4 class="text-purple-400 mb-2">4. Adaptive Learning</h4>
+                    <p class="text-sm">Continuous improvement based on outcomes. Successful strategies are reinforced; unsuccessful ones trigger recalibration.</p>
+                </div>
+            </div>
+            
+            <h3>Privacy-Preserving Intelligence</h3>
+            <p>Helacore uses anonymized data aggregation for market insights while keeping your individual business data completely private. Our collective intelligence network identifies trends without exposing any single business's information.</p>
+            
+            <div class="doc-callout warning">
+                <svg class="doc-callout-icon text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Important:</strong>
+                    <p class="mt-1">Your business data is never shared with third parties or other users. Market intelligence is derived from aggregated, anonymized patterns only.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Health Score -->
+        <section id="financial-health" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </span>
+                Financial Health Score
+            </h2>
+            <p>The Financial Health Score is a dynamic metric (0-100) that continuously evaluates your business stability, risk exposure, and growth trajectory.</p>
+            
+            <h3>Score Components</h3>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Weight</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong class="text-theme-primary">Cash Flow Stability</strong></td>
+                        <td><span class="doc-badge amber">30%</span></td>
+                        <td>Consistency and predictability of cash inflows and outflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Profitability Margin</strong></td>
+                        <td><span class="doc-badge emerald">25%</span></td>
+                        <td>Net profit as percentage of revenue</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Debt Management</strong></td>
+                        <td><span class="doc-badge cyan">20%</span></td>
+                        <td>Loan repayment consistency and debt-to-income ratio</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Inventory Efficiency</strong></td>
+                        <td><span class="doc-badge amber">15%</span></td>
+                        <td>Turnover rate and waste minimization</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Growth Trajectory</strong></td>
+                        <td><span class="doc-badge emerald">10%</span></td>
+                        <td>Revenue trend and expansion potential</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Score Interpretation</h3>
+            <div class="doc-grid">
+                <div class="doc-card border-l-4 border-emerald-400">
+                    <h4 class="text-emerald-400">80-100: Excellent</h4>
+                    <p>Strong financial foundation with sustainable growth patterns.</p>
+                </div>
+                <div class="doc-card border-l-4 border-amber-400">
+                    <h4 class="text-amber-400">60-79: Good</h4>
+                    <p>Stable operations with room for optimization.</p>
+                </div>
+                <div class="doc-card border-l-4 border-orange-400">
+                    <h4 class="text-orange-400">40-59: Fair</h4>
+                    <p>Operational but vulnerable to market fluctuations.</p>
+                </div>
+                <div class="doc-card border-l-4 border-red-400">
+                    <h4 class="text-red-400">0-39: At Risk</h4>
+                    <p>Immediate intervention recommended to prevent business failure.</p>
+                </div>
+            </div>
+            
+            <div class="doc-callout info">
+                <svg class="doc-callout-icon text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Score Updates:</strong>
+                    <p class="mt-1">Your Financial Health Score updates daily at midnight based on the previous day's data. Significant changes trigger immediate notifications.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What-If Simulation Engine -->
+        <section id="simulation-engine" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </span>
+                What-If Simulation Engine
+            </h2>
+            <p>Test business decisions before implementing them. Simulate various scenarios to minimize risk and maximize confidence in your choices.</p>
+            
+            <h3>Available Simulations</h3>
+            <ul>
+                <li><strong class="text-theme-primary">Price Changes:</strong> Model the impact of increasing or decreasing prices on revenue, customer demand, and profit margins</li>
+                <li><strong class="text-theme-primary">Loan Impact:</strong> Understand how taking a loan affects cash flow, repayment schedules, and overall financial health</li>
+                <li><strong class="text-theme-primary">Inventory Expansion:</strong> Project the effects of adding new product lines or increasing stock levels</li>
+                <li><strong class="text-theme-primary">Staffing Changes:</strong> Evaluate the financial impact of hiring employees or adjusting work hours</li>
+                <li><strong class="text-theme-primary">Location Moves:</strong> Analyze potential revenue and cost changes from relocating your business</li>
+            </ul>
+            
+            <h3>Using the Simulator</h3>
+            <div class="doc-code">
+<span class="comment">// Example: Simulating a 10% price increase</span>
+<span class="keyword">const</span> simulation = {
+  <span class="string">type</span>: <span class="string">"price_change"</span>,
+  <span class="string">parameters</span>: {
+    <span class="string">change_percentage</span>: <span class="function">10</span>,
+    <span class="string">affected_products</span>: [<span class="string">"maize_flour"</span>, <span class="string">"cooking_oil"</span>],
+    <span class="string">duration_days</span>: <span class="function">30</span>
+  }
+};
+
+<span class="comment">// Response includes predicted outcomes</span>
+<span class="keyword">const</span> result = <span class="keyword">await</span> helacore.<span class="function">simulate</span>(simulation);
+<span class="comment">// Result: +15% profit, -5% customer volume, net positive</span>
+            </div>
+            
+            <div class="doc-callout success">
+                <svg class="doc-callout-icon text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Accuracy Rate:</strong>
+                    <p class="mt-1">Our simulations achieve 94% accuracy when compared to actual outcomes after implementation. The system continuously improves based on real-world results.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Capital Allocation -->
+        <section id="capital-allocation" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                </span>
+                Smart Capital Allocation
+            </h2>
+            <p>AI-guided distribution of funds across inventory, savings, loan repayment, and reinvestment to ensure optimal use of limited resources.</p>
+            
+            <h3>Allocation Categories</h3>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Purpose</th>
+                        <th>AI Optimization Goal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong class="text-theme-primary">Inventory</strong></td>
+                        <td>Purchasing stock for resale</td>
+                        <td>Maximize turnover, minimize waste</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Savings</strong></td>
+                        <td>Building emergency fund</td>
+                        <td>3-6 month operational buffer</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Loan Repayment</strong></td>
+                        <td>Service existing debts</td>
+                        <td>Minimize interest, maintain credit score</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Reinvestment</strong></td>
+                        <td>Business growth initiatives</td>
+                        <td>Highest ROI opportunities</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Personal</strong></td>
+                        <td>Owner's living expenses</td>
+                        <td>Sustainable withdrawal rate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Voice Interface -->
+        <section id="voice-interface" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                </span>
+                Multilingual Voice Interface
+            </h2>
+            <p>Communicate with Helacore in English or Swahili through natural, conversational interfaces. No technical literacy required.</p>
+            
+            <h3>Supported Languages</h3>
+            <div class="flex gap-4 my-6">
+                <div class="liquid-glass-dark px-6 py-3 flex items-center gap-3">
+                    <span class="text-2xl">🇬🇧</span>
+                    <div>
+                        <div class="font-semibold text-theme-primary">English</div>
+                        <div class="text-xs text-theme-muted">Full support</div>
+                    </div>
+                </div>
+                <div class="liquid-glass-dark px-6 py-3 flex items-center gap-3">
+                    <span class="text-2xl">🇰🇪</span>
+                    <div>
+                        <div class="font-semibold text-theme-primary">Swahili</div>
+                        <div class="text-xs text-theme-muted">Full support</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Example Interactions</h3>
+            <div class="doc-grid">
+                <div class="doc-card">
+                    <h4 class="text-amber-400 text-sm mb-2">User (Swahili):</h4>
+                    <p class="italic text-theme-secondary">"Nina pesa ya elfu tano, nini nifanye?"</p>
+                    <p class="text-xs text-theme-muted mt-2">Translation: "I have five thousand shillings, what should I do?"</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-emerald-400 text-sm mb-2">Helacore Response:</h4>
+                    <p class="text-theme-secondary">"Kulingana na biashara yako, pendekeza: Sh 2000 kwa bei ya chini ya unga, Sh 1500 akiba, na Sh 1500 kwa malipo ya mkopo."</p>
+                    <p class="text-xs text-theme-muted mt-2">Translation: "Based on your business, I suggest: Sh 2000 for flour at low price, Sh 1500 for savings, and Sh 1500 for loan payment."</p>
+                </div>
+            </div>
+            
+            <div class="doc-callout info">
+                <svg class="doc-callout-icon text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Accessibility Focus:</strong>
+                    <p class="mt-1">The voice interface is designed for users with limited technical literacy. Simply speak naturally—no special commands or syntax required.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Intelligence -->
+        <section id="market-intelligence" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-rose-500/20 to-red-500/20">
+                    <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                Market Intelligence Network
+            </h2>
+            <p>Benefit from collective intelligence through anonymized data aggregation. Identify emerging trends, regional patterns, and seasonal fluctuations that affect your business.</p>
+            
+            <h3>Intelligence Types</h3>
+            <ul>
+                <li><strong class="text-theme-primary">Trend Identification:</strong> Early detection of market shifts before they become obvious</li>
+                <li><strong class="text-theme-primary">Regional Insights:</strong> Location-specific patterns that affect pricing and demand</li>
+                <li><strong class="text-theme-primary">Seasonal Fluctuations:</strong> Predictable patterns tied to holidays, weather, and events</li>
+                <li><strong class="text-theme-primary">Competitor Analysis:</strong> Anonymized benchmarking against similar businesses</li>
+            </ul>
+            
+            <div class="doc-callout warning">
+                <svg class="doc-callout-icon text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Privacy First:</strong>
+                    <p class="mt-1">All market intelligence is derived from aggregated, anonymized data. No individual business information is ever exposed or shared.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marketplace Connector -->
+        <section id="marketplace" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-indigo-500/20 to-violet-500/20">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </span>
+                Marketplace Connector
+            </h2>
+            <p>Connect directly with suppliers, customers, and financial institutions within the Helacore ecosystem.</p>
+            
+            <h3>Marketplace Features</h3>
+            <div class="doc-grid">
+                <div class="doc-card">
+                    <h4 class="text-amber-400">Supplier Network</h4>
+                    <p>Access verified suppliers with competitive pricing and reliable delivery.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-emerald-400">Credit Access</h4>
+                    <p>Connect with financial institutions offering favorable terms based on your Helacore score.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-cyan-400">Customer Outreach</h4>
+                    <p>Reach new customers in your area through our targeted marketplace.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Reference -->
+        <section id="api-reference" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                </span>
+                API Reference
+            </h2>
+            <p>Integrate Helacore's intelligence into your own applications using our RESTful API.</p>
+            
+            <h3>Base URL</h3>
+            <div class="doc-code">
+https://api.helacore.ai/v1
+            </div>
+            
+            <h3>Authentication</h3>
+            <p>All API requests require an API key passed in the Authorization header:</p>
+            <div class="doc-code">
+Authorization: Bearer YOUR_API_KEY
+            </div>
+            
+            <h3>Core Endpoints</h3>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="doc-inline-code">/health-score</code></td>
+                        <td><span class="doc-badge emerald">GET</span></td>
+                        <td>Retrieve current financial health score</td>
+                    </tr>
+                    <tr>
+                        <td><code class="doc-inline-code">/recommendations</code></td>
+                        <td><span class="doc-badge cyan">GET</span></td>
+                        <td>Get personalized recommendations</td>
+                    </tr>
+                    <tr>
+                        <td><code class="doc-inline-code">/simulate</code></td>
+                        <td><span class="doc-badge amber">POST</span></td>
+                        <td>Run what-if simulation</td>
+                    </tr>
+                    <tr>
+                        <td><code class="doc-inline-code">/transactions</code></td>
+                        <td><span class="doc-badge emerald">POST</span></td>
+                        <td>Record business transaction</td>
+                    </tr>
+                    <tr>
+                        <td><code class="doc-inline-code">/market-insights</code></td>
+                        <td><span class="doc-badge cyan">GET</span></td>
+                        <td>Access market intelligence data</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Example Request</h3>
+            <div class="doc-code">
+<span class="comment">// Get financial health score</span>
+<span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">'https://api.helacore.ai/v1/health-score'</span>, {
+  headers: {
+    <span class="string">'Authorization'</span>: <span class="string">'Bearer YOUR_API_KEY'</span>,
+    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+  }
+});
+
+<span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="function">json</span>();
+<span class="comment">// Response: { score: 87, components: {...}, trend: "improving" }</span>
+            </div>
+        </section>
+
+        <!-- Data Models -->
+        <section id="data-models" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                </span>
+                Data Models
+            </h2>
+            <p>Understanding Helacore's core data structures for API integration.</p>
+            
+            <h3>Transaction Model</h3>
+            <div class="doc-code">
+{
+  <span class="string">"id"</span>: <span class="string">"txn_1234567890"</span>,
+  <span class="string">"type"</span>: <span class="string">"sale"</span>,  <span class="comment">// sale, expense, loan_payment, savings</span>
+  <span class="string">"amount"</span>: <span class="function">1500</span>,
+  <span class="string">"currency"</span>: <span class="string">"KES"</span>,
+  <span class="string">"description"</span>: <span class="string">"Sold 3kg maize flour"</span>,
+  <span class="string">"items"</span>: [
+    {
+      <span class="string">"name"</span>: <span class="string">"Maize Flour"</span>,
+      <span class="string">"quantity"</span>: <span class="function">3</span>,
+      <span class="string">"unit"</span>: <span class="string">"kg"</span>,
+      <span class="string">"unit_price"</span>: <span class="function">500</span>
+    }
+  ],
+  <span class="string">"timestamp"</span>: <span class="string">"2024-01-15T14:30:00Z"</span>,
+  <span class="string">"location"</span>: <span class="string">"Thika, Kiambu County"</span>
+}
+            </div>
+            
+            <h3>Recommendation Model</h3>
+            <div class="doc-code">
+{
+  <span class="string">"id"</span>: <span class="string">"rec_abc123"</span>,
+  <span class="string">"priority"</span>: <span class="string">"high"</span>,  <span class="comment">// low, medium, high, urgent</span>
+  <span class="string">"category"</span>: <span class="string">"inventory"</span>,
+  <span class="string">"title"</span>: <span class="string">"Reduce stock purchase by 15%"</span>,
+  <span class="string">"description"</span>: <span class="string">"Market data shows lower foot traffic expected..."</span>,
+  <span class="string">"expected_impact"</span>: {
+    <span class="string">"profit_change"</span>: <span class="string">"+8%"</span>,
+    <span class="string">"risk_reduction"</span>: <span class="string">"12%"</span>
+  },
+  <span class="string">"confidence"</span>: <span class="function">0.94</span>,
+  <span class="string">"expires_at"</span>: <span class="string">"2024-01-16T00:00:00Z"</span>
+}
+            </div>
+        </section>
+
+        <!-- Authentication -->
+        <section id="authentication" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </span>
+                Authentication
+            </h2>
+            <p>Helacore uses API keys for authentication. Keys are scoped to specific permissions and can be revoked at any time.</p>
+            
+            <h3>Getting Your API Key</h3>
+            <ol>
+                <li>Navigate to Settings → API Keys in your Helacore dashboard</li>
+                <li>Click "Generate New Key"</li>
+                <li>Select required permissions (read, write, admin)</li>
+                <li>Copy and securely store your API key</li>
+            </ol>
+            
+            <div class="doc-callout warning">
+                <svg class="doc-callout-icon text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Security Warning:</strong>
+                    <p class="mt-1">Never expose your API key in client-side code or public repositories. Use environment variables or secure key management services.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Webhooks -->
+        <section id="webhooks" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                    <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </span>
+                Webhooks
+            </h2>
+            <p>Receive real-time notifications when specific events occur in your Helacore account.</p>
+            
+            <h3>Available Events</h3>
+            <ul>
+                <li><code class="doc-inline-code">health_score.changed</code> - Financial health score updates</li>
+                <li><code class="doc-inline-code">recommendation.new</code> - New recommendation available</li>
+                <li><code class="doc-inline-code">recommendation.expired</code> - Recommendation expired without action</li>
+                <li><code class="doc-inline-code">alert.critical</code> - Critical business alert triggered</li>
+                <li><code class="doc-inline-code">loan.payment_due</code> - Loan payment reminder</li>
+            </ul>
+        </section>
+
+        <!-- Mobile SDK -->
+        <section id="mobile-sdk" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                </span>
+                Mobile SDK
+            </h2>
+            <p>Native SDKs for iOS and Android to integrate Helacore directly into your mobile applications.</p>
+            
+            <h3>Installation</h3>
+            <div class="doc-code">
+<span class="comment">// iOS (CocoaPods)</span>
+pod <span class="string">'HelacoreSDK'</span>, <span class="string">'~> 2.0'</span>
+
+<span class="comment">// Android (Gradle)</span>
+implementation <span class="string">'ai.helacore:sdk:2.0.0'</span>
+            </div>
+            
+            <h3>Quick Integration</h3>
+            <div class="doc-code">
+<span class="comment">// Initialize SDK</span>
+Helacore.<span class="function">initialize</span>(apiKey: <span class="string">"YOUR_API_KEY"</span>)
+
+<span class="comment">// Get health score</span>
+<span class="keyword">let</span> score = <span class="keyword">try await</span> Helacore.<span class="function">getHealthScore</span>()
+<span class="function">print</span>(<span class="string">"Score: \(score.value)"</span>)
+            </div>
+        </section>
+
+        <!-- Offline Mode -->
+        <section id="offline-mode" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829"/></svg>
+                </span>
+                Offline Mode
+            </h2>
+            <p>Helacore continues to function in areas with limited or no internet connectivity, critical for rural entrepreneurs.</p>
+            
+            <h3>Offline Capabilities</h3>
+            <ul>
+                <li><strong class="text-theme-primary">Transaction Recording:</strong> Store transactions locally and sync when connected</li>
+                <li><strong class="text-theme-primary">Cached Recommendations:</strong> Access previously generated guidance offline</li>
+                <li><strong class="text-theme-primary">Basic Calculations:</strong> Perform essential financial calculations without internet</li>
+                <li><strong class="text-theme-primary">Low Data Mode:</strong> Reduced data usage for expensive connections</li>
+            </ul>
+            
+            <div class="doc-callout info">
+                <svg class="doc-callout-icon text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <strong class="text-theme-primary">Sync Behavior:</strong>
+                    <p class="mt-1">Offline data automatically syncs when connectivity is restored. Conflicts are resolved using timestamp-based merging.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Third-Party Integration -->
+        <section id="third-party" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                </span>
+                Third-Party Integration
+            </h2>
+            <p>Connect Helacore with popular business tools and services.</p>
+            
+            <h3>Supported Integrations</h3>
+            <div class="doc-grid">
+                <div class="doc-card">
+                    <h4 class="text-amber-400">M-Pesa</h4>
+                    <p>Automatic transaction syncing from Safaricom's mobile money service.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-emerald-400">QuickBooks</h4>
+                    <p>Two-way sync with Intuit's accounting software.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-cyan-400">Google Sheets</h4>
+                    <p>Import/export data to and from Google Sheets.</p>
+                </div>
+                <div class="doc-card">
+                    <h4 class="text-purple-400">WhatsApp Business</h4>
+                    <p>Receive recommendations via WhatsApp messages.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section id="best-practices" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-amber-500/20 to-orange-500/20">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                Best Practices
+            </h2>
+            <p>Follow these guidelines to maximize the value you get from Helacore.</p>
+            
+            <h3>Data Entry</h3>
+            <ul>
+                <li>Record transactions daily for most accurate insights</li>
+                <li>Categorize expenses consistently (use standard categories)</li>
+                <li>Include all income sources, not just primary sales</li>
+                <li>Update inventory levels at least weekly</li>
+            </ul>
+            
+            <h3>Acting on Recommendations</h3>
+            <ul>
+                <li>Review recommendations within 24 hours of receipt</li>
+                <li>Use the What-If Simulator before implementing major changes</li>
+                <li>Provide feedback on recommendation outcomes to improve AI accuracy</li>
+                <li>Don't ignore low-priority recommendations—they often prevent future issues</li>
+            </ul>
+            
+            <h3>Security</h3>
+            <ul>
+                <li>Enable two-factor authentication on your account</li>
+                <li>Use strong, unique passwords</li>
+                <li>Restrict API key permissions to minimum required</li>
+                <li>Regularly review account access and activity logs</li>
+            </ul>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section id="troubleshooting" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-rose-500/20 to-red-500/20">
+                    <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                Troubleshooting
+            </h2>
+            <p>Solutions to common issues encountered when using Helacore.</p>
+            
+            <h3>Common Issues</h3>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong class="text-theme-primary">Health score not updating</strong></td>
+                        <td>Ensure you've entered transactions in the past 7 days. Scores require minimum data to calculate.</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Recommendations seem generic</strong></td>
+                        <td>Provide more detailed transaction data including item-level information for personalized insights.</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Voice interface not responding</strong></td>
+                        <td>Check microphone permissions and ensure you're speaking clearly in a quiet environment.</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">API returns 401 errors</strong></td>
+                        <td>Verify your API key is correct and hasn't been revoked. Check key expiration date.</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Offline data not syncing</strong></td>
+                        <td>Manually trigger sync when connected. Check for sync conflicts in dashboard.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-indigo-500/20 to-violet-500/20">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                Frequently Asked Questions
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-theme-primary mb-2">Is my business data safe?</h4>
+                    <p class="text-sm">Yes. We use bank-grade encryption, and your data is never shared with third parties or other users. Market intelligence is derived from anonymized, aggregated patterns only.</p>
+                </div>
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-theme-primary mb-2">How accurate are the recommendations?</h4>
+                    <p class="text-sm">Our AI achieves 94% accuracy when recommendations are implemented as suggested. Accuracy improves over time as the system learns your specific business patterns.</p>
+                </div>
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-theme-primary mb-2">Can I use Helacore without internet?</h4>
+                    <p class="text-sm">Yes. Helacore has offline capabilities for transaction recording and accessing cached recommendations. Full features require internet connectivity.</p>
+                </div>
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-theme-primary mb-2">What if I don't follow a recommendation?</h4>
+                    <p class="text-sm">No problem. Helacore learns from your choices and will adjust future recommendations based on your actual decisions and their outcomes.</p>
+                </div>
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-theme-primary mb-2">How much does Helacore cost?</h4>
+                    <p class="text-sm">We offer a free tier for basic features. Premium plans with advanced analytics and priority support start at KES 500/month. Contact us for enterprise pricing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Glossary -->
+        <section id="glossary" class="doc-section reveal">
+            <h2>
+                <span class="section-icon bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                </span>
+                Glossary
+            </h2>
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong class="text-theme-primary">Financial Health Score</strong></td>
+                        <td>A 0-100 metric evaluating business stability, risk, and growth potential</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">What-If Simulation</strong></td>
+                        <td>AI-powered scenario testing to predict business decision outcomes</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Smart Capital Allocation</strong></td>
+                        <td>AI-guided distribution of funds across business categories</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Market Intelligence Network</strong></td>
+                        <td>Collective insights derived from anonymized business data aggregation</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Adaptive Learning</strong></td>
+                        <td>System's ability to improve recommendations based on user outcomes</td>
+                    </tr>
+                    <tr>
+                        <td><strong class="text-theme-primary">Confidence Score</strong></td>
+                        <td>AI's certainty level (0-1) about a recommendation's accuracy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- CTA -->
+        <section class="doc-section reveal">
+            <div class="liquid-glass-warm p-12 rounded-3xl text-center" style="background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(16,185,129,0.1));border:1px solid rgba(245,158,11,0.2);">
+                <h2 class="font-display text-3xl font-bold mb-4 text-theme-primary">Ready to Get Started?</h2>
+                <p class="text-theme-secondary mb-8 max-w-lg mx-auto">Join 2.4M+ businesses already using Helacore to make smarter decisions and increase profits.</p>
+                <a href="sign up.html" class="btn-liquid inline-flex items-center gap-2">
+                    <span>Create Your Account</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg)">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                        <span class="font-display font-bold text-xl text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-theme-secondary text-sm leading-relaxed mb-6">Empowering entrepreneurs across emerging markets with AI-powered business guidance that transforms uncertainty into profitable clarity.</p>
+                   <div class="flex items-center gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#0A66C2] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#E4405F] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#FF0000] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors group">
+                            <svg class="w-4 h-4 text-tertiary group-hover:text-[#25D366] transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Platform</h4>
+                    <ul class="space-y-3">
+                        <li><a href="features.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Who We Serve</a></li>
+                        <li><a href="impact.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Impact Stories</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="documentation.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Documentation</a></li>
+                        <li><a href="api access.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">API Access</a></li>
+                        <li><a href="patner program.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Partner Program</a></li>
+                        <li><a href="community.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Community</a></li>
+                    </ul>
+                </div>
+                <div class="md:col-span-1">
+                    <h4 class="font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-3">
+                        <li><a href="about us.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">About Us</a></li>
+                        <li><a href="careers.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Careers</a></li>
+                        <li><a href="privacy policy.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Privacy Policy</a></li>
+                        <li><a href="terms of service.html" class="text-theme-secondary hover:text-amber-400 transition-colors text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-sm text-theme-muted">2024 Helacore. Empowering African entrepreneurs.</p>
+                <div class="flex items-center space-x-2 text-sm text-theme-muted"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span><span>System Status: <span class="text-emerald-400">All Systems Operational</span></span></div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // THEME MANAGEMENT
+        (function(){
+            const themeToggle=document.getElementById('theme-toggle');
+            const html=document.documentElement;
+            const savedTheme=localStorage.getItem('helacore-theme');
+            const systemPrefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if(savedTheme){html.setAttribute('data-theme',savedTheme);}
+            else if(systemPrefersDark){html.setAttribute('data-theme','dark');}
+            else{html.setAttribute('data-theme','dark');}
+            function toggleTheme(){
+                const currentTheme=html.getAttribute('data-theme');
+                const newTheme=currentTheme==='light'?'dark':'light';
+                html.setAttribute('data-theme',newTheme);
+                localStorage.setItem('helacore-theme',newTheme);
+                updateParticleColors(newTheme);
+            }
+            if(themeToggle){themeToggle.addEventListener('click',toggleTheme);}
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',(e)=>{
+                if(!localStorage.getItem('helacore-theme')){
+                    html.setAttribute('data-theme',e.matches?'dark':'light');
+                    updateParticleColors(e.matches?'dark':'light');
+                }
+            });
+        })();
+
+        // THREE.JS BACKGROUND
+        const canvas=document.getElementById('bg-canvas');
+        const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+        camera.position.z=5;
+        const particlesGeometry=new THREE.BufferGeometry();
+        const particleCount=200;
+        const positions=new Float32Array(particleCount*3);
+        const colors=new Float32Array(particleCount*3);
+        let particlesMaterial,particles;
+        function initParticles(theme){
+            const isLight=theme==='light';
+            for(let i=0;i<particleCount*3;i+=3){
+                positions[i]=(Math.random()-0.5)*20;
+                positions[i+1]=(Math.random()-0.5)*20;
+                positions[i+2]=(Math.random()-0.5)*20;
+                if(isLight){
+                    const t=Math.random();
+                    colors[i]=0.85*(1-t)+0.02*t;
+                    colors[i+1]=0.47*(1-t)+0.60*t;
+                    colors[i+2]=0.02*(1-t)+0.40*t;
+                }else{
+                    const t=Math.random();
+                    colors[i]=0.96*(1-t)+0.06*t;
+                    colors[i+1]=0.62*(1-t)+0.73*t;
+                    colors[i+2]=0.04*(1-t)+0.51*t;
+                }
+            }
+            particlesGeometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+            particlesGeometry.setAttribute('color',new THREE.BufferAttribute(colors,3));
+            if(particlesMaterial){particlesMaterial.dispose();}
+            particlesMaterial=new THREE.PointsMaterial({size:isLight?0.04:0.05,vertexColors:true,transparent:true,opacity:isLight?0.4:0.6});
+            if(particles){scene.remove(particles);}
+            particles=new THREE.Points(particlesGeometry,particlesMaterial);
+            scene.add(particles);
+        }
+        function updateParticleColors(theme){initParticles(theme);}
+        const currentTheme=document.documentElement.getAttribute('data-theme')||'dark';
+        initParticles(currentTheme);
+        function animate(){
+            requestAnimationFrame(animate);
+            if(particles){particles.rotation.y+=0.0003;particles.rotation.x+=0.0001;}
+            renderer.render(scene,camera);
+        }
+        animate();
+        window.addEventListener('resize',()=>{
+            camera.aspect=window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth,window.innerHeight);
+        });
+
+        // MOBILE MENU
+        const mobileMenuBtn=document.getElementById('mobile-menu-btn');
+        const closeMenuBtn=document.getElementById('close-menu-btn');
+        const mobileMenu=document.getElementById('mobile-menu');
+        if(mobileMenuBtn){mobileMenuBtn.addEventListener('click',()=>{mobileMenu.classList.add('open');});}
+        if(closeMenuBtn){closeMenuBtn.addEventListener('click',()=>{mobileMenu.classList.remove('open');});}
+        document.querySelectorAll('.mobile-nav-link').forEach(link=>{link.addEventListener('click',()=>{mobileMenu.classList.remove('open');});});
+
+        // NAVBAR SCROLL
+        const navbar=document.getElementById('navbar');
+        window.addEventListener('scroll',()=>{
+            if(window.scrollY>50){navbar.classList.add('py-2');navbar.classList.remove('py-4');}
+            else{navbar.classList.add('py-4');navbar.classList.remove('py-2');}
+        });
+
+        // DOCUMENTATION SIDEBAR
+        const docSidebar=document.getElementById('doc-sidebar');
+        const docNavItems=document.querySelectorAll('.doc-nav-item');
+        
+        // Mobile sidebar toggle (can be added as a button)
+        function toggleDocSidebar(){
+            if(docSidebar){
+                docSidebar.classList.toggle('open');
+            }
+        }
+        
+        // Active section tracking
+        const docSections=document.querySelectorAll('.doc-section');
+        function updateActiveNav(){
+            const scrollPos=window.scrollY+120;
+            docSections.forEach(section=>{
+                const top=section.offsetTop;
+                const height=section.offsetHeight;
+                const id=section.getAttribute('id');
+                if(scrollPos>=top&&scrollPos<top+height){
+                    docNavItems.forEach(item=>{
+                        item.classList.remove('active');
+                        if(item.getAttribute('href')===`#${id}`){
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+        window.addEventListener('scroll',updateActiveNav);
+        updateActiveNav();
+
+        // SCROLL REVEAL
+        function reveal(){
+            const reveals=document.querySelectorAll('.reveal');
+            reveals.forEach(element=>{
+                const windowHeight=window.innerHeight;
+                const elementTop=element.getBoundingClientRect().top;
+                const elementVisible=100;
+                if(elementTop<windowHeight-elementVisible){
+                    element.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll',reveal);
+        reveal();
+
+        // Smooth scroll for doc nav
+        docNavItems.forEach(item=>{
+            item.addEventListener('click',(e)=>{
+                e.preventDefault();
+                const targetId=item.getAttribute('href');
+                const target=document.querySelector(targetId);
+                if(target){
+                    target.scrollIntoView({behavior:'smooth',block:'start'});
+                }
+                // Close mobile sidebar if open
+                if(docSidebar&&docSidebar.classList.contains('open')){
+                    docSidebar.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
