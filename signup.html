@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Create Your Workspace</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b;
+            --hela-gold: #d97706;
+            --hela-emerald: #10b981;
+            --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px;
+            --liquid-radius-md: 20px;
+            --liquid-radius-lg: 28px;
+            --liquid-radius-xl: 36px;
+            --bg-primary: #050507;
+            --bg-secondary: #0a0a0f;
+            --bg-tertiary: #111118;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --text-inverse: #09090b;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-border-hover: rgba(255, 255, 255, 0.25);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+            --glass-shine: rgba(255, 255, 255, 0.1);
+            --dark-glass-bg: rgba(10, 10, 15, 0.6);
+            --dark-glass-border: rgba(255, 255, 255, 0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --input-focus-border: rgba(245, 158, 11, 0.5);
+            --input-focus-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+            --input-text: #ffffff;
+            --input-placeholder: #71717a;
+            --border-subtle: rgba(255, 255, 255, 0.1);
+            --border-footer: rgba(255, 255, 255, 0.1);
+            --footer-bg: rgba(0, 0, 0, 0.2);
+            --scrollbar-track: #050507;
+            --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg, #f59e0b 0%, #10b981 50%, #06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(16, 185, 129, 0.2));
+            --btn-gradient-hover: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(16, 185, 129, 0.3));
+            --chart-grid: rgba(255, 255, 255, 0.05);
+            --chart-line: rgba(245, 158, 11, 0.6);
+            --chart-fill: rgba(245, 158, 11, 0.1);
+            --mobile-menu-bg: rgba(10, 10, 15, 0.95);
+            --social-bg: rgba(255, 255, 255, 0.05);
+            --social-bg-hover: rgba(255, 255, 255, 0.1);
+            --social-icon: #a1a1aa;
+            --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255, 255, 255, 0.1);
+            --stats-bg: rgba(255, 255, 255, 0.05);
+            --tag-bg: rgba(255, 255, 255, 0.1);
+            --chatbot-bg: rgba(10, 10, 15, 0.95);
+            --chatbot-border: rgba(255, 255, 255, 0.12);
+            --chatbot-user-msg: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(16, 185, 129, 0.15));
+            --chatbot-bot-msg: rgba(255, 255, 255, 0.06);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #fafaf9;
+            --bg-secondary: #f5f5f4;
+            --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --text-muted: #a8a29e;
+            --text-inverse: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-hover: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-border-hover: rgba(0, 0, 0, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0, 0, 0, 0.03);
+            --glass-shine: rgba(255, 255, 255, 0.5);
+            --dark-glass-bg: rgba(255, 255, 255, 0.5);
+            --dark-glass-border: rgba(0, 0, 0, 0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --input-border: rgba(0, 0, 0, 0.12);
+            --input-focus-border: rgba(245, 158, 11, 0.6);
+            --input-focus-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+            --input-text: #1c1917;
+            --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --border-footer: rgba(0, 0, 0, 0.08);
+            --footer-bg: rgba(245, 245, 244, 0.8);
+            --scrollbar-track: #f5f5f4;
+            --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg, #d97706 0%, #059669 50%, #0891b2 100%);
+            --btn-gradient: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(16, 185, 129, 0.15));
+            --btn-gradient-hover: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(16, 185, 129, 0.25));
+            --chart-grid: rgba(0, 0, 0, 0.06);
+            --chart-line: rgba(217, 119, 6, 0.7);
+            --chart-fill: rgba(217, 119, 6, 0.08);
+            --mobile-menu-bg: rgba(250, 250, 249, 0.98);
+            --social-bg: rgba(0, 0, 0, 0.05);
+            --social-bg-hover: rgba(0, 0, 0, 0.08);
+            --social-icon: #78716c;
+            --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0, 0, 0, 0.06);
+            --stats-bg: rgba(255, 255, 255, 0.6);
+            --tag-bg: rgba(0, 0, 0, 0.06);
+            --chatbot-bg: rgba(255, 255, 255, 0.97);
+            --chatbot-border: rgba(0, 0, 0, 0.1);
+            --chatbot-user-msg: linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(5, 150, 105, 0.1));
+            --chatbot-bot-msg: rgba(0, 0, 0, 0.04);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+        /* === LIQUID GLASS === */
+        .liquid-glass {
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255,255,255,0.03) 100%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow), var(--glass-inset-top), var(--glass-inset-bottom);
+            position: relative; overflow: hidden;
+            border-radius: var(--liquid-radius-lg);
+            transition: all 0.4s ease;
+        }
+        [data-theme="light"] .liquid-glass {
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255,255,255,0.4) 100%);
+        }
+        .liquid-glass::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+            border-radius: var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;
+            pointer-events: none; z-index: 1;
+        }
+        [data-theme="light"] .liquid-glass::before {
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+        }
+        .liquid-glass::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--glass-shine), transparent);
+            transition: left 0.7s ease-out; pointer-events: none; z-index: 2;
+        }
+        .liquid-glass:hover::after { left: 100%; }
+        .liquid-glass:hover { border-color: var(--glass-border-hover); }
+
+        .liquid-glass-dark {
+            background: var(--dark-glass-bg);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid var(--dark-glass-border);
+            box-shadow: var(--dark-glass-shadow);
+            border-radius: var(--liquid-radius-md);
+            transition: all 0.3s ease;
+        }
+
+        /* === BUTTONS === */
+        .btn-liquid {
+            position: relative; overflow: hidden; border-radius: 9999px;
+            padding: 12px 28px; font-weight: 600;
+            background: var(--btn-gradient);
+            border: 1px solid rgba(245,158,11,0.3);
+            color: var(--text-primary); transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.15);
+            cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px;
+        }
+        [data-theme="light"] .btn-liquid {
+            border: 1px solid rgba(217,119,6,0.4);
+            box-shadow: 0 4px 15px rgba(217,119,6,0.12);
+        }
+        .btn-liquid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245,158,11,0.3);
+            background: var(--btn-gradient-hover);
+        }
+        [data-theme="light"] .btn-liquid:hover {
+            box-shadow: 0 8px 25px rgba(217,119,6,0.2);
+        }
+        .btn-liquid:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        .btn-secondary {
+            border-radius: 9999px; padding: 12px 28px; font-weight: 600;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-primary); transition: all 0.3s ease;
+            cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px;
+        }
+        .btn-secondary:hover { background: var(--glass-bg-hover); transform: translateY(-1px); }
+
+        /* === THEME TOGGLE === */
+        .theme-toggle {
+            position: relative; width: 44px; height: 44px; border-radius: 50%;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; color: var(--text-primary);
+        }
+        .theme-toggle:hover { background: var(--glass-bg-hover); transform: scale(1.05); }
+        .theme-toggle svg { width: 20px; height: 20px; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform: rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle .sun-icon,
+        :root:not([data-theme]) .theme-toggle .sun-icon { display: none; }
+        [data-theme="dark"] .theme-toggle .moon-icon,
+        :root:not([data-theme]) .theme-toggle .moon-icon { display: block; }
+
+        /* === ANIMATIONS === */
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes float-reverse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        @keyframes fade-in-up { 0%{opacity:0;transform:translateY(24px)} 100%{opacity:1;transform:translateY(0)} }
+        @keyframes scale-in { 0%{opacity:0;transform:scale(0.9)} 100%{opacity:1;transform:scale(1)} }
+        @keyframes dot-pulse { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+        @keyframes spin-slow { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        @keyframes check-draw { 0%{stroke-dashoffset:24} 100%{stroke-dashoffset:0} }
+        @keyframes slide-in-right { 0%{opacity:0;transform:translateX(40px)} 100%{opacity:1;transform:translateX(0)} }
+        @keyframes progress-fill { 0%{width:0%} 100%{width:var(--fill)} }
+        @keyframes typing-dots { 0%,20%{opacity:0} 50%{opacity:1} 80%,100%{opacity:0} }
+        @keyframes chatbot-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes success-ring { 0%{stroke-dashoffset:283} 100%{stroke-dashoffset:0} }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+        .gradient-text-hela {
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+        /* === FORM ELEMENTS === */
+        .form-input-liquid {
+            background: var(--input-bg); border: 1px solid var(--input-border);
+            border-radius: var(--liquid-radius-md); padding: 14px 18px;
+            color: var(--input-text); transition: all 0.3s; width: 100%;
+            font-family: 'Inter', sans-serif; font-size: 14px;
+        }
+        .form-input-liquid::placeholder { color: var(--input-placeholder); }
+        .form-input-liquid:focus { outline: none; border-color: var(--input-focus-border); box-shadow: var(--input-focus-shadow); }
+        .form-input-liquid.error { border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.1); }
+        .form-input-liquid.success { border-color: var(--hela-emerald); box-shadow: 0 0 20px rgba(16,185,129,0.1); }
+
+        select.form-input-liquid {
+            -webkit-appearance: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;
+            padding-right: 48px;
+        }
+        [data-theme="light"] select.form-input-liquid {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2357534e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/path%3E%3C/svg%3E");
+        }
+        .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; letter-spacing: 0.01em; }
+        .form-label .required { color: #ef4444; margin-left: 2px; }
+        .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .form-error { font-size: 12px; color: #ef4444; margin-top: 4px; display: none; }
+        .form-error.visible { display: block; animation: fade-in-up 0.3s ease; }
+
+        /* === MOBILE MENU === */
+        .mobile-menu { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform: translateX(0); }
+
+        .text-theme-primary { color: var(--text-primary); }
+        .text-theme-secondary { color: var(--text-secondary); }
+        .text-theme-muted { color: var(--text-muted); }
+        .bg-theme-primary { background: var(--bg-primary); }
+        #bg-canvas { opacity: var(--canvas-opacity); transition: opacity 0.5s ease; }
+
+        /* === STEP INDICATOR === */
+        .step-indicator { display: flex; align-items: center; gap: 4px; }
+        .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--input-border); transition: all 0.4s ease; }
+        .step-dot.active { background: var(--hela-amber); box-shadow: 0 0 12px rgba(245,158,11,0.5); transform: scale(1.3); }
+        .step-dot.completed { background: var(--hela-emerald); }
+        .step-line { height: 2px; flex: 1; background: var(--input-border); border-radius: 1px; position: relative; overflow: hidden; }
+        .step-line .fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--hela-emerald); border-radius: 1px; transition: width 0.6s ease; }
+
+        .form-step { display: none; animation: fade-in-up 0.5s ease; }
+        .form-step.active { display: block; }
+
+        /* === CHECKBOX === */
+        .checkbox-liquid {
+            width: 20px; height: 20px; border: 1.5px solid var(--input-border);
+            border-radius: 6px; background: var(--input-bg); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; flex-shrink: 0;
+        }
+        .checkbox-liquid.checked {
+            background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(16,185,129,0.3));
+            border-color: var(--hela-amber);
+        }
+        .checkbox-liquid.checked svg { display: block; }
+        .checkbox-liquid svg { display: none; width: 14px; height: 14px; color: var(--hela-amber); }
+
+        /* === PASSWORD STRENGTH === */
+        .password-strength { height: 4px; border-radius: 2px; background: var(--input-border); overflow: hidden; margin-top: 6px; }
+        .password-strength .bar { height: 100%; border-radius: 2px; transition: all 0.4s ease; width: 0%; }
+        .password-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); transition: color 0.3s; background:none;border:none; }
+        .password-toggle:hover { color: var(--text-primary); }
+
+        /* === LOGO UPLOAD === */
+        .logo-upload {
+            border: 2px dashed var(--input-border); border-radius: var(--liquid-radius-md);
+            padding: 32px; text-align: center; cursor: pointer;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .logo-upload:hover { border-color: var(--hela-amber); background: rgba(245,158,11,0.03); }
+        .logo-upload.has-file { border-color: var(--hela-emerald); border-style: solid; }
+
+        /* === OTP INPUT === */
+        .otp-input {
+            width: 48px; height: 56px; text-align: center; font-size: 24px; font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif; background: var(--input-bg);
+            border: 1.5px solid var(--input-border); border-radius: var(--liquid-radius-md);
+            color: var(--text-primary); transition: all 0.3s;
+        }
+        .otp-input:focus { outline: none; border-color: var(--input-focus-border); box-shadow: var(--input-focus-shadow); }
+
+        /* === SOCIAL BUTTON === */
+        .social-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 20px; border-radius: var(--liquid-radius-md);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-primary); font-weight: 500; font-size: 14px;
+            cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; width: 100%;
+        }
+        .social-btn:hover { background: var(--glass-bg-hover); border-color: var(--glass-border-hover); transform: translateY(-1px); }
+
+        /* === PLAN CARD === */
+        .plan-card {
+            padding: 24px; border-radius: var(--liquid-radius-lg);
+            border: 1.5px solid var(--input-border); background: var(--dark-glass-bg);
+            backdrop-filter: blur(20px); cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .plan-card:hover { border-color: var(--glass-border-hover); transform: translateY(-2px); }
+        .plan-card.selected { border-color: var(--hela-amber); box-shadow: 0 0 30px rgba(245,158,11,0.15); }
+        .plan-card.selected::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--hela-amber), var(--hela-emerald));
+        }
+        .plan-card .badge {
+            position: absolute; top: 12px; right: 12px; padding: 4px 10px;
+            border-radius: 9999px; font-size: 11px; font-weight: 600;
+        }
+
+        /* === PERSONALITY CARD === */
+        .personality-card {
+            padding: 16px; border-radius: var(--liquid-radius-md);
+            border: 1.5px solid var(--input-border); background: var(--dark-glass-bg);
+            cursor: pointer; transition: all 0.3s; text-align: center;
+        }
+        .personality-card:hover { border-color: var(--glass-border-hover); }
+        .personality-card.selected { border-color: var(--hela-amber); box-shadow: 0 0 20px rgba(245,158,11,0.1); }
+
+        /* === CHALLENGE CARDS === */
+        .challenge-card {
+            padding: 12px 14px; border-radius: var(--liquid-radius-md);
+            border: 1.5px solid var(--input-border); background: var(--dark-glass-bg);
+            cursor: pointer; transition: all 0.3s;
+        }
+        .challenge-card:hover { border-color: var(--glass-border-hover); }
+        .challenge-card.selected { border-color: var(--hela-amber); background: rgba(245,158,11,0.08); box-shadow: 0 0 15px rgba(245,158,11,0.1); }
+
+        /* === MODULE CARDS === */
+        .module-card {
+            padding: 12px 10px; border-radius: var(--liquid-radius-md);
+            border: 1.5px solid var(--input-border); background: var(--dark-glass-bg);
+            cursor: pointer; transition: all 0.3s; text-align: center;
+        }
+        .module-card:hover { border-color: var(--glass-border-hover); }
+        .module-card.selected { border-color: var(--hela-emerald); background: rgba(16,185,129,0.08); box-shadow: 0 0 15px rgba(16,185,129,0.1); }
+        .module-card.selected svg { color: var(--hela-emerald); }
+
+        /* === PRIORITY CARDS === */
+        .priority-card {
+            padding: 12px 10px; border-radius: var(--liquid-radius-md);
+            border: 1.5px solid var(--input-border); background: var(--dark-glass-bg);
+            cursor: pointer; transition: all 0.3s; text-align: center;
+        }
+        .priority-card:hover { border-color: var(--glass-border-hover); }
+        .priority-card.selected { border-color: var(--hela-amber); background: rgba(245,158,11,0.08); box-shadow: 0 0 15px rgba(245,158,11,0.1); }
+        .priority-card.selected svg { color: var(--hela-amber); }
+
+        /* === CAPTCHA === */
+        .captcha-box {
+            width: 200px; height: 60px; border-radius: var(--liquid-radius-md);
+            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(16,185,129,0.08));
+            border: 1px solid var(--input-border); display: flex; align-items: center;
+            justify-content: center; cursor: pointer; user-select: none;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .captcha-box.verified { border-color: var(--hela-emerald); background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.1)); }
+        .captcha-box::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%; animation: shimmer 2s infinite;
+        }
+
+        /* === TOAST === */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; padding: 14px 20px;
+            border-radius: var(--liquid-radius-md); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+            z-index: 9999; transform: translateY(100px); opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1); max-width: 360px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); }
+        .toast.error { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); }
+        .toast.info { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3); }
+
+        /* === LOADING DOTS === */
+        .loading-dots { display: flex; gap: 4px; align-items: center; justify-content: center; }
+        .loading-dots span {
+            width: 6px; height: 6px; border-radius: 50%; background: var(--hela-amber);
+            animation: dot-pulse 1.4s infinite ease-in-out both;
+        }
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        /* === VERIFICATION OVERLAY === */
+        .verification-overlay {
+            position: fixed; inset: 0; background: rgba(5,5,7,0.85);
+            backdrop-filter: blur(10px); z-index: 100; display: none;
+            align-items: center; justify-content: center; padding: 16px;
+        }
+        .verification-overlay.show { display: flex; }
+
+        /* === SECTION DIVIDER === */
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-subtle), transparent); margin: 8px 0; }
+
+        /* === CHATBOT === */
+        .chatbot-fab {
+            position: fixed; bottom: 24px; left: 24px; z-index: 90;
+            width: 56px; height: 56px; border-radius: 50%; cursor: pointer;
+            background: linear-gradient(135deg, var(--hela-amber), var(--hela-emerald));
+            border: none; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(245,158,11,0.3);
+            transition: all 0.3s ease; animation: chatbot-bounce 3s ease-in-out infinite;
+        }
+        .chatbot-fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(245,158,11,0.4); }
+        .chatbot-fab svg { width: 26px; height: 26px; color: white; }
+
+        .chatbot-panel {
+            position: fixed; bottom: 92px; left: 24px; z-index: 90;
+            width: 380px; max-width: calc(100vw - 48px); height: 520px; max-height: calc(100vh - 140px);
+            border-radius: var(--liquid-radius-lg); background: var(--chatbot-bg);
+            border: 1px solid var(--chatbot-border); backdrop-filter: blur(30px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: flex; flex-direction: column;
+            transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1); overflow: hidden;
+        }
+        .chatbot-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+        .chatbot-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--chatbot-border);
+            display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+        .chatbot-messages {
+            flex: 1; overflow-y: auto; padding: 16px; display: flex;
+            flex-direction: column; gap: 12px;
+        }
+        .chatbot-messages::-webkit-scrollbar { width: 4px; }
+        .chatbot-messages::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+
+        .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; }
+        .chat-msg.bot { background: var(--chatbot-bot-msg); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-msg.user { background: var(--chatbot-user-msg); align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .chat-msg.bot .typing-indicator { display: inline-flex; gap: 4px; align-items: center; padding: 2px 0; }
+        .chat-msg.bot .typing-indicator span {
+            width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted);
+            animation: typing-dots 1.4s infinite ease-in-out both;
+        }
+        .chat-msg.bot .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .chat-msg.bot .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-msg.bot .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        .chatbot-input-area {
+            padding: 12px 16px; border-top: 1px solid var(--chatbot-border);
+            display: flex; gap: 8px; flex-shrink: 0;
+        }
+        .chatbot-input {
+            flex: 1; background: var(--input-bg); border: 1px solid var(--input-border);
+            border-radius: 9999px; padding: 10px 16px; color: var(--input-text);
+            font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: all 0.3s;
+        }
+        .chatbot-input:focus { border-color: var(--input-focus-border); }
+        .chatbot-input::placeholder { color: var(--input-placeholder); }
+        .chatbot-send {
+            width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+            background: linear-gradient(135deg, var(--hela-amber), var(--hela-emerald));
+            color: white; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; flex-shrink: 0;
+        }
+        .chatbot-send:hover { transform: scale(1.05); }
+        .chatbot-send svg { width: 16px; height: 16px; }
+
+        .chat-suggestion {
+            display: inline-block; padding: 6px 12px; border-radius: 9999px;
+            background: var(--input-bg); border: 1px solid var(--input-border);
+            font-size: 12px; color: var(--text-secondary); cursor: pointer;
+            transition: all 0.3s; margin: 2px;
+        }
+        .chat-suggestion:hover { border-color: var(--hela-amber); color: var(--hela-amber); }
+
+        /* === SUCCESS SCREEN === */
+        .success-screen { display: none; text-align: center; padding: 40px 20px; animation: scale-in 0.6s ease; }
+        .success-screen.show { display: block; }
+        .success-ring { width: 100px; height: 100px; margin: 0 auto 24px; }
+        .success-ring circle { fill: none; stroke-width: 4; }
+        .success-ring .ring-bg { stroke: var(--input-border); }
+        .success-ring .ring-fill { stroke: var(--hela-emerald); stroke-dasharray: 283; stroke-dashoffset: 283; transform: rotate(-90deg); transform-origin: center; }
+        .success-screen.show .success-ring .ring-fill { animation: success-ring 1s ease 0.3s forwards; }
+        .success-check { animation: check-draw 0.5s ease 1s forwards; stroke-dasharray: 24; stroke-dashoffset: 24; }
+
+        .confetti-piece {
+            position: fixed; width: 10px; height: 10px; border-radius: 2px;
+            animation: confetti-fall linear forwards; z-index: 200; pointer-events: none;
+        }
+
+        /* === REVIEW TABLE === */
+        .review-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 12px 0; border-bottom: 1px solid var(--border-subtle);
+        }
+        .review-row:last-child { border-bottom: none; }
+        .review-label { font-size: 13px; color: var(--text-muted); flex-shrink: 0; min-width: 140px; }
+        .review-value { font-size: 13px; color: var(--text-primary); font-weight: 500; text-align: right; word-break: break-word; }
+
+        @media (max-width: 768px) {
+            .otp-input { width: 42px; height: 48px; font-size: 20px; }
+            .chatbot-panel { left: 12px; bottom: 84px; width: calc(100vw - 24px); height: 440px; }
+            .chatbot-fab { left: 12px; bottom: 16px; width: 50px; height: 50px; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">
+        <div class="flex items-center gap-3">
+            <div id="toast-icon" class="w-5 h-5 flex-shrink-0"></div>
+            <span id="toast-msg" class="text-sm font-medium"></span>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="signin.html" class="hidden md:inline-flex px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Sign In</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <div class="section-divider"></div>
+                <a href="signin.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CHATBOT -->
+    <button class="chatbot-fab" id="chatbot-fab" aria-label="Open chat assistant">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    </button>
+    <div class="chatbot-panel" id="chatbot-panel">
+        <div class="chatbot-header">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-theme-primary">Hela Assistant</p>
+                <p class="text-xs text-theme-muted">I'll help you set up your workspace</p>
+            </div>
+            <button id="chatbot-close" class="p-1.5 rounded-full hover:bg-white/10 text-theme-muted" aria-label="Close chat">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input-area">
+            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Ask me anything..." autocomplete="off">
+            <button class="chatbot-send" id="chatbot-send" aria-label="Send message">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN SIGN-UP SECTION -->
+    <main class="min-h-screen relative flex items-start justify-center pt-28 pb-16 px-4 md:px-6">
+        <div class="w-full max-w-4xl relative z-10">
+            <!-- HEADER -->
+            <div class="text-center mb-10 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius:9999px">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">Workspace Creation</span>
+                </div>
+                <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-theme-primary">Create Your <span class="gradient-text-hela">Workspace</span></h1>
+                <p class="text-theme-secondary max-w-lg mx-auto">Set up your Helacore workspace in minutes. AI-powered business guidance tailored to your unique journey.</p>
+            </div>
+
+            <!-- SOCIAL SIGN-IN -->
+            <div class="liquid-glass p-6 mb-6 reveal active" style="border-radius:var(--liquid-radius-lg)">
+                <p class="text-sm text-theme-muted text-center mb-4">Get started faster with your existing account</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button class="social-btn" id="btn-google">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        <span>Google</span>
+                    </button>
+                    <button class="social-btn" id="btn-microsoft">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><rect x="1" y="1" width="10" height="10" fill="#F25022"/><rect x="13" y="1" width="10" height="10" fill="#7FBA00"/><rect x="1" y="13" width="10" height="10" fill="#00A4EF"/><rect x="13" y="13" width="10" height="10" fill="#FFB900"/></svg>
+                        <span>Microsoft</span>
+                    </button>
+                    <button class="social-btn" id="btn-apple">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                        <span>Apple</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-4 my-5">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent"></div>
+                    <span class="text-xs text-theme-muted font-medium tracking-wider uppercase">or sign up with email</span>
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent"></div>
+                </div>
+            </div>
+
+            <!-- STEP INDICATORS -->
+            <div class="liquid-glass p-4 mb-6 reveal active" style="border-radius:var(--liquid-radius-lg)">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-theme-muted uppercase tracking-wider">Step <span id="current-step-num">1</span> of 7</span>
+                    <span id="step-label" class="text-xs font-medium text-amber-400">Personal Information</span>
+                </div>
+                <div class="step-indicator">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="3"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="4"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="5"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="6"></div>
+                    <div class="step-line"><div class="fill" style="width:0%"></div></div>
+                    <div class="step-dot" data-step="7"></div>
+                </div>
+            </div>
+
+            <!-- FORM CONTAINER -->
+            <div class="liquid-glass p-6 md:p-8 reveal active" style="border-radius:var(--liquid-radius-lg)">
+                <form id="signup-form" novalidate>
+                    <!-- STEP 1: Personal Information -->
+                    <div class="form-step active" data-step="1">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Personal Information</h2>
+                        <p class="text-sm text-theme-muted mb-6">Tell us about yourself to personalize your experience.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="form-label">First Name <span class="required">*</span></label>
+                                <input type="text" id="firstName" class="form-input-liquid" placeholder="e.g. John" required>
+                                <div class="form-error" id="firstName-error">Please enter your first name</div>
+                            </div>
+                            <div>
+                                <label class="form-label">Last Name <span class="required">*</span></label>
+                                <input type="text" id="lastName" class="form-input-liquid" placeholder="e.g. Kamau" required>
+                                <div class="form-error" id="lastName-error">Please enter your last name</div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label">Business Name <span class="required">*</span></label>
+                                <input type="text" id="businessName" class="form-input-liquid" placeholder="e.g. Kamau Fresh Produce" required>
+                                <div class="form-error" id="businessName-error">Please enter your business name</div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label">Business Logo</label>
+                                <div class="logo-upload" id="logo-upload" onclick="document.getElementById('logo-input').click()">
+                                    <input type="file" id="logo-input" accept="image/*" class="hidden">
+                                    <div id="logo-preview-area">
+                                        <svg class="w-10 h-10 mx-auto mb-2 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <p class="text-sm text-theme-secondary">Click to upload your business logo</p>
+                                        <p class="text-xs text-theme-muted mt-1">PNG, JPG or SVG up to 2MB</p>
+                                    </div>
+                                    <div id="logo-preview" class="hidden flex items-center gap-3 justify-center">
+                                        <img id="logo-img" class="w-12 h-12 rounded-lg object-cover" alt="Logo">
+                                        <div class="text-left">
+                                            <p id="logo-name" class="text-sm font-medium text-theme-primary"></p>
+                                            <p id="logo-size" class="text-xs text-theme-muted"></p>
+                                        </div>
+                                        <button type="button" id="remove-logo-btn" class="ml-2 p-1 rounded-full hover:bg-red-500/20 text-red-400 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Contact & Security -->
+                    <div class="form-step" data-step="2">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Contact & Security</h2>
+                        <p class="text-sm text-theme-muted mb-6">Set up your login credentials and verification channels.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="md:col-span-2">
+                                <label class="form-label">Work Email <span class="required">*</span></label>
+                                <div class="relative">
+                                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    <input type="email" id="workEmail" class="form-input-liquid" style="padding-left:44px" placeholder="you@business.com" required>
+                                </div>
+                                <div class="form-error" id="workEmail-error">Please enter a valid work email</div>
+                            </div>
+                            <div>
+                                <label class="form-label">Phone Number <span class="required">*</span></label>
+                                <div class="flex gap-2">
+                                    <select id="phoneCode" class="form-input-liquid" style="width:110px;flex-shrink:0">
+                                        <option value="+254">+254</option>
+                                        <option value="+255">+255</option>
+                                        <option value="+256">+256</option>
+                                        <option value="+250">+250</option>
+                                        <option value="+257">+257</option>
+                                        <option value="+1">+1</option>
+                                        <option value="+44">+44</option>
+                                        <option value="+91">+91</option>
+                                        <option value="+234">+234</option>
+                                        <option value="+27">+27</option>
+                                    </select>
+                                    <input type="tel" id="phoneNumber" class="form-input-liquid" placeholder="712 345 678" required>
+                                </div>
+                                <div class="form-error" id="phoneNumber-error">Please enter a valid phone number</div>
+                            </div>
+                            <div></div>
+                            <div>
+                                <label class="form-label">Password <span class="required">*</span></label>
+                                <div class="relative">
+                                    <input type="password" id="password" class="form-input-liquid" style="padding-right:44px" placeholder="Min 8 characters" required>
+                                    <button type="button" class="password-toggle" id="toggle-pw1">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </button>
+                                </div>
+                                <div class="password-strength"><div class="bar" id="pw-strength-bar"></div></div>
+                                <p class="text-xs mt-1 text-theme-muted" id="pw-strength-text">Enter a password</p>
+                                <div class="form-error" id="password-error">Password must be at least 8 characters</div>
+                            </div>
+                            <div>
+                                <label class="form-label">Confirm Password <span class="required">*</span></label>
+                                <div class="relative">
+                                    <input type="password" id="confirmPassword" class="form-input-liquid" style="padding-right:44px" placeholder="Re-enter password" required>
+                                    <button type="button" class="password-toggle" id="toggle-pw2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </button>
+                                </div>
+                                <div class="form-error" id="confirmPassword-error">Passwords do not match</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 liquid-glass-dark rounded-xl p-3 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p class="text-xs text-theme-secondary">We recommend enabling two-factor authentication after sign-up for enhanced security. You can set up biometric login and trusted device registration from your workspace settings.</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Location & Preferences -->
+                    <div class="form-step" data-step="3">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Location & Preferences</h2>
+                        <p class="text-sm text-theme-muted mb-6">Help us localize your experience for accurate insights.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="form-label">Country <span class="required">*</span></label>
+                                <select id="country" class="form-input-liquid" required>
+                                    <option value="">Select your country</option>
+                                    <option value="KE" selected>Kenya</option>
+                                    <option value="TZ">Tanzania</option>
+                                    <option value="UG">Uganda</option>
+                                    <option value="RW">Rwanda</option>
+                                    <option value="BI">Burundi</option>
+                                    <option value="ET">Ethiopia</option>
+                                    <option value="NG">Nigeria</option>
+                                    <option value="GH">Ghana</option>
+                                    <option value="ZA">South Africa</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                                <div class="form-error" id="country-error">Please select your country</div>
+                            </div>
+                            <div>
+                                <label class="form-label">City <span class="required">*</span></label>
+                                <input type="text" id="city" class="form-input-liquid" placeholder="e.g. Nairobi" required>
+                                <div class="form-error" id="city-error">Please enter your city</div>
+                            </div>
+                            <div>
+                                <label class="form-label">Business Address</label>
+                                <input type="text" id="businessAddress" class="form-input-liquid" placeholder="Street address (optional)">
+                            </div>
+                            <div>
+                                <label class="form-label">Preferred Currency</label>
+                                <select id="currency" class="form-input-liquid">
+                                    <option value="KES">KES - Kenyan Shilling</option>
+                                    <option value="TZS">TZS - Tanzanian Shilling</option>
+                                    <option value="UGX">UGX - Ugandan Shilling</option>
+                                    <option value="RWF">RWF - Rwandan Franc</option>
+                                    <option value="NGN">NGN - Nigerian Naira</option>
+                                    <option value="GHS">GHS - Ghanaian Cedi</option>
+                                    <option value="ZAR">ZAR - South African Rand</option>
+                                    <option value="USD">USD - US Dollar</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - British Pound</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Timezone</label>
+                                <select id="timezone" class="form-input-liquid">
+                                    <option value="Africa/Nairobi">East Africa Time (EAT)</option>
+                                    <option value="Africa/Lagos">West Africa Time (WAT)</option>
+                                    <option value="Africa/Johannesburg">South Africa Time (SAST)</option>
+                                    <option value="Africa/Cairo">Eastern European Time (EET)</option>
+                                    <option value="Europe/London">Greenwich Mean Time (GMT)</option>
+                                    <option value="Europe/Paris">Central European Time (CET)</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Language</label>
+                                <select id="language" class="form-input-liquid">
+                                    <option value="en" selected>English</option>
+                                    <option value="sw">Swahili</option>
+                                    <option value="fr">French</option>
+                                    <option value="ar">Arabic</option>
+                                    <option value="am">Amharic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: Business Details & AI Personality -->
+                    <div class="form-step" data-step="4">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Business Details & AI Personality</h2>
+                        <p class="text-sm text-theme-muted mb-6">Tell us about your business so we can tailor AI guidance.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="form-label">Industry <span class="required">*</span></label>
+                                <select id="industry" class="form-input-liquid" required>
+                                    <option value="">Select your industry</option>
+                                    <option value="agriculture">Agriculture & Farming</option>
+                                    <option value="retail">Retail & E-Commerce</option>
+                                    <option value="manufacturing">Manufacturing</option>
+                                    <option value="tech">Technology & SaaS</option>
+                                    <option value="finance">Finance & Banking</option>
+                                    <option value="healthcare">Healthcare & Pharma</option>
+                                    <option value="education">Education & Training</option>
+                                    <option value="hospitality">Hospitality & Tourism</option>
+                                    <option value="logistics">Logistics & Transport</option>
+                                    <option value="construction">Construction & Real Estate</option>
+                                    <option value="media">Media & Entertainment</option>
+                                    <option value="professional">Professional Services</option>
+                                    <option value="food">Food & Beverage</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="form-error" id="industry-error">Please select your industry</div>
+                            </div>
+                            <div>
+                                <label class="form-label">Business Size</label>
+                                <select id="businessSize" class="form-input-liquid">
+                                    <option value="solo">Solo / Freelancer</option>
+                                    <option value="micro">Micro (1-5 employees)</option>
+                                    <option value="small">Small (6-20 employees)</option>
+                                    <option value="medium">Medium (21-100 employees)</option>
+                                    <option value="large">Large (100+ employees)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Business Stage</label>
+                                <select id="businessStage" class="form-input-liquid">
+                                    <option value="idea">Idea / Planning</option>
+                                    <option value="startup">Early Stage Startup</option>
+                                    <option value="growing">Growing Business</option>
+                                    <option value="established">Established Business</option>
+                                    <option value="scaling">Scaling / Expanding</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Website</label>
+                                <input type="url" id="website" class="form-input-liquid" placeholder="https://yourbusiness.com">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label">Business Description</label>
+                                <textarea id="businessDesc" class="form-input-liquid" rows="3" placeholder="Briefly describe what your business does and your main goals..." style="resize:vertical;min-height:80px"></textarea>
+                                <p class="form-hint">This helps our AI provide more relevant insights and recommendations.</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="form-label">AI Assistant Personality</label>
+                                <p class="form-hint mb-3">Choose how your Helacore AI assistant communicates with you.</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div class="personality-card" data-personality="professional">
+                                        <div class="text-2xl mb-2">
+                                            <svg class="w-8 h-8 mx-auto text-theme-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-medium text-theme-primary">Professional</p>
+                                        <p class="text-xs text-theme-muted mt-1">Formal & concise</p>
+                                    </div>
+                                    <div class="personality-card" data-personality="friendly">
+                                        <div class="text-2xl mb-2">
+                                            <svg class="w-8 h-8 mx-auto text-theme-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-medium text-theme-primary">Friendly</p>
+                                        <p class="text-xs text-theme-muted mt-1">Warm & casual</p>
+                                    </div>
+                                    <div class="personality-card selected" data-personality="analytical">
+                                        <div class="text-2xl mb-2">
+                                            <svg class="w-8 h-8 mx-auto text-theme-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-medium text-theme-primary">Analytical</p>
+                                        <p class="text-xs text-theme-muted mt-1">Data-driven</p>
+                                    </div>
+                                    <div class="personality-card" data-personality="motivational">
+                                        <div class="text-2xl mb-2">
+                                            <svg class="w-8 h-8 mx-auto text-theme-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-medium text-theme-primary">Motivational</p>
+                                        <p class="text-xs text-theme-muted mt-1">Energetic & upbeat</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: Business Challenges -->
+                    <div class="form-step" data-step="5">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Your Business Challenges</h2>
+                        <p class="text-sm text-theme-muted mb-6">Identify your biggest challenges so Helacore can prioritize the right solutions for you.</p>
+
+                        <div class="mb-6">
+                            <label class="form-label">What's your biggest business challenge right now? <span class="required">*</span></label>
+                            <p class="text-xs text-theme-muted mb-3">Choose the one that impacts your business the most.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="business-challenges-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="form-error" id="businessChallenge-error">Please select your biggest business challenge</div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="form-label">What best describes your current situation? <span class="required">*</span></label>
+                            <p class="text-xs text-theme-muted mb-3">This helps us adjust our coaching style to match your experience level.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="background-challenges-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="form-error" id="backgroundChallenge-error">Please select your current situation</div>
+                        </div>
+
+                        <div class="mt-4 liquid-glass-dark rounded-xl p-3 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <p class="text-xs text-theme-secondary">Your challenge profile helps us generate personalized solution playbooks, adjust coaching tone, and prioritize which Helacore modules matter most for your business.</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 6: Goals & Priorities -->
+                    <div class="form-step" data-step="6">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Goals & Priorities</h2>
+                        <p class="text-sm text-theme-muted mb-6">Set your targets and tell us which areas of your business matter most right now.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                            <div>
+                                <label class="form-label">Monthly Revenue Target</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="range" id="revenueTarget" min="10000" max="5000000" step="10000" value="200000" class="w-full accent-amber-400" style="height:6px">
+                                    <span id="revenueTargetDisplay" class="text-sm font-medium text-amber-400 whitespace-nowrap min-w-[120px]">KES 200,000</span>
+                                </div>
+                                <p class="form-hint mt-1">Drag to set your monthly revenue goal. We'll track your progress.</p>
+                            </div>
+                            <div>
+                                <label class="form-label">Current Monthly Revenue</label>
+                                <select id="currentRevenue" class="form-input-liquid">
+                                    <option value="0">Just starting out</option>
+                                    <option value="1">Under KES 50,000</option>
+                                    <option value="2">KES 50,000 - 150,000</option>
+                                    <option value="3">KES 150,000 - 500,000</option>
+                                    <option value="4" selected>KES 500,000 - 1,000,000</option>
+                                    <option value="5">KES 1,000,000 - 5,000,000</option>
+                                    <option value="6">Over KES 5,000,000</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="form-label">What are your top priorities? <span class="required">*</span></label>
+                            <p class="text-xs text-theme-muted mb-3">Select up to 3 priorities. These shape your dashboard focus and recommendations.</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="priorities-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="form-error" id="priorities-error">Please select at least one priority</div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="form-label">Which Helacore modules interest you most?</label>
+                            <p class="text-xs text-theme-muted mb-3">We'll pre-configure these for your dashboard. You can change anytime.</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="modules-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <div class="liquid-glass-dark rounded-xl p-3 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <p class="text-xs text-theme-secondary">Based on your business type, challenges, and goals, Helacore will automatically prioritize which intelligence modules appear first on your dashboard.</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 7: Plan Selection & Review -->
+                    <div class="form-step" data-step="7">
+                        <h2 class="font-display text-xl font-semibold mb-1 text-theme-primary">Choose Your Plan & Review</h2>
+                        <p class="text-sm text-theme-muted mb-6">Select a plan that fits your needs and review your details.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="plan-card" data-plan="free">
+                                <div class="badge" style="background:rgba(245,158,11,0.15);color:var(--hela-amber)">Free</div>
+                                <p class="font-display text-2xl font-bold text-theme-primary mt-2">$0</p>
+                                <p class="text-xs text-theme-muted mb-4">Forever free</p>
+                                <ul class="space-y-2 text-sm text-theme-secondary">
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>1 Workspace</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Basic AI Insights</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>5 Team Members</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Community Support</li>
+                                </ul>
+                            </div>
+                            <div class="plan-card selected" data-plan="pro">
+                                <div class="badge" style="background:rgba(16,185,129,0.15);color:var(--hela-emerald)">Popular</div>
+                                <p class="font-display text-2xl font-bold text-theme-primary mt-2">$29</p>
+                                <p class="text-xs text-theme-muted mb-4">per month</p>
+                                <ul class="space-y-2 text-sm text-theme-secondary">
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>5 Workspaces</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Advanced AI Analytics</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>25 Team Members</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Priority Support</li>
+                                </ul>
+                            </div>
+                            <div class="plan-card" data-plan="enterprise">
+                                <div class="badge" style="background:rgba(6,182,212,0.15);color:var(--hela-cyan)">Enterprise</div>
+                                <p class="font-display text-2xl font-bold text-theme-primary mt-2">Custom</p>
+                                <p class="text-xs text-theme-muted mb-4">tailored pricing</p>
+                                <ul class="space-y-2 text-sm text-theme-secondary">
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited Workspaces</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Custom AI Models</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited Members</li>
+                                    <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Dedicated Manager</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- REVIEW SUMMARY -->
+                        <div class="liquid-glass-dark rounded-xl p-5 mb-5">
+                            <h3 class="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                Review Your Details
+                            </h3>
+                            <div id="review-summary">
+                                <div class="review-row"><span class="review-label">Name</span><span class="review-value" id="review-name">-</span></div>
+                                <div class="review-row"><span class="review-label">Business</span><span class="review-value" id="review-business">-</span></div>
+                                <div class="review-row"><span class="review-label">Email</span><span class="review-value" id="review-email">-</span></div>
+                                <div class="review-row"><span class="review-label">Phone</span><span class="review-value" id="review-phone">-</span></div>
+                                <div class="review-row"><span class="review-label">Location</span><span class="review-value" id="review-location">-</span></div>
+                                <div class="review-row"><span class="review-label">Industry</span><span class="review-value" id="review-industry">-</span></div>
+                                <div class="review-row"><span class="review-label">Challenge</span><span class="review-value" id="review-challenge">-</span></div>
+                                <div class="review-row"><span class="review-label">Situation</span><span class="review-value" id="review-background">-</span></div>
+                                <div class="review-row"><span class="review-label">Revenue Target</span><span class="review-value" id="review-revenue-target">-</span></div>
+                                <div class="review-row"><span class="review-label">Priorities</span><span class="review-value" id="review-priorities">-</span></div>
+                                <div class="review-row"><span class="review-label">Modules</span><span class="review-value" id="review-modules">-</span></div>
+                                <div class="review-row"><span class="review-label">Plan</span><span class="review-value" id="review-plan">Pro - $29/mo</span></div>
+                            </div>
+                        </div>
+
+                        <!-- TERMS & CAPTCHA -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-2">
+                            <div class="flex items-start gap-3 cursor-pointer" id="terms-check">
+                                <div class="checkbox-liquid" id="terms-checkbox">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span class="text-sm text-theme-secondary">I agree to the <a href="#" class="text-amber-400 hover:underline">Terms of Service</a> and <a href="#" class="text-amber-400 hover:underline">Privacy Policy</a></span>
+                            </div>
+                            <div class="captcha-box" id="captcha-box">
+                                <div class="flex items-center gap-2 z-10" id="captcha-content">
+                                    <svg class="w-5 h-5 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    <span class="text-sm font-medium text-theme-secondary" id="captcha-text">Verify</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-error" id="terms-error">You must agree to the terms and verify</div>
+                    </div>
+
+                    <!-- SUCCESS SCREEN — Email Verification Link Sent -->
+                    <div class="success-screen" id="success-screen">
+                        <div class="success-ring">
+                            <svg viewBox="0 0 100 100" class="w-full h-full">
+                                <circle class="ring-bg" cx="50" cy="50" r="45"/>
+                                <circle class="ring-fill" cx="50" cy="50" r="45"/>
+                                <path class="success-check" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M30 52l14 14 26-30" style="transform:rotate(-90deg);transform-origin:50px 50px"/>
+                            </svg>
+                        </div>
+                        <h2 class="font-display text-2xl font-bold text-theme-primary mb-2">Check Your Email</h2>
+                        <p class="text-theme-secondary mb-2">Welcome to Helacore, <span id="success-name">User</span>!</p>
+                        <p class="text-sm text-theme-muted mb-6 max-w-md mx-auto">We've sent a verification link to<br><strong id="success-email" class="text-theme-primary text-base">your@email.com</strong><br><br>Click the link in the email to verify your account and access your personalized dashboard.</p>
+                        <div class="liquid-glass-dark rounded-xl p-5 max-w-sm mx-auto mb-6">
+                            <div class="flex items-start gap-3 mb-4">
+                                <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div>
+                                    <p class="text-xs text-theme-secondary mb-1"><strong>Didn't get the email?</strong></p>
+                                    <ul class="text-xs text-theme-muted space-y-1">
+                                        <li>Check your spam/junk folder</li>
+                                        <li>Make sure the email address is correct</li>
+                                        <li>Wait a minute — delivery can take a moment</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-liquid w-full text-sm" id="resend-email-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                Resend Verification Link
+                            </button>
+                        </div>
+                        <a href="signin.html" class="inline-flex items-center gap-2 text-sm text-amber-400 hover:text-amber-300 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Go to Sign In
+                        </a>
+                    </div>
+
+                    <!-- FORM NAVIGATION -->
+                    <div class="flex items-center justify-between mt-8" id="form-nav">
+                        <button type="button" class="btn-secondary" id="prev-btn" style="visibility:hidden">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
+                                Back
+                            </span>
+                        </button>
+                        <div class="flex items-center gap-3">
+                            <button type="button" class="btn-liquid" id="next-btn">
+                                <span class="flex items-center gap-2" id="next-btn-text">
+                                    Continue
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                </span>
+                                <span class="loading-dots hidden" id="next-btn-loading">
+                                    <span></span><span></span><span></span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="mt-12 text-center">
+                <div class="section-divider mb-6"></div>
+                <div class="flex items-center justify-center gap-6 mb-4">
+                    <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Terms</a>
+                    <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Privacy</a>
+                    <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Support</a>
+                    <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Status</a>
+                </div>
+                <p class="text-xs text-theme-muted">&copy; 2025 Helacore. All rights reserved. Built for African businesses.</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- (OTP overlay removed — email verification link flow replaces it) -->
+
+    <script>
+    /* ============================================================
+       SUPABASE INITIALIZATION
+       Replace these with your actual Supabase project credentials
+       ============================================================ */
+    const SUPABASE_URL = 'https://megtqhibcdlbpuisvtgo.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lZ3RxaGliY2RsYnB1aXN2dGdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1OTA0NDYsImV4cCI6MjA5OTE2NjQ0Nn0.p1eTEJ1spI19Y2qcXbDimO6CPsTnGaenpYSlHuBqHUM';
+
+    let supabaseClient = null;
+    try {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client initialized successfully');
+    } catch (e) {
+        console.warn('Supabase initialization failed. Running in demo mode.', e);
+    }
+
+    /* ============================================================
+       STATE MANAGEMENT
+       ============================================================ */
+    let currentStep = 1;
+    const totalSteps = 7;
+    let selectedPlan = 'pro';
+    let selectedPersonality = 'analytical';
+    let termsAccepted = false;
+    let captchaVerified = false;
+    let logoFile = null;
+    let isSubmitting = false;
+    let selectedBusinessChallenge = '';
+    let selectedBackgroundChallenge = '';
+    let selectedModules = [];
+    let selectedPriorities = [];
+    let revenueTarget = 200000;
+
+    const stepLabels = {
+        1: 'Personal Information',
+        2: 'Contact & Security',
+        3: 'Location & Preferences',
+        4: 'Business Details & AI',
+        5: 'Business Challenges',
+        6: 'Goals & Priorities',
+        7: 'Plan & Review'
+    };
+
+    /* ============================================================
+       ONBOARDING DATA — 49 business types, 28 challenges, 24 backgrounds, 16 modules
+       ============================================================ */
+    const BUSINESS_CHALLENGES = [
+        "Poor financial planning",
+        "Irregular cash flow",
+        "Business decisions based mainly on intuition",
+        "Unclear product profitability",
+        "Supplier price fluctuations",
+        "Inconsistent supplier reliability",
+        "Customer acquisition is expensive",
+        "High transport and logistics costs",
+        "Difficulty deciding when to expand",
+        "Limited customer retention",
+        "Poor inventory visibility",
+        "Difficulty identifying business risks",
+        "Difficulty comparing investment options",
+        "Staff productivity challenges",
+        "Difficulty forecasting sales",
+        "High operating costs",
+        "Limited digital business tools",
+        "Difficulty setting prices",
+        "Low profit margins",
+        "Seasonal demand fluctuations",
+        "Unpredictable customer demand",
+        "Slow-moving stock",
+        "Too much money tied up in stock",
+        "Weak sales tracking",
+        "Waste and operational inefficiencies",
+        "Limited access to useful market information",
+        "High production costs",
+        "Difficulty managing multiple branches"
+    ];
+
+    const BACKGROUND_CHALLENGES = [
+        "Family income is partly dependent on the business",
+        "Has limited staff and manages several roles personally",
+        "Has experienced periods of inconsistent revenue",
+        "Has difficulty turning raw business data into decisions",
+        "Limited access to affordable business financing",
+        "Has operated mainly through informal business processes",
+        "Business grew faster than its management systems",
+        "Limited technology experience",
+        "Operates with limited working capital",
+        "No formal business planning experience",
+        "Limited accounting and financial-management knowledge",
+        "Operates in a highly competitive local market",
+        "Depends on a small number of major customers",
+        "Recently moved from informal to more structured operations",
+        "Relies heavily on manual record keeping",
+        "Business records are fragmented across notebooks and spreadsheets",
+        "Depends on a small number of suppliers",
+        "Started with limited personal capital",
+        "Needs to balance business growth with household expenses",
+        "Limited access to professional business advisors",
+        "Limited access to reliable market data",
+        "Wants to expand but lacks confidence in financial projections",
+        "Previously experienced an unsuccessful business investment",
+        "Started the business to create employment for family members"
+    ];
+
+    const HELACORE_MODULES = [
+        { id: "cash-flow", name: "Cash-Flow Forecasting", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        { id: "inventory", name: "Inventory Intelligence", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
+        { id: "pricing", name: "Pricing Intelligence", icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" },
+        { id: "customers", name: "Customer Insights", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+        { id: "demand", name: "Demand Forecasting", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
+        { id: "market", name: "Market Intelligence", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        { id: "what-if", name: "What-If Simulation", icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" },
+        { id: "risk", name: "Risk Monitoring", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" },
+        { id: "opportunity", name: "Opportunity Detection", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+        { id: "supplier", name: "Supplier Intelligence", icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" },
+        { id: "financial", name: "Financial Health", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+        { id: "capital", name: "Smart Capital", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+        { id: "growth", name: "Growth Planning", icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" },
+        { id: "ai-guidance", name: "AI Guidance", icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" },
+        { id: "performance", name: "Performance Analytics", icon: "M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" },
+        { id: "agricultural", name: "Agricultural Intel", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" }
+    ];
+
+    const BUSINESS_PRIORITIES = [
+        { id: "revenue", name: "Revenue Growth", icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6", color: "amber" },
+        { id: "costs", name: "Cost Reduction", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4", color: "emerald" },
+        { id: "customers", name: "Customer Growth", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", color: "cyan" },
+        { id: "cashflow", name: "Cash Flow", icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color: "amber" },
+        { id: "inventory", name: "Inventory Control", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4", color: "emerald" },
+        { id: "risk", name: "Risk Reduction", icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z", color: "red" },
+        { id: "team", name: "Team Productivity", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z", color: "cyan" },
+        { id: "expansion", name: "Market Expansion", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z", color: "amber" },
+        { id: "technology", name: "Digital Tools", icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", color: "emerald" }
+    ];
+
+    /* ============================================================
+       POPULATE ONBOARDING SELECTORS
+       ============================================================ */
+    function populateBusinessChallenges() {
+        const grid = document.getElementById('business-challenges-grid');
+        if (!grid) return;
+        grid.innerHTML = BUSINESS_CHALLENGES.map(c => {
+            const severity = c.includes('cash flow') || c.includes('Poor financial') ? 'critical' : c.includes('Irregular') || c.includes('Unclear') || c.includes('Inconsistent') ? 'high' : 'medium';
+            const sevColor = severity === 'critical' ? 'red' : severity === 'high' ? 'amber' : 'emerald';
+            return `<div class="challenge-card cursor-pointer" data-challenge="${c}" onclick="selectBusinessChallenge(this, '${c.replace(/'/g, "\\'")}')">
+                <div class="flex items-start gap-2">
+                    <div class="w-2 h-2 rounded-full bg-${sevColor}-400 mt-1.5 flex-shrink-0"></div>
+                    <span class="text-sm text-theme-secondary">${c}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function populateBackgroundChallenges() {
+        const grid = document.getElementById('background-challenges-grid');
+        if (!grid) return;
+        grid.innerHTML = BACKGROUND_CHALLENGES.map(c => {
+            return `<div class="challenge-card cursor-pointer" data-challenge="${c}" onclick="selectBackgroundChallenge(this, '${c.replace(/'/g, "\\'")}')">
+                <div class="flex items-start gap-2">
+                    <div class="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div>
+                    <span class="text-sm text-theme-secondary">${c}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function selectBusinessChallenge(el, challenge) {
+        document.querySelectorAll('#business-challenges-grid .challenge-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedBusinessChallenge = challenge;
+        clearError('businessChallenge');
+    }
+
+    function selectBackgroundChallenge(el, challenge) {
+        document.querySelectorAll('#background-challenges-grid .challenge-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedBackgroundChallenge = challenge;
+        clearError('backgroundChallenge');
+    }
+
+    function populateModules() {
+        const grid = document.getElementById('modules-grid');
+        if (!grid) return;
+        grid.innerHTML = HELACORE_MODULES.map(m => {
+            return `<div class="module-card cursor-pointer" data-module="${m.id}" onclick="toggleModule(this, '${m.id}')">
+                <svg class="w-5 h-5 text-amber-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${m.icon}"/></svg>
+                <span class="text-xs text-theme-secondary">${m.name}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleModule(el, moduleId) {
+        el.classList.toggle('selected');
+        if (el.classList.contains('selected')) {
+            if (!selectedModules.includes(moduleId)) selectedModules.push(moduleId);
+        } else {
+            selectedModules = selectedModules.filter(m => m !== moduleId);
+        }
+    }
+
+    function populatePriorities() {
+        const grid = document.getElementById('priorities-grid');
+        if (!grid) return;
+        grid.innerHTML = BUSINESS_PRIORITIES.map(p => {
+            return `<div class="priority-card cursor-pointer" data-priority="${p.id}" onclick="togglePriority(this, '${p.id}')">
+                <svg class="w-5 h-5 text-${p.color}-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${p.icon}"/></svg>
+                <span class="text-xs text-theme-secondary">${p.name}</span>
+            </div>`;
+        }).join('');
+    }
+
+    function togglePriority(el, priorityId) {
+        if (el.classList.contains('selected')) {
+            el.classList.remove('selected');
+            selectedPriorities = selectedPriorities.filter(p => p !== priorityId);
+        } else {
+            if (selectedPriorities.length >= 3) {
+                showToast('You can select up to 3 priorities', 'info');
+                return;
+            }
+            el.classList.add('selected');
+            selectedPriorities.push(priorityId);
+        }
+        if (selectedPriorities.length > 0) clearError('priorities');
+    }
+
+    /* ============================================================
+       REVENUE TARGET SLIDER
+       ============================================================ */
+    const revenueSlider = document.getElementById('revenueTarget');
+    const revenueDisplay = document.getElementById('revenueTargetDisplay');
+    if (revenueSlider) {
+        revenueSlider.addEventListener('input', function() {
+            revenueTarget = parseInt(this.value);
+            revenueDisplay.textContent = 'KES ' + revenueTarget.toLocaleString();
+        });
+    }
+
+    /* ============================================================
+       INIT SELECTORS ON LOAD
+       ============================================================ */
+    populateBusinessChallenges();
+    populateBackgroundChallenges();
+    populateModules();
+    populatePriorities();
+
+    /* ============================================================
+       THEME MANAGEMENT
+       ============================================================ */
+    function initTheme() {
+        const saved = localStorage.getItem('helacore-theme');
+        if (saved) {
+            document.documentElement.setAttribute('data-theme', saved);
+        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+    initTheme();
+
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('helacore-theme', next);
+    });
+
+    /* ============================================================
+       MOBILE MENU
+       ============================================================ */
+    const mobileMenu = document.getElementById('mobile-menu');
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => mobileMenu.classList.add('open'));
+    document.getElementById('close-menu-btn').addEventListener('click', () => mobileMenu.classList.remove('open'));
+    mobileMenu.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('open');
+    });
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+       ============================================================ */
+    let toastTimeout = null;
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toast-icon');
+        const msg = document.getElementById('toast-msg');
+        toast.className = 'toast ' + type;
+        msg.textContent = message;
+
+        const icons = {
+            success: '<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+            error: '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info: '<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        };
+        icon.innerHTML = icons[type] || icons.info;
+
+        clearTimeout(toastTimeout);
+        requestAnimationFrame(() => { toast.classList.add('show'); });
+        toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 4000);
+    }
+
+    /* ============================================================
+       FORM VALIDATION
+       ============================================================ */
+    function showError(fieldId, show = true) {
+        const input = document.getElementById(fieldId);
+        const error = document.getElementById(fieldId + '-error');
+        if (input) { show ? input.classList.add('error') : input.classList.remove('error'); }
+        if (error) { show ? error.classList.add('visible') : error.classList.remove('visible'); }
+    }
+
+    function clearError(fieldId) { showError(fieldId, false); }
+    function markSuccess(fieldId) {
+        const input = document.getElementById(fieldId);
+        if (input) { input.classList.remove('error'); input.classList.add('success'); }
+        clearError(fieldId);
+    }
+
+    function validateStep(step) {
+        let valid = true;
+        if (step === 1) {
+            const fn = document.getElementById('firstName').value.trim();
+            const ln = document.getElementById('lastName').value.trim();
+            const bn = document.getElementById('businessName').value.trim();
+            if (!fn) { showError('firstName'); valid = false; } else { markSuccess('firstName'); }
+            if (!ln) { showError('lastName'); valid = false; } else { markSuccess('lastName'); }
+            if (!bn) { showError('businessName'); valid = false; } else { markSuccess('businessName'); }
+        } else if (step === 2) {
+            const email = document.getElementById('workEmail').value.trim();
+            const phone = document.getElementById('phoneNumber').value.trim();
+            const pw = document.getElementById('password').value;
+            const cpw = document.getElementById('confirmPassword').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) { showError('workEmail'); valid = false; } else { markSuccess('workEmail'); }
+            if (!phone || phone.length < 6) { showError('phoneNumber'); valid = false; } else { markSuccess('phoneNumber'); }
+            if (!pw || pw.length < 8) { showError('password'); valid = false; } else { clearError('password'); }
+            if (pw !== cpw) { showError('confirmPassword'); valid = false; } else { clearError('confirmPassword'); }
+        } else if (step === 3) {
+            const country = document.getElementById('country').value;
+            const city = document.getElementById('city').value.trim();
+            if (!country) { showError('country'); valid = false; } else { markSuccess('country'); }
+            if (!city) { showError('city'); valid = false; } else { markSuccess('city'); }
+        } else if (step === 4) {
+            const industry = document.getElementById('industry').value;
+            if (!industry) { showError('industry'); valid = false; } else { markSuccess('industry'); }
+        } else if (step === 5) {
+            if (!selectedBusinessChallenge) { showError('businessChallenge'); valid = false; } else { clearError('businessChallenge'); }
+            if (!selectedBackgroundChallenge) { showError('backgroundChallenge'); valid = false; } else { clearError('backgroundChallenge'); }
+        } else if (step === 6) {
+            if (selectedPriorities.length === 0) { showError('priorities'); valid = false; } else { clearError('priorities'); }
+        } else if (step === 7) {
+            if (!termsAccepted || !captchaVerified) {
+                document.getElementById('terms-error').classList.add('visible');
+                valid = false;
+            } else {
+                document.getElementById('terms-error').classList.remove('visible');
+            }
+            populateReview();
+        }
+        return valid;
+    }
+
+    /* ============================================================
+       STEP NAVIGATION
+       ============================================================ */
+    function goToStep(step) {
+        if (step < 1 || step > totalSteps) return;
+        document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+        const target = document.querySelector(`.form-step[data-step="${step}"]`);
+        if (target) target.classList.add('active');
+
+        document.getElementById('current-step-num').textContent = step;
+        document.getElementById('step-label').textContent = stepLabels[step];
+
+        // Update step dots
+        document.querySelectorAll('.step-dot').forEach(dot => {
+            const s = parseInt(dot.dataset.step);
+            dot.classList.remove('active', 'completed');
+            if (s === step) dot.classList.add('active');
+            else if (s < step) dot.classList.add('completed');
+        });
+
+        // Update step lines
+        document.querySelectorAll('.step-line .fill').forEach((fill, i) => {
+            fill.style.width = (step > i + 1) ? '100%' : '0%';
+        });
+
+        // Navigation buttons
+        document.getElementById('prev-btn').style.visibility = step === 1 ? 'hidden' : 'visible';
+        const nextText = document.getElementById('next-btn-text');
+        const nextLoading = document.getElementById('next-btn-loading');
+        if (step === totalSteps) {
+            nextText.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Create Workspace';
+        } else {
+            nextText.innerHTML = 'Continue <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>';
+        }
+        nextText.classList.remove('hidden');
+        nextLoading.classList.add('hidden');
+
+        currentStep = step;
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    document.getElementById('next-btn').addEventListener('click', async function() {
+        if (isSubmitting) return;
+        if (!validateStep(currentStep)) return;
+
+        if (currentStep === totalSteps) {
+            await submitForm();
+            return;
+        }
+        goToStep(currentStep + 1);
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', function() {
+        goToStep(currentStep - 1);
+    });
+
+    /* ============================================================
+       PASSWORD STRENGTH
+       ============================================================ */
+    document.getElementById('password').addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+    });
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+        checkPasswordMatch();
+    });
+
+    function checkPasswordStrength(pw) {
+        const bar = document.getElementById('pw-strength-bar');
+        const text = document.getElementById('pw-strength-text');
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+        const levels = [
+            { width: '0%', color: 'transparent', label: 'Enter a password' },
+            { width: '20%', color: '#ef4444', label: 'Very weak' },
+            { width: '40%', color: '#f97316', label: 'Weak' },
+            { width: '60%', color: '#eab308', label: 'Fair' },
+            { width: '80%', color: '#22c55e', label: 'Strong' },
+            { width: '100%', color: '#10b981', label: 'Very strong' }
+        ];
+        const level = levels[Math.min(score, 5)];
+        bar.style.width = level.width;
+        bar.style.background = level.color;
+        text.textContent = level.label;
+        text.style.color = level.color;
+    }
+
+    function checkPasswordMatch() {
+        const pw = document.getElementById('password').value;
+        const cpw = document.getElementById('confirmPassword').value;
+        if (cpw && cpw !== pw) {
+            showError('confirmPassword');
+        } else {
+            clearError('confirmPassword');
+            if (cpw) markSuccess('confirmPassword');
+        }
+    }
+
+    /* ============================================================
+       PASSWORD TOGGLE
+       ============================================================ */
+    document.getElementById('toggle-pw1').addEventListener('click', function() {
+        const input = document.getElementById('password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    });
+    document.getElementById('toggle-pw2').addEventListener('click', function() {
+        const input = document.getElementById('confirmPassword');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    /* ============================================================
+       LOGO UPLOAD
+       ============================================================ */
+    document.getElementById('logo-input').addEventListener('change', function(e) {
+        handleLogoUpload(e.target);
+    });
+    document.getElementById('remove-logo-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        removeLogo();
+    });
+
+    function handleLogoUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('Logo must be under 2MB', 'error');
+            return;
+        }
+        logoFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('logo-img').src = e.target.result;
+            document.getElementById('logo-name').textContent = file.name;
+            document.getElementById('logo-size').textContent = (file.size / 1024).toFixed(1) + ' KB';
+            document.getElementById('logo-preview-area').classList.add('hidden');
+            document.getElementById('logo-preview').classList.remove('hidden');
+            document.getElementById('logo-upload').classList.add('has-file');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeLogo() {
+        logoFile = null;
+        document.getElementById('logo-input').value = '';
+        document.getElementById('logo-preview-area').classList.remove('hidden');
+        document.getElementById('logo-preview').classList.add('hidden');
+        document.getElementById('logo-upload').classList.remove('has-file');
+    }
+
+    /* ============================================================
+       PLAN SELECTION
+       ============================================================ */
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedPlan = this.dataset.plan;
+        });
+    });
+
+    /* ============================================================
+       PERSONALITY SELECTION
+       ============================================================ */
+    document.querySelectorAll('.personality-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.personality-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedPersonality = this.dataset.personality;
+        });
+    });
+
+    /* ============================================================
+       TERMS & CAPTCHA
+       ============================================================ */
+    document.getElementById('terms-check').addEventListener('click', function() {
+        termsAccepted = !termsAccepted;
+        const cb = document.getElementById('terms-checkbox');
+        termsAccepted ? cb.classList.add('checked') : cb.classList.remove('checked');
+        if (termsAccepted) document.getElementById('terms-error').classList.remove('visible');
+    });
+
+    document.getElementById('captcha-box').addEventListener('click', function() {
+        if (captchaVerified) return;
+        const box = this;
+        box.style.opacity = '0.6';
+        box.style.pointerEvents = 'none';
+        document.getElementById('captcha-text').textContent = 'Verifying...';
+
+        // Simulate captcha verification (in production, use reCAPTCHA or hCaptcha)
+        setTimeout(() => {
+            captchaVerified = true;
+            box.classList.add('verified');
+            box.style.opacity = '1';
+            box.style.pointerEvents = 'auto';
+            document.getElementById('captcha-text').textContent = 'Verified';
+            document.getElementById('captcha-content').innerHTML = `
+                <svg class="w-5 h-5 text-emerald-400 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-sm font-medium text-emerald-400 z-10">Verified</span>
+            `;
+            if (termsAccepted) document.getElementById('terms-error').classList.remove('visible');
+        }, 1500);
+    });
+
+    /* ============================================================
+       POPULATE REVIEW
+       ============================================================ */
+    function populateReview() {
+        const fn = document.getElementById('firstName').value.trim();
+        const ln = document.getElementById('lastName').value.trim();
+        const bn = document.getElementById('businessName').value.trim();
+        const email = document.getElementById('workEmail').value.trim();
+        const code = document.getElementById('phoneCode').value;
+        const phone = document.getElementById('phoneNumber').value.trim();
+        const country = document.getElementById('country').value;
+        const city = document.getElementById('city').value.trim();
+        const industry = document.getElementById('industry');
+
+        const countryNames = { KE:'Kenya', TZ:'Tanzania', UG:'Uganda', RW:'Rwanda', BI:'Burundi', ET:'Ethiopia', NG:'Nigeria', GH:'Ghana', ZA:'South Africa', OTHER:'Other' };
+        const industryNames = { agriculture:'Agriculture', retail:'Retail', manufacturing:'Manufacturing', tech:'Technology', finance:'Finance', healthcare:'Healthcare', education:'Education', hospitality:'Hospitality', logistics:'Logistics', construction:'Construction', media:'Media', professional:'Professional Services', food:'Food & Beverage', other:'Other' };
+        const planNames = { free:'Free - $0', pro:'Pro - $29/mo', enterprise:'Enterprise - Custom' };
+
+        document.getElementById('review-name').textContent = fn + ' ' + ln;
+        document.getElementById('review-business').textContent = bn;
+        document.getElementById('review-email').textContent = email;
+        document.getElementById('review-phone').textContent = code + ' ' + phone;
+        document.getElementById('review-location').textContent = city + ', ' + (countryNames[country] || country);
+        document.getElementById('review-industry').textContent = industryNames[industry.value] || '-';
+        document.getElementById('review-challenge').textContent = selectedBusinessChallenge || '-';
+        document.getElementById('review-background').textContent = selectedBackgroundChallenge || '-';
+        document.getElementById('review-revenue-target').textContent = 'KES ' + revenueTarget.toLocaleString();
+        document.getElementById('review-priorities').textContent = selectedPriorities.length > 0 ? selectedPriorities.map(p => {
+            const pr = BUSINESS_PRIORITIES.find(x => x.id === p);
+            return pr ? pr.name : p;
+        }).join(', ') : '-';
+        document.getElementById('review-modules').textContent = selectedModules.length > 0 ? selectedModules.map(m => {
+            const mod = HELACORE_MODULES.find(x => x.id === m);
+            return mod ? mod.name : m;
+        }).join(', ') : '-';
+        document.getElementById('review-plan').textContent = planNames[selectedPlan] || 'Pro - $29/mo';
+    }
+
+    /* ============================================================
+       EMAIL VERIFICATION LINK FLOW (no OTP popup)
+       ============================================================ */
+    /* OTP overlay has been removed. After signup, Supabase sends a
+       verification link to the user's email. Clicking it lands them
+       on dashboard.html with a confirmed session. */
+
+    /* ============================================================
+       FORM SUBMISSION
+       ============================================================ */
+    async function submitForm() {
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        const nextText = document.getElementById('next-btn-text');
+        const nextLoading = document.getElementById('next-btn-loading');
+        const nextBtn = document.getElementById('next-btn');
+        nextText.classList.add('hidden');
+        nextLoading.classList.remove('hidden');
+        nextBtn.disabled = true;
+
+        const email = document.getElementById('workEmail').value.trim();
+        const password = document.getElementById('password').value;
+        const phone = document.getElementById('phoneCode').value + document.getElementById('phoneNumber').value.trim();
+
+        // Build user metadata — includes all onboarding intelligence data
+        const metadata = {
+            first_name: document.getElementById('firstName').value.trim(),
+            last_name: document.getElementById('lastName').value.trim(),
+            business_name: document.getElementById('businessName').value.trim(),
+            phone: phone,
+            country: document.getElementById('country').value,
+            city: document.getElementById('city').value.trim(),
+            business_address: document.getElementById('businessAddress').value.trim(),
+            currency: document.getElementById('currency').value,
+            timezone: document.getElementById('timezone').value,
+            language: document.getElementById('language').value,
+            industry: document.getElementById('industry').value,
+            business_size: document.getElementById('businessSize').value,
+            business_stage: document.getElementById('businessStage').value,
+            website: document.getElementById('website').value.trim(),
+            business_desc: document.getElementById('businessDesc').value.trim(),
+            ai_personality: selectedPersonality,
+            plan: selectedPlan,
+            business_challenge: selectedBusinessChallenge,
+            background_challenge: selectedBackgroundChallenge,
+            revenue_target: revenueTarget,
+            current_revenue: document.getElementById('currentRevenue').value,
+            priorities: selectedPriorities,
+            preferred_modules: selectedModules,
+            onboarding_completed: true
+        };
+
+        try {
+            if (supabaseClient) {
+                /* ── Supabase signup ───────────────────────────────────
+                   emailRedirectTo sends the user a clickable link.
+                   Clicking it confirms the email and lands on dashboard.html
+                   with a fully authenticated session. No OTP popup. */
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: metadata,
+                        emailRedirectTo: window.location.origin + '/dashboard.html'
+                    }
+                });
+
+                if (error) {
+                    if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+                        showToast('This email is already registered. Please sign in instead.', 'error');
+                        resetSubmitButton();
+                        isSubmitting = false;
+                        return;
+                    }
+                    throw error;
+                }
+
+                /* Store the full onboarding profile in workspaces so the
+                   dashboard can read it immediately after email verification. */
+                const user = data?.user;
+                if (user) {
+                    await supabaseClient.from('workspaces').upsert({
+                        id: user.id,
+                        owner_email: email,
+                        first_name: metadata.first_name,
+                        last_name: metadata.last_name,
+                        business_name: metadata.business_name,
+                        phone: metadata.phone,
+                        country: metadata.country,
+                        city: metadata.city,
+                        currency: metadata.currency,
+                        timezone: metadata.timezone,
+                        language: metadata.language,
+                        industry: metadata.industry,
+                        business_size: metadata.business_size,
+                        business_stage: metadata.business_stage,
+                        website: metadata.website,
+                        business_desc: metadata.business_desc,
+                        ai_personality: metadata.ai_personality,
+                        plan: metadata.plan,
+                        business_challenge: metadata.business_challenge,
+                        background_challenge: metadata.background_challenge,
+                        revenue_target: metadata.revenue_target,
+                        current_revenue: metadata.current_revenue,
+                        priorities: metadata.priorities,
+                        preferred_modules: metadata.preferred_modules,
+                        onboarding_completed: true,
+                        created_at: new Date().toISOString()
+                    }, { onConflict: 'id' });
+                }
+
+                // Show the success screen — "Check Your Email" with verification link instructions
+                showSuccessScreen();
+
+            } else {
+                // No Supabase configured — demo mode, go straight to dashboard
+                showToast('Creating your workspace...', 'info');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }
+
+        } catch (e) {
+            console.error('Signup error:', e);
+            showToast(e.message || 'Something went wrong. Please try again.', 'error');
+            resetSubmitButton();
+        }
+
+        isSubmitting = false;
+    }
+
+    function resetSubmitButton() {
+        const nextText = document.getElementById('next-btn-text');
+        const nextLoading = document.getElementById('next-btn-loading');
+        const nextBtn = document.getElementById('next-btn');
+        nextText.classList.remove('hidden');
+        nextLoading.classList.add('hidden');
+        nextBtn.disabled = false;
+        nextText.innerHTML = 'Create Workspace <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+    }
+
+    function showSuccessScreen() {
+        document.getElementById('form-nav').style.display = 'none';
+        document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+        const success = document.getElementById('success-screen');
+        success.classList.add('show');
+        document.getElementById('success-name').textContent = document.getElementById('firstName').value.trim();
+        document.getElementById('success-email').textContent = document.getElementById('workEmail').value.trim();
+        launchConfetti();
+    }
+
+    /* ============================================================
+       RESEND VERIFICATION LINK (SUCCESS SCREEN)
+       ============================================================ */
+    document.getElementById('resend-email-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = 'Sending...';
+        try {
+            if (supabaseClient) {
+                const { error } = await supabaseClient.auth.resend({
+                    type: 'signup',
+                    email: document.getElementById('workEmail').value.trim()
+                });
+                if (error) throw error;
+            }
+            showToast('Verification link resent! Check your inbox.', 'success');
+        } catch (e) {
+            showToast(e.message || 'Failed to resend email', 'error');
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Resend Verification Link';
+        }
+    });
+
+    /* ============================================================
+       SOCIAL SIGN-IN
+       ============================================================ */
+    document.getElementById('btn-google').addEventListener('click', async function() {
+        if (!supabaseClient) { showToast('Supabase not configured', 'error'); return; }
+        try {
+            const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+            if (error) throw error;
+        } catch (e) { showToast(e.message || 'Google sign-in failed', 'error'); }
+    });
+    document.getElementById('btn-microsoft').addEventListener('click', async function() {
+        if (!supabaseClient) { showToast('Supabase not configured', 'error'); return; }
+        try {
+            const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'azure' });
+            if (error) throw error;
+        } catch (e) { showToast(e.message || 'Microsoft sign-in failed', 'error'); }
+    });
+    document.getElementById('btn-apple').addEventListener('click', async function() {
+        if (!supabaseClient) { showToast('Supabase not configured', 'error'); return; }
+        try {
+            const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'apple' });
+            if (error) throw error;
+        } catch (e) { showToast(e.message || 'Apple sign-in failed', 'error'); }
+    });
+
+    /* ============================================================
+       CONFETTI EFFECT
+       ============================================================ */
+    function launchConfetti() {
+        const colors = ['#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#8b5cf6', '#ec4899'];
+        for (let i = 0; i < 60; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = Math.random() * 100 + 'vw';
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.width = (Math.random() * 8 + 5) + 'px';
+            piece.style.height = (Math.random() * 8 + 5) + 'px';
+            piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            piece.style.animationDelay = (Math.random() * 1) + 's';
+            document.body.appendChild(piece);
+            setTimeout(() => piece.remove(), 5000);
+        }
+    }
+
+    /* ============================================================
+       REAL-TIME INPUT CLEARING ERRORS
+       ============================================================ */
+    ['firstName', 'lastName', 'businessName', 'workEmail', 'phoneNumber', 'password', 'confirmPassword', 'country', 'city', 'industry'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => clearError(id));
+            el.addEventListener('change', () => clearError(id));
+        }
+    });
+
+    /* ============================================================
+       CHATBOT SYSTEM
+       ============================================================ */
+    const chatbotFab = document.getElementById('chatbot-fab');
+    const chatbotPanel = document.getElementById('chatbot-panel');
+    const chatbotClose = document.getElementById('chatbot-close');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+
+    let chatOpen = false;
+    let chatInitialized = false;
+
+    chatbotFab.addEventListener('click', () => {
+        chatOpen = !chatOpen;
+        chatbotPanel.classList.toggle('open', chatOpen);
+        chatbotFab.style.display = chatOpen ? 'none' : 'flex';
+        if (!chatInitialized) { initChat(); chatInitialized = true; }
+        if (chatOpen) chatbotInput.focus();
+    });
+
+    chatbotClose.addEventListener('click', () => {
+        chatOpen = false;
+        chatbotPanel.classList.remove('open');
+        chatbotFab.style.display = 'flex';
+    });
+
+    chatbotSend.addEventListener('click', sendChatMessage);
+    chatbotInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+    });
+
+    function addChatMessage(text, type = 'bot', suggestions = null) {
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg ' + type;
+        msg.textContent = text;
+        chatbotMessages.appendChild(msg);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+        if (suggestions && suggestions.length > 0) {
+            const row = document.createElement('div');
+            row.className = 'flex flex-wrap gap-1 mt-1';
+            suggestions.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = 'chat-suggestion';
+                btn.textContent = s;
+                btn.addEventListener('click', () => {
+                    chatbotInput.value = s;
+                    sendChatMessage();
+                });
+                row.appendChild(btn);
+            });
+            chatbotMessages.appendChild(row);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+    }
+
+    function addTypingIndicator() {
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg bot';
+        msg.id = 'typing-indicator';
+        msg.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        chatbotMessages.appendChild(msg);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const el = document.getElementById('typing-indicator');
+        if (el) el.remove();
+    }
+
+    function initChat() {
+        addChatMessage("Hello! I'm your Hela Assistant. I'll guide you through creating your Helacore workspace. What would you like help with?", 'bot', [
+            'How do I start?',
+            'What info do I need?',
+            'Help with Step 1'
+        ]);
+    }
+
+    function sendChatMessage() {
+        const text = chatbotInput.value.trim();
+        if (!text) return;
+        addChatMessage(text, 'user');
+        chatbotInput.value = '';
+
+        addTypingIndicator();
+        setTimeout(() => {
+            removeTypingIndicator();
+            const response = getChatResponse(text);
+            addChatMessage(response.text, 'bot', response.suggestions);
+        }, 600 + Math.random() * 800);
+    }
+
+    function getChatResponse(input) {
+        const lower = input.toLowerCase();
+
+        // Context-aware responses based on current step
+        if (lower.includes('start') || lower.includes('begin') || lower.includes('how do i')) {
+            return {
+                text: "Great question! Start by filling in your personal details in Step 1: your first name, last name, and business name. You can also upload a logo if you have one. Click 'Continue' when ready to move to the next step.",
+                suggestions: ['What info do I need?', 'Help with Step 1', 'Is my data safe?']
+            };
+        }
+
+        if (lower.includes('info') || lower.includes('need') || lower.includes('prepare') || lower.includes('what do i')) {
+            return {
+                text: "Here's what you'll need across all 5 steps:\n\n1. Your name & business name\n2. Work email, phone number, and a secure password\n3. Country, city, and currency preference\n4. Industry, business size, and a brief description\n5. Choose a plan and review everything\n\nHaving these ready will make the process smooth!",
+                suggestions: ['Help with Step 1', 'Help with Step 2', 'What plans are available?']
+            };
+        }
+
+        if (lower.includes('step 1') || lower.includes('personal') || lower.includes('name') || lower.includes('first name') || lower.includes('last name')) {
+            return {
+                text: "For Step 1, enter your real first and last name — this personalizes your workspace experience. The business name is what will appear on your dashboard and reports. The logo upload is optional but recommended for branding.",
+                suggestions: ['Go to Step 1', 'Help with Step 2', 'What logo formats?']
+            };
+        }
+
+        if (lower.includes('logo') || lower.includes('upload') || lower.includes('image')) {
+            return {
+                text: "You can upload your business logo in PNG, JPG, or SVG format. The file should be under 2MB. A square or landscape image works best. Don't worry if you don't have one yet — you can always add it later from workspace settings.",
+                suggestions: ['Help with Step 1', 'Help with Step 2', 'Skip the logo?']
+            };
+        }
+
+        if (lower.includes('step 2') || lower.includes('email') || lower.includes('password') || lower.includes('contact') || lower.includes('security')) {
+            return {
+                text: "Step 2 is about your login credentials. Use a work email you check regularly — we'll send a verification code to it. For passwords, I recommend at least 8 characters with a mix of uppercase, lowercase, numbers, and symbols for maximum security.",
+                suggestions: ['Password tips', 'Help with Step 3', 'Is my data encrypted?']
+            };
+        }
+
+        if (lower.includes('password tip') || lower.includes('strong password') || lower.includes('secure')) {
+            return {
+                text: "Here are my top password tips:\n\n- Use 12+ characters for best security\n- Mix uppercase, lowercase, numbers & symbols\n- Avoid common words or patterns\n- Don't reuse passwords from other sites\n- Consider a passphrase like 'Sunset$River7Glow!'\n\nThe strength meter below the password field will show you how strong it is in real-time.",
+                suggestions: ['Help with Step 2', 'Help with Step 3', 'What is 2FA?']
+            };
+        }
+
+        if (lower.includes('2fa') || lower.includes('two factor') || lower.includes('two-factor') || lower.includes('biometric')) {
+            return {
+                text: "Two-Factor Authentication (2FA) adds an extra layer of security. After signing up, you can enable it from workspace settings. We support SMS codes, authenticator apps (like Google Authenticator), and biometric login on supported devices. I highly recommend turning it on!",
+                suggestions: ['Help with Step 2', 'Help with Step 3', 'Is my data safe?']
+            };
+        }
+
+        if (lower.includes('step 3') || lower.includes('location') || lower.includes('country') || lower.includes('city') || lower.includes('currency') || lower.includes('timezone')) {
+            return {
+                text: "In Step 3, select your country and city so we can provide localized business insights, tax information, and market data relevant to your region. The currency and timezone settings affect how your financial data is displayed.",
+                suggestions: ['Help with Step 2', 'Help with Step 4', 'What if my country isn\'t listed?']
+            };
+        }
+
+        if (lower.includes('country') && (lower.includes('list') || lower.includes('not listed') || lower.includes('missing'))) {
+            return {
+                text: "If your country isn't listed, select 'Other' and type your city manually. We're constantly expanding our regional coverage. Your workspace will still work perfectly — some localized features may be limited until full support is added.",
+                suggestions: ['Help with Step 3', 'Help with Step 4', 'Contact support']
+            };
+        }
+
+        if (lower.includes('step 4') || lower.includes('industry') || lower.includes('business detail') || lower.includes('personality') || lower.includes('ai')) {
+            return {
+                text: "Step 4 helps us understand your business. Choose the industry that best matches your primary activity. The AI personality setting controls how your Helacore AI assistant communicates — Professional for formal settings, Friendly for a relaxed vibe, Analytical for data-heavy work, or Motivational for an energetic boost!",
+                suggestions: ['What is AI personality?', 'Help with Step 5', 'Help with Step 3']
+            };
+        }
+
+        if (lower.includes('ai personality') || lower.includes('what personality') || lower.includes('assistant style')) {
+            return {
+                text: "The AI personality changes how your Helacore assistant talks to you:\n\n- Professional: Formal, concise, business-like\n- Friendly: Warm, casual, approachable\n- Analytical: Data-focused, detailed, precise\n- Motivational: Energetic, encouraging, upbeat\n\nYou can change this anytime from settings. 'Analytical' is our most popular choice for business users.",
+                suggestions: ['Help with Step 4', 'Help with Step 5', 'Can I customize it more?']
+            };
+        }
+
+        if (lower.includes('step 5') || lower.includes('challenge') || lower.includes('biggest problem') || lower.includes('pain point') || lower.includes('struggling')) {
+            return {
+                text: "Step 5 is where we identify your biggest business challenge and current situation. This is crucial — it determines which solution playbooks Helacore prioritizes, how we adjust our coaching style, and which modules we recommend first. Choose the challenge that impacts your business the most right now.",
+                suggestions: ['Help with Step 4', 'Help with Step 6', 'What are the challenges?']
+            };
+        }
+
+        if (lower.includes('challenge') && (lower.includes('what') || lower.includes('list') || lower.includes('available'))) {
+            return {
+                text: "The main business challenges we help with include:\n\n- Irregular cash flow\n- Poor financial planning\n- Difficulty setting prices\n- High operating costs\n- Limited customer retention\n- Poor inventory visibility\n- Seasonal demand fluctuations\n- Customer acquisition costs\n\nAnd many more! Pick the one that's affecting your business the most right now.",
+                suggestions: ['Help with Step 5', 'Help with Step 6', 'Help with Step 4']
+            };
+        }
+
+        if (lower.includes('step 6') || lower.includes('goal') || lower.includes('priority') || lower.includes('revenue target') || lower.includes('module')) {
+            return {
+                text: "Step 6 lets you set your revenue target, choose up to 3 business priorities, and select which Helacore modules interest you. Your priorities shape your dashboard focus — for example, if you choose 'Revenue Growth' and 'Cash Flow', those will appear front and center.",
+                suggestions: ['Help with Step 5', 'Help with Step 7', 'What modules are available?']
+            };
+        }
+
+        if (lower.includes('module') && (lower.includes('available') || lower.includes('what') || lower.includes('list'))) {
+            return {
+                text: "Helacore has 16 intelligence modules: Cash-Flow Forecasting, Inventory Intelligence, Pricing Intelligence, Customer Insights, Demand Forecasting, Market Intelligence, What-If Simulation, Risk Monitoring, Opportunity Detection, Supplier Intelligence, Financial Health, Smart Capital, Growth Planning, AI Guidance, Performance Analytics, and Agricultural Intelligence. Select any that interest you!",
+                suggestions: ['Help with Step 6', 'Help with Step 5', 'What plans are available?']
+            };
+        }
+
+        if (lower.includes('step 7') || lower.includes('plan') || lower.includes('review') || lower.includes('pricing') || lower.includes('free') || lower.includes('pro') || lower.includes('enterprise')) {
+            return {
+                text: "In Step 7, choose a plan:\n\n- Free: Perfect for trying Helacore — 1 workspace, 5 members, basic AI\n- Pro ($29/mo): Best for growing businesses — 5 workspaces, 25 members, advanced AI analytics\n- Enterprise: Custom pricing for large organizations with unlimited everything\n\nYou can upgrade or downgrade anytime. The review section shows all your details before submitting.",
+                suggestions: ['What\'s included in Pro?', 'Can I change plans later?', 'Help with Step 6']
+            };
+        }
+
+        if (lower.includes('pro') && (lower.includes('include') || lower.includes('feature') || lower.includes('what'))) {
+            return {
+                text: "Pro plan ($29/mo) includes:\n\n- Up to 5 workspaces\n- 25 team members\n- Advanced AI analytics & predictions\n- Priority email & chat support\n- Custom reports & dashboards\n- API access (1000 calls/day)\n- Data export (CSV, PDF, Excel)\n- 90-day data retention\n\nMost businesses find Pro perfectly balances features and cost.",
+                suggestions: ['Help with Step 7', 'Is there a free trial?', 'Compare all plans']
+            };
+        }
+
+        if (lower.includes('change plan') || lower.includes('upgrade') || lower.includes('downgrade') || lower.includes('switch plan')) {
+            return {
+                text: "Absolutely! You can change your plan at any time from your workspace settings. When upgrading, you'll be prorated for the remainder of your billing cycle. Downgrading takes effect at the start of your next billing period — no data is lost.",
+                suggestions: ['Help with Step 5', 'What\'s included in Pro?', 'Help with Step 4']
+            };
+        }
+
+        if (lower.includes('safe') || lower.includes('security') || lower.includes('encrypt') || lower.includes('privacy') || lower.includes('data')) {
+            return {
+                text: "Your data security is our top priority:\n\n- All data encrypted at rest (AES-256) and in transit (TLS 1.3)\n- SOC 2 Type II compliant infrastructure\n- Regular third-party security audits\n- Your data is never sold or shared with third parties\n- GDPR & regional data protection compliant\n- You can export or delete all your data anytime",
+                suggestions: ['Help with Step 2', 'Password tips', 'What is 2FA?']
+            };
+        }
+
+        if (lower.includes('verify') || lower.includes('verification') || lower.includes('otp') || lower.includes('code') || lower.includes('confirm email') || lower.includes('email link')) {
+            return {
+                text: "After clicking 'Create Workspace', we'll send a verification link to your email. Simply click the link in the email and you'll be taken straight to your personalized dashboard — no codes to enter. Check your spam folder if you don't see it within a couple of minutes.",
+                suggestions: ['Help with Step 7', 'I didn\'t receive the email', 'Help with Step 6']
+            };
+        }
+
+        if (lower.includes('didn\'t receive') || lower.includes('no email') || lower.includes('spam') || lower.includes('junk')) {
+            return {
+                text: "If you don't see the verification email:\n\n1. Check your spam/junk folder\n2. Add noreply@helacore.com to your contacts\n3. Wait 1-2 minutes (sometimes there's a slight delay)\n4. Click 'Resend Verification Link' on the success screen\n\nIf it still doesn't arrive, contact our support team and we'll help you verify manually.",
+                suggestions: ['Help with Step 7', 'Contact support', 'Help with Step 6']
+            };
+        }
+
+        if (lower.includes('support') || lower.includes('help') || lower.includes('contact') || lower.includes('talk to human')) {
+            return {
+                text: "You can reach our support team through:\n\n- Email: support@helacore.com\n- In-app chat (after signing in)\n- Twitter/X: @helacore_help\n\nOur team typically responds within 2 hours during business hours (EAT). Pro and Enterprise users get priority support with under 30-minute response times.",
+                suggestions: ['Help with Step 1', 'Is my data safe?', 'What plans are available?']
+            };
+        }
+
+        if (lower.includes('skip') || lower.includes('optional') || lower.includes('not required')) {
+            return {
+                text: "Only fields marked with a red asterisk (*) are required. Optional fields like business logo, address, website, and description can be filled in later from your workspace settings. However, providing more details helps our AI give you better, more personalized recommendations!",
+                suggestions: ['Help with current step', 'What info do I need?', 'Help with Step 5']
+            };
+        }
+
+        if (lower.includes('thank') || lower.includes('thanks') || lower.includes('great') || lower.includes('awesome')) {
+            return {
+                text: "You're welcome! I'm here whenever you need help. Just type your question and I'll do my best to guide you through the process. Good luck with your Helacore workspace!",
+                suggestions: ['Help with current step', 'What plans are available?', 'Contact support']
+            };
+        }
+
+        // Default: context-aware fallback
+        const stepContext = {
+            1: "You're on Step 1 — Personal Information. Fill in your first name, last name, and business name. The logo is optional.",
+            2: "You're on Step 2 — Contact & Security. Enter your work email, phone number, and create a strong password.",
+            3: "You're on Step 3 — Location & Preferences. Select your country, city, and preferred settings.",
+            4: "You're on Step 4 — Business Details. Choose your industry and AI personality preference.",
+            5: "You're on Step 5 — Business Challenges. Pick your biggest challenge and current situation so we can tailor solutions.",
+            6: "You're on Step 6 — Goals & Priorities. Set your revenue target, choose up to 3 priorities, and select modules.",
+            7: "You're on Step 7 — Plan & Review. Pick a plan, verify the captcha, agree to terms, and submit!"
+        };
+
+        return {
+            text: (stepContext[currentStep] || "I'm here to help you create your Helacore workspace. ") + " You can ask me about any step, password tips, security, plans, or any other questions!",
+            suggestions: ['What info do I need?', 'Help with Step ' + currentStep, 'What plans are available?']
+        };
+    }
+
+    /* ============================================================
+       REVEAL ON SCROLL
+       ============================================================ */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ============================================================
+       THREE.JS BACKGROUND
+       ============================================================ */
+    (function initThreeJS() {
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+
+        // Particle system
+        const particleCount = 300;
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const sizes = new Float32Array(particleCount);
+
+        const colorPalette = [
+            new THREE.Color('#f59e0b'),
+            new THREE.Color('#10b981'),
+            new THREE.Color('#06b6d4'),
+            new THREE.Color('#d97706'),
+            new THREE.Color('#059669')
+        ];
+
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 60;
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+
+            const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            colors[i * 3] = color.r;
+            colors[i * 3 + 1] = color.g;
+            colors[i * 3 + 2] = color.b;
+
+            sizes[i] = Math.random() * 2 + 0.5;
+        }
+
+        const particleGeometry = new THREE.BufferGeometry();
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
+        });
+
+        const particles = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particles);
+
+        // Connection lines
+        const lineGeometry = new THREE.BufferGeometry();
+        const linePositions = new Float32Array(particleCount * particleCount * 6);
+        lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0xf59e0b,
+            transparent: true,
+            opacity: 0.06,
+            blending: THREE.AdditiveBlending
+        });
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(lines);
+
+        // Ambient floating spheres
+        const sphereGroup = new THREE.Group();
+        const sphereData = [];
+        for (let i = 0; i < 8; i++) {
+            const radius = Math.max(0.3, Math.random() * 1.2);
+            const geo = new THREE.SphereGeometry(radius, 16, 16);
+            const mat = new THREE.MeshBasicMaterial({
+                color: colorPalette[i % colorPalette.length],
+                transparent: true,
+                opacity: 0.15
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(
+                (Math.random() - 0.5) * 40,
+                (Math.random() - 0.5) * 30,
+                (Math.random() - 0.5) * 20
+            );
+            sphereGroup.add(mesh);
+            sphereData.push({
+                mesh,
+                speed: Math.random() * 0.3 + 0.1,
+                amplitude: Math.random() * 3 + 1,
+                offset: Math.random() * Math.PI * 2
+            });
+        }
+        scene.add(sphereGroup);
+
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        function updateLines() {
+            const pos = particleGeometry.attributes.position.array;
+            let lineIdx = 0;
+            const maxDist = 8;
+            for (let i = 0; i < Math.min(particleCount, 80); i++) {
+                for (let j = i + 1; j < Math.min(particleCount, 80); j++) {
+                    const dx = pos[i*3] - pos[j*3];
+                    const dy = pos[i*3+1] - pos[j*3+1];
+                    const dz = pos[i*3+2] - pos[j*3+2];
+                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (dist < maxDist) {
+                        linePositions[lineIdx++] = pos[i*3];
+                        linePositions[lineIdx++] = pos[i*3+1];
+                        linePositions[lineIdx++] = pos[i*3+2];
+                        linePositions[lineIdx++] = pos[j*3];
+                        linePositions[lineIdx++] = pos[j*3+1];
+                        linePositions[lineIdx++] = pos[j*3+2];
+                    }
+                }
+            }
+            for (let i = lineIdx; i < linePositions.length; i++) linePositions[i] = 0;
+            lineGeometry.attributes.position.needsUpdate = true;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = Date.now() * 0.001;
+
+            particles.rotation.y += 0.0003;
+            particles.rotation.x += 0.0001;
+
+            // Subtle mouse influence
+            particles.rotation.y += mouseX * 0.0002;
+            particles.rotation.x += mouseY * 0.0002;
+
+            // Animate spheres
+            sphereData.forEach(s => {
+                s.mesh.position.y += Math.sin(time * s.speed + s.offset) * 0.01 * s.amplitude;
+                s.mesh.position.x += Math.cos(time * s.speed * 0.5 + s.offset) * 0.005;
+            });
+
+            updateLines();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    })();
+
+    /* ============================================================
+       AUTO-FOCUS FIRST INPUT ON EACH STEP
+       ============================================================ */
+    const stepObserver = new MutationObserver(() => {
+        const activeStep = document.querySelector('.form-step.active');
+        if (activeStep) {
+            const firstInput = activeStep.querySelector('input:not([type="file"]):not([type="hidden"]), select, textarea');
+            if (firstInput) setTimeout(() => firstInput.focus(), 300);
+        }
+    });
+    stepObserver.observe(document.getElementById('signup-form'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+    /* ============================================================
+       KEYBOARD SHORTCUTS
+       ============================================================ */
+    document.addEventListener('keydown', function(e) {
+        // Escape closes overlays
+        if (e.key === 'Escape') {
+            if (chatOpen) {
+                chatOpen = false;
+                chatbotPanel.classList.remove('open');
+                chatbotFab.style.display = 'flex';
+            }
+            if (mobileMenu.classList.contains('open')) {
+                mobileMenu.classList.remove('open');
+            }
+        }
+    });
+
+    console.log('%c Helacore Workspace Creator ', 'background: linear-gradient(135deg, #f59e0b, #10b981); color: white; font-size: 16px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
+    console.log('%c Replace SUPABASE_URL and SUPABASE_ANON_KEY with your actual credentials for full functionality.', 'color: #f59e0b; font-size: 12px;');
+    </script>
+</body>
+</html>

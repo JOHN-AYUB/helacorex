@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Sign In</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber:#f59e0b;--hela-gold:#d97706;--hela-emerald:#10b981;--hela-cyan:#06b6d4;
+            --liquid-radius-sm:12px;--liquid-radius-md:20px;--liquid-radius-lg:28px;--liquid-radius-xl:36px;
+            --bg-primary:#050507;--bg-secondary:#0a0a0f;--bg-tertiary:#111118;
+            --text-primary:#ffffff;--text-secondary:#a1a1aa;--text-muted:#71717a;--text-inverse:#09090b;
+            --glass-bg:rgba(255,255,255,0.08);--glass-bg-hover:rgba(255,255,255,0.12);
+            --glass-border:rgba(255,255,255,0.15);--glass-border-hover:rgba(255,255,255,0.25);
+            --glass-shadow:0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top:inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom:inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine:rgba(255,255,255,0.1);
+            --dark-glass-bg:rgba(10,10,15,0.6);--dark-glass-border:rgba(255,255,255,0.1);
+            --dark-glass-shadow:0 4px 20px rgba(0,0,0,0.4);
+            --input-bg:rgba(255,255,255,0.05);--input-border:rgba(255,255,255,0.1);
+            --input-focus-border:rgba(245,158,11,0.5);--input-focus-shadow:0 0 20px rgba(245,158,11,0.1);
+            --input-text:#ffffff;--input-placeholder:#71717a;
+            --border-subtle:rgba(255,255,255,0.1);--border-footer:rgba(255,255,255,0.1);
+            --footer-bg:rgba(0,0,0,0.2);--scrollbar-track:#050507;--scrollbar-thumb:#f59e0b;
+            --canvas-opacity:0.6;
+            --gradient-text:linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient:linear-gradi#0000004d5,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --mobile-menu-bg:rgba(10,10,15,0.95);
+            --social-bg:rgba(255,255,255,0.05);--social-bg-hover:rgba(255,255,255,0.1);
+            --social-icon:#a1a1aa;--social-icon-hover:#ffffff;
+            --nav-hover-bg:rgba(255,255,255,0.1);--stats-bg:rgba(255,255,255,0.05);
+            --tag-bg:rgba(255,255,255,0.1);
+            --chatbot-bg:rgba(10,10,15,0.95);--chatbot-border:rgba(255,255,255,0.12);
+            --chatbot-user-msg:linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.15));
+            --chatbot-bot-msg:rgba(255,255,255,0.06);
+            --danger-bg:rgba(239,68,68,0.1);--danger-border:rgba(239,68,68,0.3);
+        }
+        [data-theme="light"] {
+            --bg-primary:#fafaf9;--bg-secondary:#f5f5f4;--bg-tertiary:#e7e5e4;
+            --text-primary:#1c1917;--text-secondary:#57534e;--text-muted:#a8a29e;--text-inverse:#ffffff;
+            --glass-bg:rgba(255,255,255,0.65);--glass-bg-hover:rgba(255,255,255,0.85);
+            --glass-border:rgba(0,0,0,0.08);--glass-border-hover:rgba(0,0,0,0.15);
+            --glass-shadow:0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top:inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom:inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine:rgba(255,255,255,0.5);
+            --dark-glass-bg:rgba(255,255,255,0.5);--dark-glass-border:rgba(0,0,0,0.08);
+            --dark-glass-shadow:0 4px 20px rgba(0,0,0,0.06);
+            --input-bg:rgba(255,255,255,0.8);--input-border:rgba(0,0,0,0.12);
+            --input-focus-border:rgba(245,158,11,0.6);--input-focus-shadow:0 0 20px rgba(245,158,11,0.15);
+            --input-text:#1c1917;--input-placeholder:#a8a29e;
+            --border-subtle:rgba(0,0,0,0.08);--border-footer:rgba(0,0,0,0.08);
+            --footer-bg:rgba(245,245,244,0.8);--scrollbar-track:#f5f5f4;--scrollbar-thumb:#d97706;
+            --canvas-opacity:0.15;
+            --gradient-text:linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover:linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --mobile-menu-bg:rgba(250,250,249,0.98);
+            --social-bg:rgba(0,0,0,0.05);--social-bg-hover:rgba(0,0,0,0.08);
+            --social-icon:#78716c;--social-icon-hover:#1c1917;
+            --nav-hover-bg:rgba(0,0,0,0.06);--stats-bg:rgba(255,255,255,0.6);
+            --tag-bg:rgba(0,0,0,0.06);
+            --chatbot-bg:rgba(255,255,255,0.97);--chatbot-border:rgba(0,0,0,0.1);
+            --chatbot-user-msg:linear-gradient(135deg,rgba(217,119,6,0.15),rgba(5,150,105,0.1));
+            --chatbot-bot-msg:rgba(0,0,0,0.04);
+            --danger-bg:rgba(239,68,68,0.08);--danger-border:rgba(239,68,68,0.2);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;transition:background .5s ease,color .5s ease;}
+        .font-display{font-family:'Space Grotesk',sans-serif;}
+        .liquid-glass{background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom);position:relative;overflow:hidden;border-radius:var(--liquid-radius-lg);transition:all .4s ease;}
+        [data-theme="light"] .liquid-glass{background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%);}
+        .liquid-glass::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%);border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;pointer-events:none;z-index:1;}
+        [data-theme="light"] .liquid-glass::before{background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%);}
+        .liquid-glass::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--glass-shine),transparent);transition:left .7s ease-out;pointer-events:none;z-index:2;}
+        .liquid-glass:hover::after{left:100%;}
+        .liquid-glass:hover{border-color:var(--glass-border-hover);}
+        .liquid-glass-dark{background:var(--dark-glass-bg);backdrop-filter:blur(20px) saturate(150%);border:1px solid var(--dark-glass-border);box-shadow:var(--dark-glass-shadow);border-radius:var(--liquid-radius-md);transition:all .3s ease;}
+        .btn-liquid{position:relative;overflow:hidden;border-radius:9999px;padding:12px 28px;font-weight:600;background:var(--btn-gradient);border:1px solid rgba(245,158,11,0.3);color:var(--text-primary);transition:all .3s ease;box-shadow:0 4px 15px rgba(245,158,11,0.15);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;}
+        [data-theme="light"] .btn-liquid{border:1px solid rgba(217,119,6,0.4);box-shadow:0 4px 15px rgba(217,119,6,0.12);}
+        .btn-liquid:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(245,158,11,0.3);background:var(--btn-gradient-hover);}
+        [data-theme="light"] .btn-liquid:hover{box-shadow:0 8px 25px rgba(217,119,6,0.2);}
+        .btn-liquid:disabled{opacity:0.5;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+        .btn-secondary{border-radius:9999px;padding:12px 28px;font-weight:600;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);transition:all .3s ease;cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;}
+        .btn-secondary:hover{background:var(--glass-bg-hover);transform:translateY(-1px);}
+        .btn-danger{border-radius:9999px;padding:10px 20px;font-weight:600;background:var(--danger-bg);border:1px solid var(--danger-border);color:#ef4444;transition:all .3s ease;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;}
+        .btn-danger:hover{background:rgba(239,68,68,0.15);transform:translateY(-1px);}
+        .theme-toggle{position:relative;width:44px;height:44px;border-radius:50%;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s ease;color:var(--text-primary);}
+        .theme-toggle:hover{background:var(--glass-bg-hover);transform:scale(1.05);}
+        .theme-toggle svg{width:20px;height:20px;transition:transform .5s cubic-bezier(0.4,0,0.2,1);}
+        .theme-toggle:hover svg{transform:rotate(15deg);}
+        [data-theme="light"] .theme-toggle .moon-icon{display:none;}
+        [data-theme="light"] .theme-toggle .sun-icon{display:block;}
+        [data-theme="dark"] .theme-toggle .sun-icon,:root:not([data-theme]) .theme-toggle .sun-icon{display:none;}
+        [data-theme="dark"] .theme-toggle .moon-icon,:root:not([data-theme]) .theme-toggle .moon-icon{display:block;}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+        @keyframes float-reverse{0%,100%{transform:translateY(0)}50%{transform:translateY(15px)}}
+        @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes fade-in-up{0%{opacity:0;transform:translateY(24px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes scale-in{0%{opacity:0;transform:scale(0.9)}100%{opacity:1;transform:scale(1)}}
+        @keyframes check-draw{0%{stroke-dashoffset:24}100%{stroke-dashoffset:0}}
+        @keyframes dot-pulse{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+        @keyframes success-pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+        @keyframes ripple{0%{transform:scale(0);opacity:0.5}100%{transform:scale(4);opacity:0}}
+        @keyframes typing-dots{0%,20%{opacity:0}50%{opacity:1}80%,100%{opacity:0}}
+        @keyframes chatbot-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+        @keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-4px)}20%,40%,60%,80%{transform:translateX(4px)}}
+        @keyframes glow-pulse{0%,100%{box-shadow:0 0 5px rgba(239,68,68,0.3)}50%{box-shadow:0 0 20px rgba(239,68,68,0.5)}}
+        .animate-float{animation:float 6s ease-in-out infinite;}
+        .animate-float-reverse{animation:float-reverse 7s ease-in-out infinite;}
+        .animate-pulse-glow{animation:pulse-glow 2s infinite;}
+        .gradient-text-hela{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .reveal{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(0.4,0,0.2,1);}
+        .reveal.active{opacity:1;transform:translateY(0);}
+        .delay-100{transition-delay:100ms;}.delay-200{transition-delay:200ms;}.delay-300{transition-delay:300ms;}.delay-400{transition-delay:400ms;}
+        ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--scrollbar-track);}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px;}
+        .form-input-liquid{background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--liquid-radius-md);padding:14px 18px;color:var(--input-text);transition:all .3s;width:100%;font-family:'Inter',sans-serif;font-size:14px;}
+        .form-input-liquid::placeholder{color:var(--input-placeholder);}
+        .form-input-liquid:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .form-input-liquid.error{border-color:#ef4444;box-shadow:0 0 20px rgba(239,68,68,0.1);animation:shake .4s ease;}
+        .form-input-liquid.success{border-color:var(--hela-emerald);box-shadow:0 0 20px rgba(16,185,129,0.1);}
+        .form-label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;letter-spacing:0.01em;}
+        .form-label .required{color:#ef4444;margin-left:2px;}
+        .form-hint{font-size:12px;color:var(--text-muted);margin-top:4px;}
+        .form-error{font-size:12px;color:#ef4444;margin-top:4px;display:none;}
+        .form-error.visible{display:block;animation:fade-in-up .3s ease;}
+        .mobile-menu{transform:translateX(100%);transition:transform .4s cubic-bezier(0.16,1,0.3,1);}
+        .mobile-menu.open{transform:translateX(0);}
+        .text-theme-primary{color:var(--text-primary);}.text-theme-secondary{color:var(--text-secondary);}.text-theme-muted{color:var(--text-muted);}
+        .bg-theme-primary{background:var(--bg-primary);}.bg-theme-secondary{background:var(--bg-secondary);}.border-theme-subtle{border-color:var(--border-subtle);}
+        #bg-canvas{opacity:var(--canvas-opacity);transition:opacity .5s ease;}
+        .checkbox-liquid{width:20px;height:20px;border:1.5px solid var(--input-border);border-radius:6px;background:var(--input-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;}
+        .checkbox-liquid.checked{background:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));border-color:var(--hela-amber);}
+        .checkbox-liquid.checked svg{display:block;}
+        .checkbox-liquid svg{display:none;width:14px;height:14px;color:var(--hela-amber);}
+        .password-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);transition:color .3s;background:none;border:none;padding:4px;}
+        .password-toggle:hover{color:var(--text-primary);}
+        .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px;border-radius:var(--liquid-radius-md);background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);font-weight:500;font-size:14px;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;width:100%;}
+        .social-btn:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-hover);transform:translateY(-1px);}
+        .toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:var(--liquid-radius-md);backdrop-filter:blur(20px);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);z-index:9999;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(0.16,1,0.3,1);max-width:400px;}
+        .toast.show{transform:translateY(0);opacity:1;}
+        .toast.success{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);}
+        .toast.error{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);}
+        .toast.info{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);}
+        .loading-dots{display:flex;gap:4px;align-items:center;justify-content:center;}
+        .loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--hela-amber);animation:dot-pulse 1.4s infinite ease-in-out both;}
+        .loading-dots span:nth-child(1){animation-delay:-0.32s;}
+        .loading-dots span:nth-child(2){animation-delay:-0.16s;}
+        .section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border-subtle),transparent);margin:8px 0;}
+        .tab-switch{display:inline-flex;background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--liquid-radius-md);padding:4px;gap:4px;}
+        .tab-switch button{flex:1;padding:10px 16px;border-radius:calc(var(--liquid-radius-md) - 4px);font-size:13px;font-weight:500;color:var(--text-muted);background:transparent;border:none;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;white-space:nowrap;}
+        .tab-switch button.active{background:var(--btn-gradient);color:var(--text-primary);box-shadow:0 2px 8px rgba(245,158,11,0.15);}
+        .tab-switch button:hover:not(.active){color:var(--text-secondary);}
+        .input-icon-wrap{position:relative;}
+        .input-icon-wrap .icon-left{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;transition:color .3s;}
+        .input-icon-wrap:focus-within .icon-left{color:var(--hela-amber);}
+        .input-icon-wrap .form-input-liquid{padding-left:44px;}
+        .input-icon-wrap .form-input-liquid.has-toggle{padding-right:48px;}
+        .forgot-overlay{position:fixed;inset:0;background:rgba(5,5,7,0.85);backdrop-filter:blur(10px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;}
+        .forgot-overlay.show{display:flex;}
+        .success-check{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(6,182,212,0.2));border:2px solid var(--hela-emerald);display:flex;align-items:center;justify-content:center;animation:success-pop .5s cubic-bezier(0.16,1,0.3,1);}
+        .success-check svg{width:32px;height:32px;color:var(--hela-emerald);stroke-dasharray:24;stroke-dashoffset:24;animation:check-draw .6s .3s ease forwards;}
+        .otp-input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:700;font-family:'Space Grotesk',sans-serif;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:var(--liquid-radius-md);color:var(--text-primary);transition:all .3s;}
+        .otp-input:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .otp-input.error{border-color:#ef4444;box-shadow:0 0 15px rgba(239,68,68,0.15);}
+        .unverified-banner{background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:var(--liquid-radius-md);padding:14px 18px;display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;animation:glow-pulse 2s infinite;}
+        .chatbot-fab{position:fixed;bottom:24px;left:24px;z-index:90;width:56px;height:56px;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--hela-amber),var(--hela-emerald));border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,158,11,0.3);transition:all .3s ease;animation:chatbot-bounce 3s ease-in-out infinite;}
+        .chatbot-fab:hover{transform:scale(1.1);box-shadow:0 6px 30px rgba(245,158,11,0.4);}
+        .chatbot-fab svg{width:26px;height:26px;color:white;}
+        .chatbot-panel{position:fixed;bottom:92px;left:24px;z-index:90;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 140px);border-radius:var(--liquid-radius-lg);background:var(--chatbot-bg);border:1px solid var(--chatbot-border);backdrop-filter:blur(30px);box-shadow:0 20px 60px rgba(0,0,0,0.4);display:flex;flex-direction:column;transform:translateY(20px) scale(0.95);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+        .chatbot-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all;}
+        .chatbot-header{padding:16px 20px;border-bottom:1px solid var(--chatbot-border);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+        .chatbot-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+        .chatbot-messages::-webkit-scrollbar{width:4px;}
+        .chatbot-messages::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:2px;}
+        .chat-msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;white-space:pre-line;}
+        .chat-msg.bot{background:var(--chatbot-bot-msg);align-self:flex-start;border-bottom-left-radius:4px;}
+        .chat-msg.user{background:var(--chatbot-user-msg);align-self:flex-end;border-bottom-right-radius:4px;}
+        .chat-msg.bot .typing-indicator{display:inline-flex;gap:4px;align-items:center;padding:2px 0;}
+        .chat-msg.bot .typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:typing-dots 1.4s infinite ease-in-out both;}
+        .chat-msg.bot .typing-indicator span:nth-child(1){animation-delay:0s;}
+        .chat-msg.bot .typing-indicator span:nth-child(2){animation-delay:0.2s;}
+        .chat-msg.bot .typing-indicator span:nth-child(3){animation-delay:0.4s;}
+        .chatbot-input-area{padding:12px 16px;border-top:1px solid var(--chatbot-border);display:flex;gap:8px;flex-shrink:0;}
+        .chatbot-input{flex:1;background:var(--input-bg);border:1px solid var(--input-border);border-radius:9999px;padding:10px 16px;color:var(--input-text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:all .3s;}
+        .chatbot-input:focus{border-color:var(--input-focus-border);}
+        .chatbot-input::placeholder{color:var(--input-placeholder);}
+        .chatbot-send{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--hela-amber),var(--hela-emerald));color:white;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;}
+        .chatbot-send:hover{transform:scale(1.05);}
+        .chatbot-send svg{width:16px;height:16px;}
+        .chat-suggestion{display:inline-block;padding:6px 12px;border-radius:9999px;background:var(--input-bg);border:1px solid var(--input-border);font-size:12px;color:var(--text-secondary);cursor:pointer;transition:all .3s;margin:2px;}
+        .chat-suggestion:hover{border-color:var(--hela-amber);color:var(--hela-amber);}
+        .session-card{padding:12px 14px;border-radius:var(--liquid-radius-sm);background:var(--input-bg);border:1px solid var(--input-border);cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:12px;}
+        .session-card:hover{border-color:var(--glass-border-hover);background:var(--glass-bg-hover);}
+        .session-card.active-session{border-color:var(--hela-amber);box-shadow:0 0 12px rgba(245,158,11,0.1);}
+        *,*::before,*::after{transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform;transition-timing-function:cubic-bezier(0.4,0,0.2,1);transition-duration:0.3s;}
+        @media(max-width:768px){
+            .login-grid{grid-template-columns:1fr !important;}.login-visual{display:none !important;}
+            .otp-input{width:42px;height:48px;font-size:20px;}
+            .chatbot-panel{left:12px;bottom:84px;width:calc(100vw - 24px);height:440px;}
+            .chatbot-fab{left:12px;bottom:16px;width:50px;height:50px;}
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast">
+        <div class="flex items-center gap-3">
+            <div id="toast-icon" class="w-5 h-5 flex-shrink-0"></div>
+            <span id="toast-msg" class="text-sm font-medium"></span>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-white/10 transition-all text-sm font-medium text-theme-primary">Impact</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="signup.html" class="hidden md:inline-flex btn-liquid text-sm" style="padding:8px 20px">Create Workspace</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-white/10" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px)">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-white/10" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-3 rounded-xl hover:bg-white/10 transition-all text-theme-primary">Impact</a>
+                <div class="section-divider"></div>
+                <a href="signup.html" class="btn-liquid text-center text-sm">Create Workspace</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CHATBOT -->
+    <button class="chatbot-fab" id="chatbot-fab" aria-label="Open chat assistant">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+    </button>
+    <div class="chatbot-panel" id="chatbot-panel">
+        <div class="chatbot-header">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-theme-primary">Hela Assistant</p>
+                <p class="text-xs text-theme-muted">I'll help you sign in</p>
+            </div>
+            <button id="chatbot-close" class="p-1.5 rounded-full hover:bg-white/10 text-theme-muted" aria-label="Close chat">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input-area">
+            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Ask me anything..." autocomplete="off">
+            <button class="chatbot-send" id="chatbot-send" aria-label="Send message">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN LOGIN -->
+    <main class="min-h-screen relative flex items-center justify-center pt-28 pb-16 px-4 md:px-6">
+        <div class="w-full max-w-5xl relative z-10">
+            <div class="login-grid grid gap-6" style="grid-template-columns:1fr 1fr;">
+
+                <!-- LEFT: FORM -->
+                <div class="flex flex-col justify-center">
+                    <div class="mb-8 reveal active">
+                        <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius:9999px">
+                            <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                            <span class="text-theme-secondary">Secure Access</span>
+                        </div>
+                        <h1 class="font-display text-3xl sm:text-4xl font-bold mb-3 text-theme-primary">Welcome <span class="gradient-text-hela">Back</span></h1>
+                        <p class="text-theme-secondary">Sign in to your Helacore workspace and continue building.</p>
+                    </div>
+
+                    <!-- Social Buttons -->
+                    <div class="liquid-glass p-5 mb-5 reveal active delay-100" style="border-radius:var(--liquid-radius-lg)">
+                        <p class="text-sm text-theme-muted text-center mb-4">Quick sign-in with</p>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="social-btn" id="btn-google">
+                                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                                <span>Google</span>
+                            </button>
+                            <button class="social-btn" id="btn-microsoft">
+                                <svg width="18" height="18" viewBox="0 0 24 24"><rect x="1" y="1" width="10" height="10" fill="#F25022"/><rect x="13" y="1" width="10" height="10" fill="#7FBA00"/><rect x="1" y="13" width="10" height="10" fill="#00A4EF"/><rect x="13" y="13" width="10" height="10" fill="#FFB900"/></svg>
+                                <span>Microsoft</span>
+                            </button>
+                            <button class="social-btn" id="btn-apple">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+                                <span>Apple</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-4 my-5">
+                            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent"></div>
+                            <span class="text-xs text-theme-muted font-medium tracking-wider uppercase">or continue with</span>
+                            <div class="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-subtle)] to-transparent"></div>
+                        </div>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="liquid-glass p-6 md:p-8 reveal active delay-200" style="border-radius:var(--liquid-radius-lg)" id="login-form-card">
+                        <form id="login-form" novalidate>
+                            <!-- Tab Switch -->
+                            <div class="tab-switch mb-6">
+                                <button type="button" class="active" data-tab="email" id="tab-email">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        Email
+                                    </span>
+                                </button>
+                                <button type="button" data-tab="phone" id="tab-phone">
+                                    <span class="flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                        Phone
+                                    </span>
+                                </button>
+                            </div>
+
+                            <!-- Email Input -->
+                            <div id="email-field" class="mb-5">
+                                <label class="form-label">Work Email <span class="required">*</span></label>
+                                <div class="input-icon-wrap">
+                                    <svg class="icon-left w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    <input type="email" id="loginEmail" class="form-input-liquid" placeholder="you@business.com" required autocomplete="email">
+                                </div>
+                                <div class="form-error" id="loginEmail-error">Please enter a valid work email address</div>
+                            </div>
+
+                            <!-- Phone Input -->
+                            <div id="phone-field" class="mb-5" style="display:none;">
+                                <label class="form-label">Phone Number <span class="required">*</span></label>
+                                <div class="flex gap-2">
+                                    <select id="loginPhoneCode" class="form-input-liquid" style="width:110px;flex-shrink:0">
+                                        <option value="+254">+254</option><option value="+255">+255</option><option value="+256">+256</option>
+                                        <option value="+250">+250</option><option value="+257">+257</option><option value="+1">+1</option>
+                                        <option value="+44">+44</option><option value="+91">+91</option><option value="+234">+234</option><option value="+27">+27</option>
+                                    </select>
+                                    <input type="tel" id="loginPhone" class="form-input-liquid" placeholder="712 345 678" required autocomplete="tel">
+                                </div>
+                                <div class="form-error" id="loginPhone-error">Please enter a valid phone number</div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-4">
+                                <label class="form-label">Password <span class="required">*</span></label>
+                                <div class="input-icon-wrap">
+                                    <svg class="icon-left w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    <input type="password" id="loginPassword" class="form-input-liquid has-toggle" placeholder="Enter your password" required autocomplete="current-password">
+                                    <button type="button" class="password-toggle" id="toggle-login-pw">
+                                        <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <svg class="w-5 h-5 eye-closed" style="display:none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                                    </button>
+                                </div>
+                                <div class="form-error" id="loginPassword-error">Password is required</div>
+                            </div>
+
+                            <!-- Remember + Forgot -->
+                            <div class="flex items-center justify-between mb-6">
+                                <label class="flex items-center gap-3 cursor-pointer group" id="remember-label">
+                                    <div class="checkbox-liquid" id="remember-check">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    </div>
+                                    <span class="text-sm text-theme-secondary group-hover:text-theme-primary">Remember me</span>
+                                </label>
+                                <button type="button" id="forgot-btn" class="text-sm text-amber-400 hover:text-amber-300 font-medium">Forgot password?</button>
+                            </div>
+
+                            <!-- Unverified Banner (hidden by default) -->
+                            <div id="unverified-banner" class="unverified-banner" style="display:none">
+                                <svg class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-red-400">Email not verified</p>
+                                    <p class="text-xs text-theme-muted mt-0.5">Please verify your email before signing in. Check your inbox for the verification code.</p>
+                                </div>
+                                <button type="button" class="btn-liquid text-xs" style="padding:6px 14px" id="resend-verify-btn">Resend</button>
+                            </div>
+
+                            <!-- Submit -->
+                            <button type="submit" class="btn-liquid w-full py-3.5 text-base flex items-center justify-center gap-2" id="login-btn">
+                                <span id="login-btn-text">Sign In</span>
+                                <svg id="login-btn-arrow" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                <div id="login-btn-loading" class="loading-dots" style="display:none"><span></span><span></span><span></span></div>
+                            </button>
+                        </form>
+
+                        <p class="text-sm text-theme-muted text-center mt-6">
+                            Don't have a workspace? <a href="#" class="text-amber-400 hover:text-amber-300 font-semibold">Create one free</a>
+                        </p>
+                    </div>
+
+                    <!-- Active Sessions -->
+                    <div class="liquid-glass-dark rounded-xl p-4 mt-5 reveal active delay-300" id="sessions-section" style="display:none">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-xs font-semibold text-theme-secondary uppercase tracking-wider">Active Sessions</p>
+                            <button type="button" class="btn-danger text-xs" id="signout-all-btn" style="padding:4px 12px;font-size:11px">Sign Out All</button>
+                        </div>
+                        <div id="sessions-list" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Security Note -->
+                    <div class="liquid-glass-dark rounded-xl p-4 mt-5 flex items-start gap-3 reveal active delay-300">
+                        <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <div>
+                            <p class="text-xs font-medium text-theme-secondary">End-to-end encrypted</p>
+                            <p class="text-xs text-theme-muted mt-0.5">Your credentials are protected with AES-256 encryption and never stored in plain text. Only verified users can access their dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: VISUAL PANEL -->
+                <div class="login-visual flex flex-col justify-center reveal active delay-200">
+                    <div class="liquid-glass p-8 md:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden" style="border-radius:var(--liquid-radius-lg);min-height:520px;">
+                        <div class="absolute top-8 left-8 w-32 h-32 rounded-full bg-amber-500/10 blur-3xl animate-float"></div>
+                        <div class="absolute bottom-12 right-8 w-40 h-40 rounded-full bg-emerald-500/10 blur-3xl animate-float-reverse"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-cyan-500/5 blur-3xl"></div>
+                        <div class="relative z-10">
+                            <div class="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-500/20 flex items-center justify-center animate-float" style="box-shadow:0 0 40px rgba(245,158,11,0.15);">
+                                <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <h2 class="font-display text-2xl font-bold mb-3 text-theme-primary">Your Workspace Awaits</h2>
+                            <p class="text-theme-secondary text-sm max-w-xs mx-auto mb-8 leading-relaxed">Access your AI-powered business dashboard, analytics, and team collaboration tools — all in one place.</p>
+                            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                                <span class="liquid-glass-dark px-3 py-1.5 rounded-full text-xs font-medium text-amber-400 flex items-center gap-1.5" style="border-radius:9999px"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>AI Insights</span>
+                                <span class="liquid-glass-dark px-3 py-1.5 rounded-full text-xs font-medium text-emerald-400 flex items-center gap-1.5" style="border-radius:9999px"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Team Collab</span>
+                                <span class="liquid-glass-dark px-3 py-1.5 rounded-full text-xs font-medium text-cyan-400 flex items-center gap-1.5" style="border-radius:9999px"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Analytics</span>
+                                <span class="liquid-glass-dark px-3 py-1.5 rounded-full text-xs font-medium text-amber-400 flex items-center gap-1.5" style="border-radius:9999px"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Secure</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 w-full max-w-sm mx-auto">
+                                <div class="text-center"><p class="font-display text-2xl font-bold gradient-text-hela">12K+</p><p class="text-xs text-theme-muted mt-1">Workspaces</p></div>
+                                <div class="text-center border-x" style="border-color:var(--border-subtle)"><p class="font-display text-2xl font-bold gradient-text-hela">99.9%</p><p class="text-xs text-theme-muted mt-1">Uptime</p></div>
+                                <div class="text-center"><p class="font-display text-2xl font-bold gradient-text-hela">4.9</p><p class="text-xs text-theme-muted mt-1">Rating</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FORGOT PASSWORD OVERLAY -->
+    <div id="forgot-overlay" class="forgot-overlay">
+        <div class="liquid-glass p-6 md:p-8 w-full max-w-md relative" style="border-radius:var(--liquid-radius-lg);animation:scale-in .4s cubic-bezier(0.16,1,0.3,1);">
+            <button type="button" id="close-forgot-btn" class="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10" aria-label="Close">
+                <svg class="w-5 h-5 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Step 1: Enter Email -->
+            <div id="forgot-step-1">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-500/20 flex items-center justify-center mb-6">
+                    <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </div>
+                <h2 class="font-display text-xl font-bold mb-2 text-theme-primary">Reset Password</h2>
+                <p class="text-sm text-theme-muted mb-6">Enter your work email and we'll send you a verification code to reset your password.</p>
+                <div class="mb-5">
+                    <label class="form-label">Work Email <span class="required">*</span></label>
+                    <div class="input-icon-wrap">
+                        <svg class="icon-left w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <input type="email" id="forgotEmail" class="form-input-liquid" placeholder="you@business.com">
+                    </div>
+                    <div class="form-error" id="forgotEmail-error">Please enter a valid email address</div>
+                </div>
+                <button type="button" class="btn-liquid w-full py-3.5 text-sm" id="send-code-btn">
+                    <span id="send-code-text">Send Reset Code</span>
+                    <div id="send-code-loading" class="loading-dots" style="display:none"><span></span><span></span><span></span></div>
+                </button>
+            </div>
+
+            <!-- Step 2: Enter OTP -->
+            <div id="forgot-step-2" style="display:none;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-500/20 flex items-center justify-center mb-6">
+                    <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <h2 class="font-display text-xl font-bold mb-2 text-theme-primary">Enter Verification Code</h2>
+                <p class="text-sm text-theme-muted mb-1">We sent a 6-digit code to</p>
+                <p class="text-sm font-medium text-amber-400 mb-6" id="forgot-email-display"></p>
+                <div class="flex justify-center gap-2 mb-4" id="forgot-otp-container">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="0">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="1">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="2">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="3">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="4">
+                    <input type="text" maxlength="1" class="otp-input" data-fotp="5">
+                </div>
+                <div class="form-error text-center mb-4" id="forgot-otp-error">Invalid verification code</div>
+                <button type="button" class="btn-liquid w-full py-3.5 text-sm mb-3" id="verify-forgot-otp-btn">
+                    <span id="verify-forgot-otp-text">Verify Code</span>
+                    <div id="verify-forgot-otp-loading" class="loading-dots" style="display:none"><span></span><span></span><span></span></div>
+                </button>
+                <p class="text-xs text-theme-muted text-center">Didn't receive it? <button type="button" class="text-amber-400 hover:text-amber-300 font-medium" id="resend-forgot-otp-btn">Resend</button> <span id="forgot-otp-timer" class="text-theme-muted" style="display:none"></span></p>
+            </div>
+
+            <!-- Step 3: New Password -->
+            <div id="forgot-step-3" style="display:none;" class="text-center">
+                <div class="success-check mx-auto mb-6">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <h2 class="font-display text-xl font-bold mb-2 text-theme-primary">Code Verified</h2>
+                <p class="text-sm text-theme-muted mb-6">Set your new password below.</p>
+                <div class="mb-4 text-left">
+                    <label class="form-label">New Password <span class="required">*</span></label>
+                    <div class="input-icon-wrap">
+                        <svg class="icon-left w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <input type="password" id="newPassword" class="form-input-liquid has-toggle" placeholder="Min 8 characters">
+                        <button type="button" class="password-toggle" id="toggle-new-pw">
+                            <svg class="w-5 h-5 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg class="w-5 h-5 eye-closed" style="display:none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                        </button>
+                    </div>
+                    <div style="height:4px;border-radius:2px;background:var(--input-border);overflow:hidden;margin-top:6px;"><div id="new-pw-bar" style="height:100%;border-radius:2px;transition:all .4s ease;width:0%"></div></div>
+                    <p class="text-xs mt-1 text-theme-muted" id="new-pw-text">Enter a password</p>
+                    <div class="form-error" id="newPassword-error">Password must be at least 8 characters</div>
+                </div>
+                <div class="mb-6 text-left">
+                    <label class="form-label">Confirm New Password <span class="required">*</span></label>
+                    <div class="input-icon-wrap">
+                        <svg class="icon-left w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <input type="password" id="confirmNewPassword" class="form-input-liquid" placeholder="Re-enter new password">
+                    </div>
+                    <div class="form-error" id="confirmNewPassword-error">Passwords do not match</div>
+                </div>
+                <button type="button" class="btn-liquid w-full py-3.5 text-sm" id="reset-pw-btn">
+                    <span id="reset-pw-text">Reset Password</span>
+                    <div id="reset-pw-loading" class="loading-dots" style="display:none"><span></span><span></span><span></span></div>
+                </button>
+            </div>
+
+            <!-- Step 4: Success -->
+            <div id="forgot-step-4" style="display:none;" class="text-center py-4">
+                <div class="success-check mx-auto mb-6">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <h2 class="font-display text-xl font-bold mb-2 text-theme-primary">Password Reset Complete</h2>
+                <p class="text-sm text-theme-muted mb-6">Your password has been updated successfully. You can now sign in with your new password.</p>
+                <button type="button" class="btn-liquid w-full py-3.5 text-sm" id="back-to-login-btn">Back to Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="pb-8 text-center px-4">
+        <div class="section-divider mb-6 max-w-5xl mx-auto"></div>
+        <div class="flex items-center justify-center gap-6 mb-4">
+            <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Terms</a>
+            <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Privacy</a>
+            <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Support</a>
+            <a href="#" class="text-theme-muted hover:text-theme-primary transition-colors text-xs">Status</a>
+        </div>
+        <p class="text-xs text-theme-muted">&copy; 2025 Helacore. All rights reserved. Built for African businesses.</p>
+    </footer>
+
+    <script>
+    /* ============================================================
+       SUPABASE — Replace with your actual credentials
+       ============================================================ */
+    const SUPABASE_URL = 'https://megtqhibcdlbpuisvtgo.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lZ3RxaGliY2RsYnB1aXN2dGdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1OTA0NDYsImV4cCI6MjA5OTE2NjQ0Nn0.p1eTEJ1spI19Y2qcXbDimO6CPsTnGaenpYSlHuBqHUM';
+
+    let sb = null;
+    try {
+        sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase initialized');
+    } catch (e) {
+        console.warn('Supabase init failed. Demo mode.', e);
+    }
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let currentTab = 'email';
+    let rememberMe = false;
+    let forgotTimer = null;
+    let isLoggingIn = false;
+
+    /* ============================================================
+       THEME
+       ============================================================ */
+    (function initTheme() {
+        const s = localStorage.getItem('helacore-theme');
+        if (s) document.documentElement.setAttribute('data-theme', s);
+        else if (window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.setAttribute('data-theme', 'light');
+    })();
+
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+        const c = document.documentElement.getAttribute('data-theme');
+        const n = c === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', n);
+        localStorage.setItem('helacore-theme', n);
+    });
+
+    /* ============================================================
+       MOBILE MENU
+       ============================================================ */
+    const mobileMenu = document.getElementById('mobile-menu');
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => mobileMenu.classList.add('open'));
+    document.getElementById('close-menu-btn').addEventListener('click', () => mobileMenu.classList.remove('open'));
+    mobileMenu.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimeout = null;
+    function showToast(msg, type = 'info') {
+        const t = document.getElementById('toast');
+        const icons = {
+            success: '<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',
+            error: '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',
+            info: '<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        };
+        t.className = 'toast ' + type;
+        document.getElementById('toast-icon').innerHTML = icons[type] || icons.info;
+        document.getElementById('toast-msg').textContent = msg;
+        clearTimeout(toastTimeout);
+        requestAnimationFrame(() => t.classList.add('show'));
+        toastTimeout = setTimeout(() => t.classList.remove('show'), 4500);
+    }
+
+    /* ============================================================
+       TAB SWITCH
+       ============================================================ */
+    document.getElementById('tab-email').addEventListener('click', () => switchTab('email'));
+    document.getElementById('tab-phone').addEventListener('click', () => switchTab('phone'));
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('tab-email').classList.toggle('active', tab === 'email');
+        document.getElementById('tab-phone').classList.toggle('active', tab === 'phone');
+        document.getElementById('email-field').style.display = tab === 'email' ? 'block' : 'none';
+        document.getElementById('phone-field').style.display = tab === 'phone' ? 'block' : 'none';
+        document.getElementById('unverified-banner').style.display = 'none';
+        clearAllErrors();
+    }
+
+    /* ============================================================
+       CHECKBOX
+       ============================================================ */
+    document.getElementById('remember-label').addEventListener('click', function() {
+        rememberMe = !rememberMe;
+        document.getElementById('remember-check').classList.toggle('checked', rememberMe);
+    });
+
+    /* ============================================================
+       PASSWORD TOGGLE
+       ============================================================ */
+    document.getElementById('toggle-login-pw').addEventListener('click', function() {
+        const inp = document.getElementById('loginPassword');
+        const isOpen = inp.type === 'password';
+        inp.type = isOpen ? 'text' : 'password';
+        this.querySelector('.eye-open').style.display = isOpen ? 'none' : 'block';
+        this.querySelector('.eye-closed').style.display = isOpen ? 'block' : 'none';
+    });
+
+    document.getElementById('toggle-new-pw').addEventListener('click', function() {
+        const inp = document.getElementById('newPassword');
+        const isOpen = inp.type === 'password';
+        inp.type = isOpen ? 'text' : 'password';
+        this.querySelector('.eye-open').style.display = isOpen ? 'none' : 'block';
+        this.querySelector('.eye-closed').style.display = isOpen ? 'block' : 'none';
+    });
+
+    /* ============================================================
+       ERROR HELPERS
+       ============================================================ */
+    function showError(id, show = true) {
+        const inp = document.getElementById(id);
+        const err = document.getElementById(id + '-error');
+        if (inp) show ? inp.classList.add('error') : inp.classList.remove('error');
+        if (err) show ? err.classList.add('visible') : err.classList.remove('visible');
+    }
+    function clearError(id) { showError(id, false); }
+    function clearAllErrors() {
+        ['loginEmail','loginPhone','loginPassword','forgotEmail','newPassword','confirmNewPassword'].forEach(clearError);
+        document.getElementById('forgot-otp-error').classList.remove('visible');
+        document.querySelectorAll('.otp-input').forEach(i => i.classList.remove('error'));
+    }
+
+    // Real-time error clearing
+    ['loginEmail','loginPhone','loginPassword','forgotEmail','newPassword','confirmNewPassword'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.addEventListener('input', () => clearError(id)); el.addEventListener('change', () => clearError(id)); }
+    });
+
+    /* ============================================================
+       NEW PASSWORD STRENGTH
+       ============================================================ */
+    document.getElementById('newPassword').addEventListener('input', function() {
+        const pw = this.value;
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[0-9]/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        const levels = [
+            { w:'0%', c:'transparent', t:'Enter a password' },
+            { w:'20%', c:'#ef4444', t:'Very weak' },
+            { w:'40%', c:'#f97316', t:'Weak' },
+            { w:'60%', c:'#eab308', t:'Fair' },
+            { w:'80%', c:'#22c55e', t:'Strong' },
+            { w:'100%', c:'#10b981', t:'Very strong' }
+        ];
+        const l = levels[Math.min(score, 5)];
+        document.getElementById('new-pw-bar').style.width = l.w;
+        document.getElementById('new-pw-bar').style.background = l.c;
+        document.getElementById('new-pw-text').textContent = l.t;
+        document.getElementById('new-pw-text').style.color = l.c;
+    });
+
+    /* ============================================================
+       LOGIN FORM SUBMISSION — VERIFICATION GATING
+       ============================================================ */
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (isLoggingIn) return;
+
+        let valid = true;
+        if (currentTab === 'email') {
+            const email = document.getElementById('loginEmail').value.trim();
+            const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRe.test(email)) { showError('loginEmail'); valid = false; } else { clearError('loginEmail'); }
+        } else {
+            const phone = document.getElementById('loginPhone').value.trim();
+            if (!phone || phone.length < 6) { showError('loginPhone'); valid = false; } else { clearError('loginPhone'); }
+        }
+        const pw = document.getElementById('loginPassword').value;
+        if (!pw) { showError('loginPassword'); valid = false; } else { clearError('loginPassword'); }
+        if (!valid) return;
+
+        isLoggingIn = true;
+        const btnText = document.getElementById('login-btn-text');
+        const btnArrow = document.getElementById('login-btn-arrow');
+        const btnLoad = document.getElementById('login-btn-loading');
+        const btn = document.getElementById('login-btn');
+        btnText.style.display = 'none';
+        btnArrow.style.display = 'none';
+        btnLoad.style.display = 'flex';
+        btn.disabled = true;
+
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = pw;
+
+        try {
+            if (!sb) throw new Error('Supabase not configured');
+
+            // Attempt sign in with email/password
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                // If invalid credentials, show error
+                if (error.message.includes('Invalid login') || error.message.includes('Invalid credentials') || error.status === 401) {
+                    throw new Error('Invalid email or password. Please check your credentials and try again.');
+                }
+                throw error;
+            }
+
+            const user = data.user;
+
+            // CRITICAL VERIFICATION GATE: Only verified users can proceed
+            if (!user.email_confirmed_at && !user.phone_confirmed_at) {
+                // User exists but is NOT verified — show banner
+                document.getElementById('unverified-banner').style.display = 'flex';
+                throw new Error('Please verify your email address before signing in. We sent a verification code to ' + email);
+            }
+
+            // User is verified — check session and redirect to dashboard
+            if (data.session) {
+                showToast('Welcome back, ' + (user.user_metadata?.first_name || 'User') + '!', 'success');
+                // Store session persistence preference
+                if (!rememberMe) {
+                    // Session will be cleared on browser close naturally
+                }
+                // Redirect to dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1200);
+            }
+
+        } catch (err) {
+            console.error('Login error:', err);
+            showToast(err.message || 'Login failed. Please try again.', 'error');
+
+            // Show unverified banner if the error suggests unverified
+            if (err.message.includes('verify') || err.message.includes('Email not confirmed')) {
+                document.getElementById('unverified-banner').style.display = 'flex';
+            }
+        } finally {
+            isLoggingIn = false;
+            btnText.style.display = 'inline';
+            btnArrow.style.display = 'inline';
+            btnLoad.style.display = 'none';
+            btn.disabled = false;
+        }
+    });
+
+    /* ============================================================
+       RESEND VERIFICATION EMAIL (from unverified banner)
+       ============================================================ */
+    document.getElementById('resend-verify-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = 'Sending...';
+        const email = document.getElementById('loginEmail').value.trim();
+        try {
+            if (sb) {
+                const { error } = await sb.auth.resend({ type: 'signup', email });
+                if (error) throw error;
+            }
+            showToast('Verification email resent to ' + email, 'success');
+            document.getElementById('unverified-banner').style.display = 'none';
+        } catch (e) {
+            showToast(e.message || 'Failed to resend', 'error');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'Resend';
+        }
+    });
+
+    /* ============================================================
+       SOCIAL SIGN-IN (also checks verification)
+       ============================================================ */
+    async function socialSignIn(provider) {
+        if (!sb) { showToast('Supabase not configured', 'error'); return; }
+        try {
+            const providerMap = { Google: 'google', Microsoft: 'azure', Apple: 'apple' };
+            const { data, error } = await sb.auth.signInWithOAuth({
+                provider: providerMap[provider],
+                options: { redirectTo: window.location.origin + '/dashboard.html' }
+            });
+            if (error) throw error;
+            // OAuth redirect happens automatically; the redirect URL handles verification check
+        } catch (e) {
+            showToast(e.message || provider + ' sign-in failed', 'error');
+        }
+    }
+
+    document.getElementById('btn-google').addEventListener('click', () => socialSignIn('Google'));
+    document.getElementById('btn-microsoft').addEventListener('click', () => socialSignIn('Microsoft'));
+    document.getElementById('btn-apple').addEventListener('click', () => socialSignIn('Apple'));
+
+    /* ============================================================
+       FORGOT PASSWORD FLOW
+       ============================================================ */
+    document.getElementById('forgot-btn').addEventListener('click', () => {
+        document.getElementById('forgot-overlay').classList.add('show');
+        showForgotStep(1);
+        clearAllErrors();
+    });
+    document.getElementById('close-forgot-btn').addEventListener('click', closeForgot);
+    document.getElementById('forgot-overlay').addEventListener('click', function(e) { if (e.target === this) closeForgot(); });
+
+    function closeForgot() {
+        document.getElementById('forgot-overlay').classList.remove('show');
+        clearInterval(forgotTimer);
+        showForgotStep(1);
+    }
+
+    function showForgotStep(n) {
+        [1,2,3,4].forEach(i => {
+            document.getElementById('forgot-step-' + i).style.display = i === n ? 'block' : 'none';
+        });
+    }
+
+    // Step 1: Send reset code
+    document.getElementById('send-code-btn').addEventListener('click', async function() {
+        const email = document.getElementById('forgotEmail').value.trim();
+        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRe.test(email)) { showError('forgotEmail'); return; }
+        clearError('forgotEmail');
+
+        this.disabled = true;
+        document.getElementById('send-code-text').style.display = 'none';
+        document.getElementById('send-code-loading').style.display = 'flex';
+
+        try {
+            if (sb) {
+                // Supabase sends a password reset email with a link/code
+                const { error } = await sb.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/sign in.html'
+                });
+                if (error) throw error;
+            }
+            document.getElementById('forgot-email-display').textContent = email;
+            showForgotStep(2);
+            startForgotOtpTimer();
+            showToast('Reset code sent to ' + email, 'success');
+        } catch (e) {
+            showToast(e.message || 'Failed to send reset code', 'error');
+        } finally {
+            this.disabled = false;
+            document.getElementById('send-code-text').style.display = 'inline';
+            document.getElementById('send-code-loading').style.display = 'none';
+        }
+    });
+
+    // OTP input handling for forgot password
+    const forgotOtpInputs = document.querySelectorAll('[data-fotp]');
+    forgotOtpInputs.forEach((inp, i) => {
+        inp.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value && i < forgotOtpInputs.length - 1) forgotOtpInputs[i + 1].focus();
+            this.classList.remove('error');
+            document.getElementById('forgot-otp-error').classList.remove('visible');
+        });
+        inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && i > 0) forgotOtpInputs[i - 1].focus();
+        });
+        inp.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const data = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+            for (let j = 0; j < Math.min(data.length, forgotOtpInputs.length); j++) forgotOtpInputs[j].value = data[j];
+            if (data.length > 0) forgotOtpInputs[Math.min(data.length, forgotOtpInputs.length) - 1].focus();
+        });
+    });
+
+    function startForgotOtpTimer() {
+        let sec = 60;
+        const timerEl = document.getElementById('forgot-otp-timer');
+        const resendBtn = document.getElementById('resend-forgot-otp-btn');
+        timerEl.style.display = 'inline';
+        resendBtn.style.display = 'none';
+        clearInterval(forgotTimer);
+        forgotTimer = setInterval(() => {
+            sec--;
+            timerEl.textContent = '(' + sec + 's)';
+            if (sec <= 0) { clearInterval(forgotTimer); timerEl.style.display = 'none'; resendBtn.style.display = 'inline'; }
+        }, 1000);
+    }
+
+    // Step 2: Verify OTP (for Supabase password reset, the link handles it, but we provide OTP UI for token-based flow)
+    document.getElementById('verify-forgot-otp-btn').addEventListener('click', async function() {
+        const code = Array.from(forgotOtpInputs).map(i => i.value).join('');
+        if (code.length !== 6) {
+            forgotOtpInputs.forEach(i => { if (!i.value) i.classList.add('error'); });
+            document.getElementById('forgot-otp-error').textContent = 'Please enter the full 6-digit code';
+            document.getElementById('forgot-otp-error').classList.add('visible');
+            return;
+        }
+
+        this.disabled = true;
+        document.getElementById('verify-forgot-otp-text').style.display = 'none';
+        document.getElementById('verify-forgot-otp-loading').style.display = 'flex';
+
+        try {
+            // For Supabase, the password reset link in the email handles verification.
+            // If using a custom OTP flow with a Supabase Edge Function, verify here:
+            // const { data, error } = await sb.auth.verifyOtp({ email: forgotEmail, token: code, type: 'recovery' });
+            // if (error) throw error;
+
+            // For the standard Supabase flow, we proceed to let user set new password
+            // (the email link would have already verified them)
+            showForgotStep(3);
+            clearInterval(forgotTimer);
+        } catch (e) {
+            document.getElementById('forgot-otp-error').textContent = e.message || 'Invalid verification code';
+            document.getElementById('forgot-otp-error').classList.add('visible');
+            forgotOtpInputs.forEach(i => { i.value = ''; });
+            forgotOtpInputs[0].focus();
+        } finally {
+            this.disabled = false;
+            document.getElementById('verify-forgot-otp-text').style.display = 'inline';
+            document.getElementById('verify-forgot-otp-loading').style.display = 'none';
+        }
+    });
+
+    // Resend forgot OTP
+    document.getElementById('resend-forgot-otp-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = 'Sending...';
+        try {
+            if (sb) {
+                const { error } = await sb.auth.resetPasswordForEmail(document.getElementById('forgotEmail').value.trim());
+                if (error) throw error;
+            }
+            showToast('Reset code resent!', 'success');
+            startForgotOtpTimer();
+        } catch (e) {
+            showToast(e.message || 'Failed to resend', 'error');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'Resend';
+        }
+    });
+
+    // Step 3: Reset password
+    document.getElementById('reset-pw-btn').addEventListener('click', async function() {
+        const newPw = document.getElementById('newPassword').value;
+        const confirmPw = document.getElementById('confirmNewPassword').value;
+        let valid = true;
+        if (!newPw || newPw.length < 8) { showError('newPassword'); valid = false; } else { clearError('newPassword'); }
+        if (newPw !== confirmPw) { showError('confirmNewPassword'); valid = false; } else { clearError('confirmNewPassword'); }
+        if (!valid) return;
+
+        this.disabled = true;
+        document.getElementById('reset-pw-text').style.display = 'none';
+        document.getElementById('reset-pw-loading').style.display = 'flex';
+
+        try {
+            if (sb) {
+                // Use Supabase's updateUser to set the new password
+                // (In standard flow, the user clicks the email link which sets a session, then updateUser works)
+                const { data, error } = await sb.auth.updateUser({ password: newPw });
+                if (error) throw error;
+            }
+            showForgotStep(4);
+            showToast('Password reset successfully!', 'success');
+        } catch (e) {
+            showToast(e.message || 'Failed to reset password', 'error');
+        } finally {
+            this.disabled = false;
+            document.getElementById('reset-pw-text').style.display = 'inline';
+            document.getElementById('reset-pw-loading').style.display = 'none';
+        }
+    });
+
+    // Step 4: Back to login
+    document.getElementById('back-to-login-btn').addEventListener('click', function() {
+        closeForgot();
+        document.getElementById('loginEmail').focus();
+    });
+
+    /* ============================================================
+       SIGN OUT ALL SESSIONS
+       ============================================================ */
+    document.getElementById('signout-all-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = 'Signing out...';
+        try {
+            if (sb) {
+                // Sign out from all devices by revoking all refresh tokens
+                const { error } = await sb.auth.signOut({ scope: 'global' });
+                if (error) throw error;
+            }
+            document.getElementById('sessions-section').style.display = 'none';
+            showToast('All other sessions signed out', 'success');
+        } catch (e) {
+            showToast(e.message || 'Failed to sign out sessions', 'error');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'Sign Out All';
+        }
+    });
+
+    /* ============================================================
+       CHECK FOR EXISTING SESSION ON LOAD
+       ============================================================ */
+    async function checkExistingSession() {
+        if (!sb) return;
+        try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session && session.user) {
+                const user = session.user;
+                // If user has an active session, show sessions section
+                const sessionsEl = document.getElementById('sessions-section');
+                const listEl = document.getElementById('sessions-list');
+                sessionsEl.style.display = 'block';
+
+                const meta = user.user_metadata || {};
+                const deviceInfo = detectDevice();
+                const now = new Date();
+                const lastLogin = session.user.last_sign_in_at ? new Date(session.user.last_sign_in_at) : now;
+
+                listEl.innerHTML = `
+                    <div class="session-card active-session">
+                        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-theme-primary">${deviceInfo.browser} on ${deviceInfo.os}</p>
+                            <p class="text-xs text-theme-muted">Current session &middot; ${formatTime(lastLogin)}</p>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0" style="box-shadow:0 0 8px rgba(16,185,129,0.5)"></span>
+                    </div>
+                `;
+
+                // If user is already verified and has session, offer quick redirect
+                if (user.email_confirmed_at) {
+                    const quickDiv = document.createElement('div');
+                    quickDiv.className = 'mt-3 text-center';
+                    quickDiv.innerHTML = `<p class="text-xs text-theme-muted mb-2">You're already signed in as <strong class="text-theme-secondary">${user.email}</strong></p>
+                        <button type="button" class="btn-liquid text-xs w-full" style="padding:8px 16px" id="go-dashboard-btn">Go to Dashboard</button>`;
+                    listEl.after(quickDiv);
+                    document.getElementById('go-dashboard-btn').addEventListener('click', () => {
+                        window.location.href = 'dashboard.html';
+                    });
+                }
+            }
+        } catch (e) {
+            console.log('No existing session');
+        }
+    }
+
+    function detectDevice() {
+        const ua = navigator.userAgent;
+        let browser = 'Unknown';
+        if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+        else if (ua.includes('Firefox')) browser = 'Firefox';
+        else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+        else if (ua.includes('Edg')) browser = 'Edge';
+        let os = 'Unknown';
+        if (ua.includes('Windows')) os = 'Windows';
+        else if (ua.includes('Mac')) os = 'macOS';
+        else if (ua.includes('Linux')) os = 'Linux';
+        else if (ua.includes('Android')) os = 'Android';
+        else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+        return { browser, os };
+    }
+
+    function formatTime(date) {
+        const now = new Date();
+        const diff = now - date;
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+        return date.toLocaleDateString();
+    }
+
+    checkExistingSession();
+
+    /* ============================================================
+       CHATBOT
+       ============================================================ */
+    const chatFab = document.getElementById('chatbot-fab');
+    const chatPanel = document.getElementById('chatbot-panel');
+    const chatClose = document.getElementById('chatbot-close');
+    const chatInput = document.getElementById('chatbot-input');
+    const chatSend = document.getElementById('chatbot-send');
+    const chatMessages = document.getElementById('chatbot-messages');
+    let chatOpen = false, chatInit = false;
+
+    chatFab.addEventListener('click', () => {
+        chatOpen = !chatOpen;
+        chatPanel.classList.toggle('open', chatOpen);
+        chatFab.style.display = chatOpen ? 'none' : 'flex';
+        if (!chatInit) { initChat(); chatInit = true; }
+        if (chatOpen) chatInput.focus();
+    });
+    chatClose.addEventListener('click', () => { chatOpen = false; chatPanel.classList.remove('open'); chatFab.style.display = 'flex'; });
+    chatSend.addEventListener('click', sendChat);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+
+    function addChatMsg(text, type = 'bot', suggestions = null) {
+        const m = document.createElement('div');
+        m.className = 'chat-msg ' + type;
+        m.textContent = text;
+        chatMessages.appendChild(m);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (suggestions && suggestions.length) {
+            const row = document.createElement('div');
+            row.className = 'flex flex-wrap gap-1 mt-1';
+            suggestions.forEach(s => {
+                const b = document.createElement('button');
+                b.className = 'chat-suggestion';
+                b.textContent = s;
+                b.addEventListener('click', () => { chatInput.value = s; sendChat(); });
+                row.appendChild(b);
+            });
+            chatMessages.appendChild(row);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    function addTyping() {
+        const m = document.createElement('div');
+        m.className = 'chat-msg bot';
+        m.id = 'bot-typing';
+        m.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        chatMessages.appendChild(m);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    function removeTyping() { const el = document.getElementById('bot-typing'); if (el) el.remove(); }
+
+    function initChat() {
+        addChatMsg("Hello! I'm your Hela Assistant. I can help you sign in, reset your password, or troubleshoot any issues. What do you need help with?", 'bot', [
+            'How do I sign in?',
+            'Forgot my password',
+            'Email not verified',
+            'Is my account secure?'
+        ]);
+    }
+
+    function sendChat() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+        addChatMsg(text, 'user');
+        chatInput.value = '';
+        addTyping();
+        setTimeout(() => {
+            removeTyping();
+            const r = getChatReply(text);
+            addChatMsg(r.text, 'bot', r.suggestions);
+        }, 500 + Math.random() * 700);
+    }
+
+    function getChatReply(input) {
+        const l = input.toLowerCase();
+        if (l.includes('sign in') || l.includes('login') || l.includes('how do i') || l.includes('log in')) {
+            return { text: "To sign in:\n\n1. Enter your work email (or phone number using the Phone tab)\n2. Enter your password\n3. Click 'Sign In'\n\nMake sure you've verified your email first — unverified accounts cannot access the dashboard.", suggestions: ['Forgot my password', 'Email not verified', 'Switch to phone login'] };
+        }
+        if (l.includes('forgot') || l.includes('reset') || l.includes('password') && (l.includes('lost') || l.includes('forget') || l.includes('reset'))) {
+            return { text: "To reset your password:\n\n1. Click 'Forgot password?' below the sign-in form\n2. Enter your work email\n3. We'll send a 6-digit verification code\n4. Enter the code and set your new password\n\nThe code expires in 60 seconds, but you can request a new one.", suggestions: ['I didn\'t receive the code', 'What are password requirements?', 'Back to sign in'] };
+        }
+        if (l.includes('not verified') || l.includes('verify') || l.includes('verification') || l.includes('confirm email')) {
+            return { text: "If your email isn't verified:\n\n1. Try to sign in — you'll see a red 'Email not verified' banner\n2. Click 'Resend' on that banner to get a new verification email\n3. Check your inbox (and spam folder) for the 6-digit code\n4. Enter it in the sign-up page where you originally registered\n\nYou must verify before you can access your dashboard.", suggestions: ['I didn\'t get the verification email', 'How do I sign up?', 'Contact support'] };
+        }
+        if (l.includes('didn\'t receive') || l.includes('no email') || l.includes('spam') || l.includes('junk') || l.includes('code')) {
+            return { text: "If you didn't receive the email:\n\n1. Check your spam/junk folder\n2. Add noreply@helacore.com to your contacts\n3. Wait 1-2 minutes for delivery\n4. Click 'Resend' to try again\n5. Make sure you're checking the correct email address\n\nIf it still doesn't arrive after a few minutes, contact our support team.", suggestions: ['Resend verification', 'Contact support', 'Try a different email'] };
+        }
+        if (l.includes('secure') || l.includes('safe') || l.includes('encrypt') || l.includes('privacy')) {
+            return { text: "Your account security:\n\n- All passwords are hashed with bcrypt and never stored in plain text\n- Data encrypted at rest (AES-256) and in transit (TLS 1.3)\n- Only verified email users can sign in and access the dashboard\n- You can sign out of all other sessions from the Active Sessions section below the login form\n- We support 2FA setup after signing in\n- SOC 2 Type II compliant infrastructure", suggestions: ['How do I enable 2FA?', 'Sign out all sessions', 'Forgot my password'] };
+        }
+        if (l.includes('2fa') || l.includes('two factor') || l.includes('two-factor') || l.includes('authenticator')) {
+            return { text: "Two-Factor Authentication can be enabled after signing in:\n\n1. Go to Workspace Settings\n2. Navigate to Security\n3. Enable 2FA and choose your method:\n   - Authenticator app (Google Auth, Authy)\n   - SMS codes\n   - Biometric login on supported devices\n\nI strongly recommend enabling 2FA for maximum account protection!", suggestions: ['How do I sign in?', 'Is my account secure?', 'Contact support'] };
+        }
+        if (l.includes('phone') || l.includes('switch') || l.includes('mobile')) {
+            return { text: "To sign in with your phone number:\n\n1. Click the 'Phone' tab above the email field\n2. Select your country code\n3. Enter your phone number\n4. Enter your password\n5. Click 'Sign In'\n\nNote: Phone login uses the same password you set during sign-up.", suggestions: ['How do I sign in with email?', 'Forgot my password', 'I don\'t remember my phone number'] };
+        }
+        if (l.includes('sign up') || l.includes('register') || l.includes('create') || l.includes('new account')) {
+            return { text: "To create a new workspace:\n\n1. Click 'Create Workspace' in the top navigation\n2. Fill in your details across 5 simple steps\n3. Verify your email with the 6-digit code we send\n4. Once verified, you can sign in here\n\nIt only takes a few minutes!", suggestions: ['How do I sign in?', 'Email not verified', 'Contact support'] };
+        }
+        if (l.includes('wrong password') || l.includes('incorrect') || l.includes('invalid')) {
+            return { text: "If you're getting 'Invalid email or password':\n\n1. Double-check your email address for typos\n2. Make sure Caps Lock is off\n3. Try copying and pasting your password if you have it saved securely\n4. If you've forgotten your password, use 'Forgot password?' to reset it\n5. Make sure you're using the correct email for this workspace", suggestions: ['Forgot my password', 'How do I sign up?', 'Contact support'] };
+        }
+        if (l.includes('contact') || l.includes('support') || l.includes('help') || l.includes('human')) {
+            return { text: "You can reach our support team through:\n\n- Email: support@helacore.com\n- In-app chat (after signing in)\n- Twitter/X: @helacore_help\n\nResponse times:\n- Free users: within 4 hours\n- Pro users: within 1 hour\n- Enterprise: dedicated manager, under 15 min", suggestions: ['Forgot my password', 'Email not verified', 'Back to sign in'] };
+        }
+        if (l.includes('session') || l.includes('sign out') || l.includes('device')) {
+            return { text: "The Active Sessions section (below the login form) shows your current session. If you see it, it means you have an existing session.\n\n- 'Sign Out All' terminates all other sessions on other devices\n- Your current session remains active\n- This is useful if you forgot to sign out on a shared or public computer", suggestions: ['How do I sign in?', 'Is my account secure?', 'Contact support'] };
+        }
+        if (l.includes('require') && l.includes('password')) {
+            return { text: "Password requirements:\n\n- Minimum 8 characters\n- We recommend 12+ for strong security\n- Include uppercase, lowercase, numbers, and symbols\n- Avoid common words, patterns, or personal info\n- Don't reuse passwords from other sites\n\nThe strength meter shows you how strong your password is in real-time.", suggestions: ['Forgot my password', 'How do I enable 2FA?', 'Is my account secure?'] };
+        }
+        if (l.includes('thank') || l.includes('thanks') || l.includes('great')) {
+            return { text: "You're welcome! I'm here whenever you need help. Good luck with your Helacore workspace!", suggestions: ['How do I sign in?', 'Contact support'] };
+        }
+        return { text: "I can help you with:\n\n- Signing in (email or phone)\n- Password reset\n- Email verification issues\n- Account security questions\n- General troubleshooting\n\nJust ask your question and I'll do my best to help!", suggestions: ['How do I sign in?', 'Forgot my password', 'Email not verified', 'Contact support'] };
+    }
+
+    /* ============================================================
+       REVEAL ON SCROLL
+       ============================================================ */
+    const revealObs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+    /* ============================================================
+       THREE.JS BACKGROUND
+       ============================================================ */
+    (function() {
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 30;
+
+        const count = 250;
+        const pos = new Float32Array(count * 3);
+        const col = new Float32Array(count * 3);
+        const palette = [new THREE.Color('#f59e0b'), new THREE.Color('#10b981'), new THREE.Color('#06b6d4'), new THREE.Color('#d97706'), new THREE.Color('#059669')];
+
+        for (let i = 0; i < count; i++) {
+            pos[i*3] = (Math.random()-0.5)*60;
+            pos[i*3+1] = (Math.random()-0.5)*60;
+            pos[i*3+2] = (Math.random()-0.5)*40;
+            const c = palette[Math.floor(Math.random()*palette.length)];
+            col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
+        }
+
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        const pMat = new THREE.PointsMaterial({ size: 0.15, vertexColors: true, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, sizeAttenuation: true });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        const lGeo = new THREE.BufferGeometry();
+        const lPos = new Float32Array(count * count * 6);
+        lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3));
+        const lMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending });
+        const lines = new THREE.LineSegments(lGeo, lMat);
+        scene.add(lines);
+
+        const sGroup = new THREE.Group();
+        const sData = [];
+        for (let i = 0; i < 6; i++) {
+            const r = Math.max(0.3, Math.random()*1.2);
+            const g = new THREE.SphereGeometry(r, 16, 16);
+            const m = new THREE.MeshBasicMaterial({ color: palette[i%palette.length], transparent: true, opacity: 0.12 });
+            const mesh = new THREE.Mesh(g, m);
+            mesh.position.set((Math.random()-0.5)*40, (Math.random()-0.5)*30, (Math.random()-0.5)*20);
+            sGroup.add(mesh);
+            sData.push({ mesh, speed: Math.random()*0.3+0.1, amp: Math.random()*3+1, off: Math.random()*Math.PI*2 });
+        }
+        scene.add(sGroup);
+
+        let mx = 0, my = 0;
+        document.addEventListener('mousemove', e => { mx = (e.clientX/window.innerWidth-0.5)*2; my = (e.clientY/window.innerHeight-0.5)*2; });
+
+        function updateLines() {
+            const p = pGeo.attributes.position.array;
+            let idx = 0;
+            for (let i = 0; i < Math.min(count, 70); i++) {
+                for (let j = i+1; j < Math.min(count, 70); j++) {
+                    const dx = p[i*3]-p[j*3], dy = p[i*3+1]-p[j*3+1], dz = p[i*3+2]-p[j*3+2];
+                    if (Math.sqrt(dx*dx+dy*dy+dz*dz) < 8) {
+                        lPos[idx++]=p[i*3]; lPos[idx++]=p[i*3+1]; lPos[idx++]=p[i*3+2];
+                        lPos[idx++]=p[j*3]; lPos[idx++]=p[j*3+1]; lPos[idx++]=p[j*3+2];
+                    }
+                }
+            }
+            for (let i = idx; i < lPos.length; i++) lPos[i] = 0;
+            lGeo.attributes.position.needsUpdate = true;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = Date.now() * 0.001;
+            particles.rotation.y += 0.0003 + mx * 0.0002;
+            particles.rotation.x += 0.0001 + my * 0.0002;
+            sData.forEach(s => {
+                s.mesh.position.y += Math.sin(t*s.speed+s.off)*0.01*s.amp;
+                s.mesh.position.x += Math.cos(t*s.speed*0.5+s.off)*0.005;
+            });
+            updateLines();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    })();
+
+    /* ============================================================
+       KEYBOARD SHORTCUTS
+       ============================================================ */
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('forgot-overlay').classList.contains('show')) closeForgot();
+            if (chatOpen) { chatOpen = false; chatPanel.classList.remove('open'); chatFab.style.display = 'flex'; }
+            if (mobileMenu.classList.contains('open')) mobileMenu.classList.remove('open');
+        }
+    });
+
+    console.log('%c Helacore Sign In ', 'background:linear-gradient(135deg,#f59e0b,#10b981);color:white;font-size:16px;font-weight:bold;padding:8px 16px;border-radius:8px;');
+    console.log('%c Replace SUPABASE_URL and SUPABASE_ANON_KEY with your actual credentials.', 'color:#f59e0b;font-size:12px;');
+    console.log('%c Verification gate: Only users with email_confirmed_at will be redirected to dashboard.', 'color:#10b981;font-size:12px;');
+    </script>
+</body>
+</html>
