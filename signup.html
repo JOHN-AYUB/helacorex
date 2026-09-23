@@ -1874,13 +1874,24 @@
                 /* ── Supabase signup ───────────────────────────────────
                    emailRedirectTo sends the user a clickable link.
                    Clicking it confirms the email and lands on dashboard.html
-                   with a fully authenticated session. No OTP popup. */
+                   with a fully authenticated session. No OTP popup.
+                   Build a robust redirect URL: use the current origin for
+                   http(s), but fall back gracefully for file:// or empty origins. */
+                let redirectBase = window.location.origin;
+                if (!redirectBase || redirectBase === 'null' || redirectBase === 'file://') {
+                    // file:// protocol gives origin="null" — use a relative path fallback
+                    redirectBase = window.location.href.replace(/[^/]*$/, '');
+                    // Ensure it ends with /
+                    if (!redirectBase.endsWith('/')) redirectBase += '/';
+                }
+                const redirectUrl = redirectBase + 'dashboard.html';
+
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
                         data: metadata,
-                        emailRedirectTo: window.location.origin + '/dashboard.html'
+                        emailRedirectTo: redirectUrl
                     }
                 });
 
@@ -1895,10 +1906,14 @@
                 }
 
                 /* Store the full onboarding profile in workspaces so the
-                   dashboard can read it immediately after email verification. */
+                   dashboard can read it immediately after email verification.
+                   NOTE: With email confirmation ON, this upsert may fail due
+                   to RLS (no session yet). That's OK — shared-auth.js will
+                   self-heal by creating the row from user_metadata after login. */
                 const user = data?.user;
                 if (user) {
-                    await supabaseClient.from('workspaces').upsert({
+                    try {
+                        await supabaseClient.from('workspaces').upsert({
                         id: user.id,
                         owner_email: email,
                         first_name: metadata.first_name,
@@ -1926,6 +1941,11 @@
                         onboarding_completed: true,
                         created_at: new Date().toISOString()
                     }, { onConflict: 'id' });
+                    } catch (upsertErr) {
+                        // Non-fatal: RLS may block before email verification.
+                        // shared-auth.js self-heals this after login.
+                        console.warn('Workspace upsert failed (expected before email verification):', upsertErr.message);
+                    }
                 }
 
                 // Show the success screen — "Check Your Email" with verification link instructions
@@ -2528,5 +2548,11 @@
     console.log('%c Helacore Workspace Creator ', 'background: linear-gradient(135deg, #f59e0b, #10b981); color: white; font-size: 16px; font-weight: bold; padding: 8px 16px; border-radius: 8px;');
     console.log('%c Replace SUPABASE_URL and SUPABASE_ANON_KEY with your actual credentials for full functionality.', 'color: #f59e0b; font-size: 12px;');
     </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
 </body>
 </html>

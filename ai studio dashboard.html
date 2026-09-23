@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - AI Studio</title>
+    <!-- Preconnect to CDNs for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://megtqhibcdlbpuisvtgo.supabase.co" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           HELACORE OS — AI STUDIO
+           AI creation, orchestration, deployment, testing & management
+           Design language: Liquid, spatial, conversational, adaptive, AI-native
+           Colour system: EXACT tokens from index.html (dark + light via theme.js)
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --chart-grid: rgba(255,255,255,0.05); --chart-line: rgba(245,158,11,0.6); --chart-fill: rgba(245,158,11,0.1);
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+            --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --info: #06b6d4; --purple: #a855f7;
+            --sidebar-w: 260px; --topbar-h: 72px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+        /* ── Liquid glass surfaces (exact index.html treatment) ─────────── */
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        [data-theme="light"] .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); }
+
+        /* ── Scrollbars ─────────────────────────────────────────────────── */
+        ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SIDEBAR
+           ═══════════════════════════════════════════════════════════════ */
+        .sidebar { position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w); background:var(--bg-secondary); border-right:1px solid var(--border-subtle); display:flex; flex-direction:column; z-index:40; transition:transform .4s cubic-bezier(0.16,1,0.3,1); overflow:hidden; }
+        .sidebar-logo { padding:20px 20px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border-subtle); flex-shrink:0; }
+        .sidebar-logo .logo-icon { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#10b981); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .sidebar-logo .logo-icon svg { width:22px; height:22px; color:#fff; }
+        .sidebar-nav { flex:1; overflow-y:auto; padding:12px 10px; }
+        .sidebar-nav::-webkit-scrollbar { width:3px; }
+        .nav-section-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); padding:12px 14px 6px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; color:var(--text-secondary); font-size:13.5px; font-weight:500; cursor:pointer; transition:all .25s ease; position:relative; margin-bottom:2px; white-space:nowrap; text-decoration:none; }
+        .nav-item:hover { background:var(--nav-hover-bg); color:var(--text-primary); }
+        .nav-item.active { background:var(--btn-gradient); color:var(--text-primary); border:1px solid rgba(245,158,11,0.2); box-shadow:0 2px 12px rgba(245,158,11,0.1); }
+        .nav-item .nav-icon { width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .nav-item .nav-icon svg { width:18px; height:18px; }
+        .nav-badge { margin-left:auto; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700; }
+        .nav-badge.new { background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(245,158,11,0.3)); color:#c084fc; border:1px solid rgba(168,85,247,0.3); }
+        .nav-badge.count { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+        .sidebar-footer { padding:12px 10px; border-top:1px solid var(--border-subtle); flex-shrink:0; }
+        .sidebar-user { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; cursor:pointer; transition:all .25s; }
+        .sidebar-user:hover { background:var(--nav-hover-bg); }
+        .sidebar-user .avatar { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,#f59e0b,#10b981); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; overflow:hidden; }
+        .sidebar-user .user-info { overflow:hidden; }
+        .sidebar-user .user-name { font-size:13px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .sidebar-user .user-role { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+        /* ── AI Studio expanded submenu ─────────────────────────────────── */
+        .studio-subnav { margin:2px 0 6px 14px; padding-left:14px; border-left:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:1px; }
+        .studio-subnav .ss-item { display:flex; align-items:center; gap:10px; padding:7px 12px; border-radius:10px; font-size:12.5px; color:var(--text-muted); cursor:pointer; transition:all .2s; text-decoration:none; }
+        .studio-subnav .ss-item:hover { color:var(--text-primary); background:var(--nav-hover-bg); }
+        .studio-subnav .ss-item.active { color:var(--hela-amber); font-weight:600; }
+        .studio-subnav .ss-item svg { width:14px; height:14px; flex-shrink:0; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOP SYSTEM BAR
+           ═══════════════════════════════════════════════════════════════ */
+        .topbar { position:fixed; top:0; left:var(--sidebar-w); right:0; height:var(--topbar-h); background:var(--bg-primary); border-bottom:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; padding:0 28px; z-index:30; transition:left .4s cubic-bezier(0.16,1,0.3,1); }
+        .topbar-left h1 { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; color:var(--text-primary); }
+        .topbar-left h1 span { color:var(--text-muted); font-weight:400; font-size:14px; margin-left:8px; }
+        .topbar-search { position:relative; width:320px; }
+        .topbar-search input { width:100%; padding:9px 14px 9px 40px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:12px; color:var(--input-text); font-size:13px; font-family:'Inter',sans-serif; transition:all .3s; }
+        .topbar-search input::placeholder { color:var(--input-placeholder); }
+        .topbar-search input:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        .topbar-search .search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text-muted); }
+        .topbar-search .search-icon svg { width:16px; height:16px; }
+        .topbar-search .search-kbd { position:absolute; right:10px; top:50%; transform:translateY(-50%); padding:2px 6px; border-radius:4px; background:var(--glass-bg); border:1px solid var(--border-subtle); font-size:10px; color:var(--text-muted); }
+        .topbar-right { display:flex; align-items:center; gap:8px; }
+        .topbar-btn { width:40px; height:40px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .25s; color:var(--text-secondary); position:relative; }
+        .topbar-btn:hover { background:var(--glass-bg-hover); border-color:var(--glass-border-hover); color:var(--text-primary); }
+        .topbar-btn svg { width:18px; height:18px; }
+        .topbar-btn .notif-dot { position:absolute; top:8px; right:8px; width:8px; height:8px; border-radius:50%; background:var(--danger); border:2px solid var(--bg-primary); }
+        .topbar-clock { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; padding:0 6px; line-height:1.25; }
+        .topbar-clock .tc-time { font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--text-primary); }
+        .topbar-clock .tc-date { font-size:10.5px; color:var(--text-muted); }
+        .topbar-identity { display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:14px; cursor:pointer; transition:all .25s; }
+        .topbar-identity:hover { background:var(--nav-hover-bg); }
+        .topbar-identity .ti-avatar { width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#10b981); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0; overflow:hidden; }
+        .topbar-identity .ti-name { font-size:12.5px; font-weight:600; color:var(--text-primary); line-height:1.2; }
+        .topbar-identity .ti-role { font-size:10.5px; color:var(--text-muted); line-height:1.2; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MAIN CONTENT + GRID
+           ═══════════════════════════════════════════════════════════════ */
+        .main-content { margin-left:var(--sidebar-w); margin-top:var(--topbar-h); height:calc(100vh - var(--topbar-h)); overflow-y:auto; padding:24px 28px 48px; transition:margin-left .4s cubic-bezier(0.16,1,0.3,1); }
+        .dash-grid { display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:18px; }
+        .span-12 { grid-column:span 12; } .span-8 { grid-column:span 8; } .span-6 { grid-column:span 6; } .span-4 { grid-column:span 4; } .span-3 { grid-column:span 3; }
+
+        /* ── Cards ─────────────────────────────────────────────────────── */
+        .dash-card { padding:20px; border-radius:var(--liquid-radius-md); background:var(--dark-glass-bg); backdrop-filter:blur(20px); border:1px solid var(--dark-glass-border); transition:all .3s; position:relative; overflow:hidden; }
+        .dash-card:hover { border-color:var(--glass-border-hover); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+        .dash-card::after { content:''; position:absolute; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle,rgba(245,158,11,0.10) 0%,transparent 65%); left:calc(var(--pointer-x,0.5)*100% - 170px); top:calc(var(--pointer-y,0.5)*100% - 170px); opacity:0; transition:opacity .4s ease; pointer-events:none; z-index:0; }
+        .dash-card:hover::after { opacity:1; }
+        .dash-card > * { position:relative; z-index:1; }
+        .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:10px; }
+        .card-title { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; color:var(--text-primary); }
+        .card-subtitle { font-size:11px; color:var(--text-muted); margin-top:2px; }
+        .card-icon { width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .card-icon svg { width:19px; height:19px; }
+
+        /* ── Buttons / chips ───────────────────────────────────────────── */
+        .btn-sm { padding:7px 16px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; transition:all .25s; font-family:'Inter',sans-serif; border:none; }
+        .btn-primary { background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); box-shadow:0 2px 8px rgba(245,158,11,0.1); }
+        .btn-primary:hover { background:var(--btn-gradient-hover); transform:translateY(-1px); box-shadow:0 4px 16px rgba(245,158,11,0.2); }
+        .btn-ghost { background:transparent; border:1px solid var(--border-subtle); color:var(--text-secondary); }
+        .btn-ghost:hover { border-color:var(--glass-border-hover); color:var(--text-primary); background:var(--glass-bg-hover); }
+        .btn-success { background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#34d399; }
+        .btn-success:hover { background:rgba(16,185,129,0.25); transform:translateY(-1px); }
+        .status-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:600; }
+        .status-pill.completed { background:rgba(16,185,129,0.12); color:#34d399; }
+        .status-pill.running { background:rgba(6,182,212,0.12); color:#22d3ee; }
+        .status-pill.failed { background:rgba(239,68,68,0.12); color:#f87171; }
+        .status-pill.queued { background:rgba(168,85,247,0.12); color:#c084fc; }
+        .status-pill.high { background:rgba(16,185,129,0.12); color:#34d399; }
+        .status-pill.medium { background:rgba(245,158,11,0.12); color:#fbbf24; }
+        .status-pill.low { background:rgba(239,68,68,0.12); color:#f87171; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HELLO HELA — conversational creation layer
+           ═══════════════════════════════════════════════════════════════ */
+        .hela-hero { display:flex; align-items:center; gap:20px; padding:22px 24px; cursor:pointer; }
+        .hela-orb { width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 32% 30%,rgba(245,158,11,0.9),rgba(16,185,129,0.75) 55%,rgba(6,182,212,0.6)); position:relative; flex-shrink:0; box-shadow:0 0 24px rgba(245,158,11,0.35),0 0 60px rgba(16,185,129,0.2); animation:orb-breathe 3.2s ease-in-out infinite; }
+        .hela-orb::after { content:''; position:absolute; inset:-8px; border-radius:50%; border:1px solid rgba(245,158,11,0.35); animation:orb-ring 3.2s ease-in-out infinite; }
+        .hela-orb svg { position:absolute; inset:0; margin:auto; width:26px; height:26px; color:#fff; }
+        @keyframes orb-breathe { 0%,100%{transform:scale(1);box-shadow:0 0 24px rgba(245,158,11,0.35),0 0 60px rgba(16,185,129,0.2);} 50%{transform:scale(1.06);box-shadow:0 0 34px rgba(245,158,11,0.5),0 0 80px rgba(16,185,129,0.3);} }
+        @keyframes orb-ring { 0%,100%{opacity:.5;transform:scale(1);} 50%{opacity:.15;transform:scale(1.18);} }
+        .hela-hero .hh-title { font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; color:var(--text-primary); }
+        .hela-hero .hh-sub { font-size:12.5px; color:var(--text-secondary); margin-top:3px; line-height:1.5; }
+        .hela-hero .hh-hint { margin-left:auto; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .hela-hero .hh-kbd { padding:4px 10px; border-radius:8px; background:var(--glass-bg); border:1px solid var(--border-subtle); font-size:11px; color:var(--text-muted); font-family:'Inter',sans-serif; }
+
+        /* Floating conversation panel */
+        .hela-panel { position:fixed; right:24px; bottom:24px; width:440px; max-width:calc(100vw - 32px); max-height:min(680px,calc(100vh - 48px)); background:var(--bg-secondary); border:1px solid var(--glass-border); border-radius:var(--liquid-radius-lg); box-shadow:var(--glass-shadow); z-index:80; display:flex; flex-direction:column; overflow:hidden; transform:translateY(24px) scale(.98); opacity:0; pointer-events:none; transition:all .35s cubic-bezier(0.16,1,0.3,1); }
+        .hela-panel.open { transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+        .hela-panel-head { display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--border-subtle); background:var(--bg-tertiary); }
+        .hela-panel-head .hp-orb { width:36px; height:36px; border-radius:50%; background:radial-gradient(circle at 32% 30%,rgba(245,158,11,0.9),rgba(16,185,129,0.75) 55%,rgba(6,182,212,0.6)); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 14px rgba(245,158,11,0.35); }
+        .hela-panel-head .hp-orb svg { width:16px; height:16px; color:#fff; }
+        .hela-panel-head .hp-title { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700; color:var(--text-primary); }
+        .hela-panel-head .hp-status { font-size:10.5px; color:var(--text-muted); }
+        .hela-panel-head .hp-close { margin-left:auto; width:30px; height:30px; border-radius:9px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .25s; }
+        .hela-panel-head .hp-close:hover { color:var(--text-primary); background:var(--glass-bg-hover); }
+        .hela-panel-head .hp-close svg { width:14px; height:14px; }
+        .hela-convo { flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+        .chat-bubble { max-width:85%; padding:11px 15px; border-radius:16px; font-size:13px; line-height:1.55; animation:bubble-in .3s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes bubble-in { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+        .chat-bubble.ai { align-self:flex-start; background:var(--glass-bg); border:1px solid var(--border-subtle); color:var(--text-primary); border-bottom-left-radius:4px; }
+        .chat-bubble.user { align-self:flex-end; background:linear-gradient(135deg,#f59e0b,#10b981); color:#fff; border-bottom-right-radius:4px; }
+        .chat-bubble .cb-meta { display:flex; align-items:center; gap:6px; margin-top:6px; font-size:10px; color:var(--text-muted); }
+        .chat-bubble .cb-evidence { margin-top:8px; padding:8px 10px; border-radius:10px; background:var(--input-bg); border:1px solid var(--input-border); font-size:11px; color:var(--text-secondary); }
+        .chat-bubble .cb-evidence .ev-label { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--hela-amber); margin-bottom:3px; }
+        .typing-dots { display:inline-flex; gap:4px; padding:4px 2px; }
+        .typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--text-muted); animation:typing 1.2s infinite; }
+        .typing-dots span:nth-child(2){animation-delay:.15s;} .typing-dots span:nth-child(3){animation-delay:.3s;}
+        @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:.4;} 30%{transform:translateY(-4px);opacity:1;} }
+        .hela-input { display:flex; align-items:center; gap:10px; padding:12px 14px; border-top:1px solid var(--border-subtle); background:var(--bg-tertiary); }
+        .hela-input input { flex:1; padding:10px 14px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:12px; color:var(--input-text); font-size:13px; font-family:'Inter',sans-serif; transition:all .3s; }
+        .hela-input input::placeholder { color:var(--input-placeholder); }
+        .hela-input input:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        .hela-input .hi-btn { width:38px; height:38px; border-radius:12px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .25s; flex-shrink:0; }
+        .hela-input .hi-btn:hover { color:var(--text-primary); border-color:var(--glass-border-hover); background:var(--glass-bg-hover); }
+        .hela-input .hi-btn.send { background:linear-gradient(135deg,#f59e0b,#10b981); border:none; color:#fff; }
+        .hela-input .hi-btn.send:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(245,158,11,0.3); }
+        .hela-input .hi-btn svg { width:17px; height:17px; }
+        .waveform { display:flex; align-items:center; gap:3px; height:26px; }
+        .waveform span { width:3px; border-radius:2px; background:linear-gradient(180deg,#f59e0b,#10b981); animation:wave 1s ease-in-out infinite; }
+        .waveform span:nth-child(1){animation-delay:0s;} .waveform span:nth-child(2){animation-delay:.1s;} .waveform span:nth-child(3){animation-delay:.2s;} .waveform span:nth-child(4){animation-delay:.3s;} .waveform span:nth-child(5){animation-delay:.4s;} .waveform span:nth-child(6){animation-delay:.5s;} .waveform span:nth-child(7){animation-delay:.6s;} .waveform span:nth-child(8){animation-delay:.7s;} .waveform span:nth-child(9){animation-delay:.8s;} .waveform span:nth-child(10){animation-delay:.9s;}
+        @keyframes wave { 0%,100%{height:5px;} 50%{height:24px;} }
+        .hela-action-status { padding:10px 14px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); font-size:12px; color:var(--text-secondary); display:flex; flex-direction:column; gap:6px; }
+        .hela-action-status .as-step { display:flex; align-items:center; gap:8px; opacity:.55; transition:all .3s; }
+        .hela-action-status .as-step.done { opacity:1; color:var(--text-primary); }
+        .hela-action-status .as-step.done svg { color:#34d399; }
+        .hela-action-status .as-step svg { width:14px; height:14px; flex-shrink:0; }
+        .hela-action-status .as-step .as-spin { animation:spin 1s linear infinite; color:var(--hela-amber); }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        /* ═══════════════════════════════════════════════════════════════
+           GREETING + CREATION QUICK ACTIONS
+           ═══════════════════════════════════════════════════════════════ */
+        .greeting-title { font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:var(--text-primary); line-height:1.25; }
+        .greeting-sub { font-size:13px; color:var(--text-secondary); margin-top:6px; line-height:1.6; }
+        .greeting-context { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+        .ctx-chip { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:9999px; font-size:11px; font-weight:600; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-secondary); }
+        .ctx-chip .dot { width:7px; height:7px; border-radius:50%; }
+        .creation-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+        .creation-card { display:flex; flex-direction:column; gap:10px; padding:18px; cursor:pointer; }
+        .creation-card .cc-icon { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; transition:transform .3s cubic-bezier(0.16,1,0.3,1); }
+        .creation-card:hover .cc-icon { transform:scale(1.12) rotate(-4deg); }
+        .creation-card .cc-icon svg { width:21px; height:21px; }
+        .creation-card .cc-title { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:var(--text-primary); }
+        .creation-card .cc-desc { font-size:11.5px; color:var(--text-muted); line-height:1.45; }
+        .creation-card .cc-kbd { font-size:9.5px; color:var(--text-muted); padding:2px 7px; border-radius:6px; background:var(--input-bg); border:1px solid var(--input-border); align-self:flex-start; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MY AI SYSTEMS
+           ═══════════════════════════════════════════════════════════════ */
+        .sys-card { padding:16px; border-radius:16px; background:var(--input-bg); border:1px solid var(--input-border); transition:all .3s; cursor:pointer; position:relative; overflow:hidden; }
+        .sys-card:hover { border-color:var(--glass-border-hover); transform:translateY(-2px); background:var(--glass-bg); }
+        .sys-card .sc-head { display:flex; align-items:center; gap:12px; }
+        .sys-card .sc-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .sys-card .sc-icon svg { width:19px; height:19px; }
+        .sys-card .sc-name { font-size:13.5px; font-weight:600; color:var(--text-primary); }
+        .sys-card .sc-type { font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+        .sys-card .sc-status { margin-left:auto; }
+        .sys-card .sc-meta { display:flex; gap:14px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border-subtle); }
+        .sys-card .sc-meta .sm-item { font-size:10.5px; color:var(--text-muted); }
+        .sys-card .sc-meta .sm-item strong { display:block; font-size:13px; font-family:'Space Grotesk',sans-serif; color:var(--text-primary); }
+        .sys-card .sc-open { margin-top:12px; display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; color:var(--hela-amber); }
+        .sys-card .sc-open svg { width:13px; height:13px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AI PROJECT WORKSPACE / PIPELINE
+           ═══════════════════════════════════════════════════════════════ */
+        .pipeline { display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+        .pipeline-step { display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); font-size:12.5px; color:var(--text-secondary); transition:all .3s; }
+        .pipeline-step .ps-ic { width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:11px; font-weight:700; font-family:'Space Grotesk',sans-serif; }
+        .pipeline-step.done { color:var(--text-primary); }
+        .pipeline-step.done .ps-ic { background:rgba(16,185,129,0.15); color:#34d399; }
+        .pipeline-step.done .ps-check { color:#34d399; }
+        .pipeline-step.current { border-color:rgba(245,158,11,0.4); background:rgba(245,158,11,0.06); color:var(--text-primary); }
+        .pipeline-step.current .ps-ic { background:rgba(245,158,11,0.15); color:var(--hela-amber); }
+        .pipeline-step .ps-check { margin-left:auto; width:16px; height:16px; flex-shrink:0; }
+        .pipeline-step .ps-check svg { width:16px; height:16px; }
+        .progress-track { height:6px; border-radius:3px; background:var(--input-bg); overflow:hidden; margin-top:14px; }
+        .progress-fill { height:100%; border-radius:3px; background:var(--gradient-text); transition:width 1s cubic-bezier(0.16,1,0.3,1); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RECOMMENDATIONS
+           ═══════════════════════════════════════════════════════════════ */
+        .rec-card { padding:14px 16px; border-radius:16px; background:var(--input-bg); border:1px solid var(--input-border); transition:all .3s; cursor:pointer; }
+        .rec-card:hover { border-color:var(--glass-border-hover); transform:translateY(-1px); background:var(--glass-bg); }
+        .rec-card .rc-head { display:flex; align-items:center; gap:10px; }
+        .rec-card .rc-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .rec-card .rc-icon svg { width:16px; height:16px; }
+        .rec-card .rc-name { font-size:12.5px; font-weight:600; color:var(--text-primary); }
+        .rec-card .rc-why { font-size:10.5px; color:var(--text-muted); margin-top:2px; line-height:1.45; }
+        .rec-card .rc-actions { display:flex; gap:8px; margin-top:10px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           AGENTS / WORKFLOWS LISTS
+           ═══════════════════════════════════════════════════════════════ */
+        .agent-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:var(--input-bg); border:1px solid var(--input-border); transition:all .25s; cursor:pointer; }
+        .agent-row:hover { border-color:var(--glass-border-hover); transform:translateX(3px); background:var(--glass-bg); }
+        .agent-row .ar-icon { width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .agent-row .ar-icon svg { width:17px; height:17px; }
+        .agent-row .ar-name { font-size:12.5px; font-weight:600; color:var(--text-primary); }
+        .agent-row .ar-meta { font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+        .agent-row .ar-actions { margin-left:auto; display:flex; gap:6px; flex-shrink:0; }
+        .agent-row .ar-actions .btn-sm { padding:5px 11px; font-size:10.5px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           KNOWLEDGE / TOOLS
+           ═══════════════════════════════════════════════════════════════ */
+        .k-tile { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:var(--input-bg); border:1px solid var(--input-border); transition:all .25s; }
+        .k-tile:hover { border-color:var(--glass-border-hover); }
+        .k-tile .kt-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .k-tile .kt-icon svg { width:16px; height:16px; }
+        .k-tile .kt-name { font-size:12.5px; font-weight:600; color:var(--text-primary); }
+        .k-tile .kt-desc { font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+        .k-tile .kt-status { margin-left:auto; font-size:10.5px; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
+        .k-tile .kt-status .s-dot { width:7px; height:7px; border-radius:50%; }
+        .k-tile .kt-status.ok { color:#34d399; } .k-tile .kt-status.ok .s-dot { background:#10b981; box-shadow:0 0 8px rgba(16,185,129,0.5); }
+        .k-tile .kt-status.warn { color:#fbbf24; } .k-tile .kt-status.warn .s-dot { background:#f59e0b; box-shadow:0 0 8px rgba(245,158,11,0.5); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DEPLOYMENTS + MONITORING
+           ═══════════════════════════════════════════════════════════════ */
+        .deploy-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:var(--input-bg); border:1px solid var(--input-border); }
+        .deploy-row .dr-name { font-size:12.5px; font-weight:600; color:var(--text-primary); }
+        .deploy-row .dr-ver { font-size:10px; color:var(--text-muted); font-family:'Space Grotesk',sans-serif; }
+        .deploy-row .dr-stat { margin-left:auto; display:flex; align-items:center; gap:8px; }
+        .monitor-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; }
+        .monitor-stat { padding:14px 16px; border-radius:14px; background:var(--input-bg); border:1px solid var(--input-border); }
+        .monitor-stat .ms-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); }
+        .monitor-stat .ms-value { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:var(--text-primary); margin-top:5px; }
+        .monitor-stat .ms-sub { font-size:10px; color:var(--text-muted); margin-top:2px; }
+        .monitor-stat .ms-bar { height:4px; border-radius:2px; background:var(--input-bg); margin-top:8px; overflow:hidden; }
+        .monitor-stat .ms-bar > div { height:100%; border-radius:2px; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           MODALS
+           ═══════════════════════════════════════════════════════════════ */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px); z-index:95; display:flex; align-items:center; justify-content:center; padding:24px; opacity:0; pointer-events:none; transition:opacity .3s ease; }
+        .modal-overlay.open { opacity:1; pointer-events:auto; }
+        .modal { width:100%; max-width:760px; max-height:calc(100vh - 48px); background:var(--bg-secondary); border:1px solid var(--glass-border); border-radius:var(--liquid-radius-lg); box-shadow:var(--glass-shadow); overflow:hidden; display:flex; flex-direction:column; transform:translateY(16px) scale(.98); transition:transform .35s cubic-bezier(0.16,1,0.3,1); }
+        .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+        .modal-head { display:flex; align-items:center; gap:12px; padding:18px 22px; border-bottom:1px solid var(--border-subtle); background:var(--bg-tertiary); flex-shrink:0; }
+        .modal-head .mh-icon { width:38px; height:38px; border-radius:12px; background:var(--btn-gradient); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .modal-head .mh-icon svg { width:18px; height:18px; color:var(--hela-amber); }
+        .modal-head .mh-title { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; color:var(--text-primary); }
+        .modal-head .mh-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
+        .modal-head .mh-close { margin-left:auto; width:32px; height:32px; border-radius:10px; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .25s; }
+        .modal-head .mh-close:hover { color:var(--text-primary); background:var(--glass-bg-hover); }
+        .modal-head .mh-close svg { width:15px; height:15px; }
+        .modal-body { flex:1; overflow-y:auto; padding:20px 22px; }
+        .modal-foot { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px 22px; border-top:1px solid var(--border-subtle); background:var(--bg-tertiary); flex-shrink:0; }
+        .tab-bar { display:flex; gap:4px; overflow-x:auto; padding-bottom:12px; border-bottom:1px solid var(--border-subtle); margin-bottom:16px; }
+        .tab-bar .tab { padding:7px 14px; border-radius:10px; font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; white-space:nowrap; transition:all .25s; border:1px solid transparent; }
+        .tab-bar .tab:hover { color:var(--text-primary); background:var(--nav-hover-bg); }
+        .tab-bar .tab.active { color:var(--text-primary); background:var(--btn-gradient); border-color:rgba(245,158,11,0.25); }
+        .form-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin:14px 0 6px; }
+        .form-input { width:100%; padding:10px 14px; background:var(--input-bg); border:1px solid var(--input-border); border-radius:12px; color:var(--input-text); font-size:13px; font-family:'Inter',sans-serif; transition:all .3s; }
+        .form-input:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        .form-input::placeholder { color:var(--input-placeholder); }
+        textarea.form-input { resize:vertical; min-height:90px; line-height:1.55; }
+        .check-row { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); cursor:pointer; transition:all .2s; margin-bottom:6px; }
+        .check-row:hover { border-color:var(--glass-border-hover); }
+        .check-row input { accent-color:var(--hela-amber); width:15px; height:15px; flex-shrink:0; }
+        .check-row .cr-label { font-size:12.5px; font-weight:500; color:var(--text-primary); }
+        .check-row .cr-desc { font-size:10.5px; color:var(--text-muted); }
+        .check-row .cr-risk { margin-left:auto; font-size:9.5px; font-weight:700; padding:2px 8px; border-radius:9999px; }
+        .cr-risk.low { background:rgba(16,185,129,0.12); color:#34d399; }
+        .cr-risk.medium { background:rgba(245,158,11,0.12); color:#fbbf24; }
+        .cr-risk.high { background:rgba(239,68,68,0.12); color:#f87171; }
+
+        /* ── Workflow node editor ──────────────────────────────────────── */
+        .node-editor { display:grid; grid-template-columns:170px 1fr; gap:14px; min-height:300px; }
+        .node-palette { display:flex; flex-direction:column; gap:6px; }
+        .node-palette .np-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; background:var(--input-bg); border:1px solid var(--input-border); font-size:11.5px; font-weight:600; color:var(--text-secondary); cursor:pointer; transition:all .2s; }
+        .node-palette .np-item:hover { border-color:var(--glass-border-hover); color:var(--text-primary); background:var(--glass-bg); }
+        .node-palette .np-item svg { width:13px; height:13px; flex-shrink:0; }
+        .node-canvas { background:var(--bg-tertiary); border:1px solid var(--input-border); border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; min-height:300px; position:relative; }
+        .node-canvas .nc-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:12px; text-align:center; padding:20px; line-height:1.6; }
+        .wf-node { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); font-size:12px; font-weight:600; color:var(--text-primary); animation:bubble-in .3s cubic-bezier(0.16,1,0.3,1); }
+        .wf-node .wn-icon { width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .wf-node .wn-icon svg { width:14px; height:14px; }
+        .wf-node .wn-del { margin-left:auto; width:24px; height:24px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; transition:all .2s; }
+        .wf-node .wn-del:hover { color:#f87171; background:rgba(239,68,68,0.12); }
+        .wf-node .wn-del svg { width:12px; height:12px; }
+        .wf-connector { display:flex; align-items:center; justify-content:center; color:var(--text-muted); }
+        .wf-connector svg { width:14px; height:14px; }
+
+        /* ── Test result ───────────────────────────────────────────────── */
+        .test-result { display:none; margin-top:14px; padding:14px 16px; border-radius:14px; border:1px solid; }
+        .test-result.show { display:block; animation:bubble-in .35s cubic-bezier(0.16,1,0.3,1); }
+        .test-result.pass { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.3); }
+        .test-result.fail { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.3); }
+        .test-result .tr-head { display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; }
+        .test-result.pass .tr-head { color:#34d399; } .test-result.fail .tr-head { color:#f87171; }
+        .test-result .tr-head svg { width:16px; height:16px; }
+        .test-result .tr-row { display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-secondary); padding:5px 0; border-bottom:1px dashed var(--border-subtle); }
+        .test-result .tr-row:last-child { border-bottom:none; }
+        .test-result .tr-row span:first-child { color:var(--text-muted); }
+
+        /* ── Build progress ────────────────────────────────────────────── */
+        .build-steps { display:flex; flex-direction:column; gap:10px; }
+        .build-step { display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:12px; background:var(--input-bg); border:1px solid var(--input-border); font-size:12.5px; color:var(--text-secondary); transition:all .3s; }
+        .build-step .bs-ic { width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .build-step .bs-ic svg { width:14px; height:14px; }
+        .build-step.done { color:var(--text-primary); }
+        .build-step.done .bs-ic { background:rgba(16,185,129,0.15); color:#34d399; }
+        .build-step.current .bs-ic { background:rgba(245,158,11,0.15); color:var(--hela-amber); }
+        .build-step .bs-ic .as-spin { animation:spin 1s linear infinite; }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COMMAND PALETTE / NOTIFICATIONS / TOASTS
+           ═══════════════════════════════════════════════════════════════ */
+        .cmd-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); z-index:90; display:flex; align-items:flex-start; justify-content:center; padding:12vh 16px 16px; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+        .cmd-overlay.open { opacity:1; pointer-events:auto; }
+        .cmd-palette { width:100%; max-width:560px; background:var(--bg-secondary); border:1px solid var(--glass-border); border-radius:var(--liquid-radius-lg); box-shadow:var(--glass-shadow); overflow:hidden; transform:translateY(-12px) scale(.98); transition:transform .3s cubic-bezier(0.16,1,0.3,1); }
+        .cmd-overlay.open .cmd-palette { transform:translateY(0) scale(1); }
+        .cmd-search { display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--border-subtle); }
+        .cmd-search svg { width:18px; height:18px; color:var(--text-muted); flex-shrink:0; }
+        .cmd-search input { flex:1; background:transparent; border:none; outline:none; color:var(--text-primary); font-size:15px; font-family:'Inter',sans-serif; }
+        .cmd-search input::placeholder { color:var(--text-muted); }
+        .cmd-list { max-height:380px; overflow-y:auto; padding:10px; }
+        .cmd-group-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); padding:8px 10px 4px; }
+        .cmd-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; cursor:pointer; transition:all .2s; }
+        .cmd-item:hover, .cmd-item.selected { background:var(--nav-hover-bg); }
+        .cmd-item .ci-icon { width:32px; height:32px; border-radius:9px; background:var(--input-bg); border:1px solid var(--input-border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .cmd-item .ci-icon svg { width:15px; height:15px; }
+        .cmd-item .ci-label { font-size:13px; font-weight:500; color:var(--text-primary); }
+        .cmd-item .ci-desc { font-size:11px; color:var(--text-muted); }
+        .cmd-item .ci-kbd { margin-left:auto; font-size:10px; color:var(--text-muted); padding:2px 6px; border-radius:5px; background:var(--input-bg); border:1px solid var(--input-border); }
+        .notif-panel { position:fixed; top:var(--topbar-h); right:0; width:380px; max-height:calc(100vh - var(--topbar-h)); background:var(--bg-secondary); border-left:1px solid var(--border-subtle); z-index:35; transform:translateX(100%); transition:transform .35s cubic-bezier(0.16,1,0.3,1); overflow-y:auto; box-shadow:-8px 0 32px rgba(0,0,0,0.3); }
+        .notif-panel.open { transform:translateX(0); }
+        .alert-item { display:flex; gap:12px; padding:13px 14px; border-radius:14px; cursor:pointer; transition:all .25s; }
+        .alert-item:hover { background:var(--nav-hover-bg); }
+        .alert-item .alert-dot { width:9px; height:9px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+        .alert-item .alert-title { font-size:12.5px; font-weight:600; color:var(--text-primary); }
+        .alert-item .alert-desc { font-size:11px; color:var(--text-muted); margin-top:2px; line-height:1.45; }
+        .toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+        .toast-item { padding:14px 20px; border-radius:var(--liquid-radius-sm); backdrop-filter:blur(20px); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow); transform:translateX(120%); opacity:0; transition:all .4s cubic-bezier(0.16,1,0.3,1); max-width:360px; display:flex; align-items:center; gap:10px; }
+        .toast-item.show { transform:translateX(0); opacity:1; }
+        .toast-item.success { background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); }
+        .toast-item.error { background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.3); }
+        .toast-item.info { background:rgba(245,158,11,0.15); border-color:rgba(245,158,11,0.3); }
+        .toast-item svg { width:18px; height:18px; flex-shrink:0; }
+        .toast-item span { font-size:13px; font-weight:500; color:var(--text-primary); }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SKELETONS / MISC / RESPONSIVE
+           ═══════════════════════════════════════════════════════════════ */
+        .skeleton { position:relative; overflow:hidden; background:var(--input-bg); border-radius:10px; }
+        .skeleton::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent); animation:shimmer 1.4s infinite; }
+        @keyframes shimmer { from{transform:translateX(-100%);} to{transform:translateX(100%);} }
+        .skeleton-line { height:12px; margin-bottom:10px; }
+        .skeleton-line.w60 { width:60%; } .skeleton-line.w80 { width:80%; } .skeleton-line.w40 { width:40%; }
+        .sidebar-toggle { display:none; position:fixed; bottom:24px; left:24px; z-index:50; width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg,#f59e0b,#10b981); border:none; color:#fff; cursor:pointer; box-shadow:0 4px 20px rgba(245,158,11,0.3); align-items:center; justify-content:center; transition:all .3s; }
+        .sidebar-toggle:hover { transform:scale(1.05); }
+        .sidebar-toggle svg { width:22px; height:22px; }
+        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:39; backdrop-filter:blur(4px); }
+        .reveal { opacity:0; transform:translateY(24px); transition:all .6s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-1 { transition-delay:60ms; } .delay-2 { transition-delay:120ms; } .delay-3 { transition-delay:180ms; } .delay-4 { transition-delay:240ms; } .delay-5 { transition-delay:300ms; }
+        .live-dot { width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px rgba(16,185,129,0.6); animation:pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+        .divider { height:1px; background:var(--border-subtle); margin:14px 0; }
+        .text-hela-amber { color:var(--hela-amber); } .text-hela-emerald { color:var(--hela-emerald); } .text-hela-cyan { color:var(--hela-cyan); }
+        .section-anchor { scroll-margin-top:calc(var(--topbar-h) + 16px); }
+
+        @media(max-width:1280px){
+            .span-4 { grid-column:span 6; }
+            .span-3 { grid-column:span 6; }
+            .creation-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .monitor-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        }
+        @media(max-width:1024px){
+            .sidebar { transform:translateX(-100%); } .sidebar.open { transform:translateX(0); }
+            .topbar { left:0; } .main-content { margin-left:0; }
+            .sidebar-toggle { display:flex; } .sidebar-overlay.show { display:block; }
+            .span-8,.span-6,.span-4,.span-3 { grid-column:span 12; }
+            .topbar-search { width:220px; }
+        }
+        @media(max-width:768px){
+            .topbar-search { display:none; }
+            .topbar { padding:0 14px; }
+            .topbar-clock { display:none; }
+            .topbar-identity .ti-meta { display:none; }
+            .notif-panel { width:100%; }
+            .main-content { padding:16px 14px 40px; }
+            .hela-hero { flex-wrap:wrap; }
+            .hela-hero .hh-hint { display:none; }
+            .greeting-title { font-size:21px; }
+            .creation-grid { grid-template-columns:1fr 1fr; }
+            .monitor-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .node-editor { grid-template-columns:1fr; }
+            .node-palette { flex-direction:row; flex-wrap:wrap; }
+        }
+        @media(max-width:480px){
+            .creation-grid { grid-template-columns:1fr; }
+            .monitor-grid { grid-template-columns:1fr 1fr; }
+        }
+        @media(prefers-reduced-motion:reduce){
+            * { animation-duration:0.01ms!important; transition-duration:0.01ms!important; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+    <!-- ═══════════════ SIDEBAR ═══════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+            <div>
+                <div class="font-display font-bold text-base tracking-tight" style="color:var(--text-primary)">Hela<span style="color:var(--hela-amber)">core</span></div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:-1px;">AI Business Advisor</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item" href="dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-2a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg></span>Dashboard</a>
+            <a class="nav-item" href="money dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>HelaCore Money</a>
+            <a class="nav-item" href="ask hela dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>Ask Hela</a>
+<a class="nav-item" href="helaone dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12zm0 3a3 3 0 100 6 3 3 0 000-6z"/></svg></span>HelaOne</a>
+<a class="nav-item" href="helabank dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M4 21V10m4 11V10m4 11V10m4 11V10m4 11V10M2 10l10-7 10 7M6 6V4h4v2"/></svg></span>HelaBank</a>
+            <a class="nav-item active" href="ai studio dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></span>AI Studio</a>
+<a class="nav-item" href="ai agents dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>AI Agents</a>
+            <a class="nav-item" href="projects dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></span>Projects</a>
+            <div class="studio-subnav" id="studioSubnav">
+                <a class="ss-item active" href="#overview" onclick="scrollToSection('overview')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z"/></svg>Overview</a>
+                <a class="ss-item" href="#agentsSection" onclick="scrollToSection('agentsSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8V4H8a4 4 0 00-4 4v4a4 4 0 004 4h8a4 4 0 004-4v-4a4 4 0 00-4-4h-4zM4 12v4a4 4 0 004 4h8a4 4 0 004-4v-4M8 8h.01M16 8h.01M8 12h8"/></svg>Agents</a>
+                <a class="ss-item" href="#workflowsSection" onclick="scrollToSection('workflowsSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v12m0 0a3 3 0 10-3 3m3-3a3 3 0 013 3m0 0h6a3 3 0 003-3V9m0 0a3 3 0 10-3-3m3 3a3 3 0 01-3-3"/></svg>Workflows</a>
+                <a class="ss-item" href="#systemsSection" onclick="scrollToSection('systemsSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm0 4h18M7 7h.01M11 7h.01"/></svg>Apps</a>
+                <a class="ss-item" href="#creationSection" onclick="scrollToSection('creationSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 3h-7a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V4a1 1 0 00-1-1zm-10 0H3a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1zm10 10h-7a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1zm-10 0H3a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1v-7a1 1 0 00-1-1z"/></svg>Templates</a>
+                <a class="ss-item" href="#knowledgeSection" onclick="scrollToSection('knowledgeSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 6l4 14M12 6v14M8 8v12M4 4v16"/></svg>Knowledge</a>
+                <a class="ss-item" href="#toolsSection" onclick="scrollToSection('toolsSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Tools</a>
+                <a class="ss-item" href="#" onclick="openTestModal()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v7.527a2 2 0 01-.211.896L4.72 20.55a1 1 0 00.9 1.45h12.76a1 1 0 00.9-1.45l-5.069-10.127A2 2 0 0114 9.527V2M8.5 2h7M7 16h10"/></svg>Testing</a>
+                <a class="ss-item" href="#deploySection" onclick="scrollToSection('deploySection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2zM9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Deployments</a>
+                <a class="ss-item" href="#monitorSection" onclick="scrollToSection('monitorSection')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Monitoring</a>
+            </div>
+            <a class="nav-item" href="financial overview dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Financial Overview</a>
+            <a class="nav-item" href="transactions dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></span>Transactions</a>
+            <div class="nav-section-label" style="margin-top:8px;">Operations</div>
+            <a class="nav-item" href="inventory dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>Inventory<span class="nav-badge count">3</span></a>
+            <a class="nav-item" href="customers dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Customers</a>
+            <a class="nav-item" href="suppliers dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg></span>Suppliers</a>
+            <a class="nav-item" href="loan and financing dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>Loans & Financing</a>
+            <div class="nav-section-label" style="margin-top:8px;">Intelligence</div>
+            <a class="nav-item" href="ai simulations dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>AI Simulations</a>
+            <a class="nav-item" href="market intelligence dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3z"/></svg></span>Market Intelligence</a>
+            <a class="nav-item" href="opportunities dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>Opportunities</a>
+            <a class="nav-item" href="reports dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Reports</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="settings dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Settings</a>
+            <a class="nav-item" href="help center dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Help Center</a>
+            <a class="nav-item" onclick="HelacoreAuth.handleLogout()" style="color:#f87171;"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>Log Out</a>
+            <div class="sidebar-user" style="margin-top:8px;"><div class="avatar" id="sidebarAvatar">?</div><div class="user-info"><div class="user-name" id="sidebarUserName">Loading...</div><div class="user-role" id="sidebarUserRole">Business Owner</div></div></div>
+        </div>
+    </aside>
+
+    <!-- ═══════════════ TOP SYSTEM BAR ═══════════════ -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left"><h1>AI Studio <span>AI Creation &amp; Orchestration</span></h1></div>
+        <div class="topbar-search"><span class="search-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span><input type="text" placeholder="Search agents, workflows, templates..." id="globalSearch" onclick="openCommandPalette()" readonly><span class="search-kbd">Ctrl+K</span></div>
+        <div class="topbar-right">
+            <div class="topbar-clock"><span class="tc-time" id="clockTime">--:--</span><span class="tc-date" id="clockDate">—</span></div>
+            <button class="topbar-btn" onclick="toggleNotifPanel()" id="notifBtn" aria-label="Notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+            <button class="topbar-btn" onclick="openHelloHela()" aria-label="Ask Hela"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></button>
+            <button class="topbar-btn" onclick="window.location.href='settings dashboard.html'" aria-label="Settings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+            <div class="topbar-identity" onclick="window.location.href='settings dashboard.html'">
+                <div class="ti-avatar" id="topbarAvatar">?</div>
+                <div class="ti-meta">
+                    <div class="ti-name" id="topbarUserName">Loading...</div>
+                    <div class="ti-role" id="topbarUserRole">Business Owner</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════ NOTIFICATION PANEL ═══════════════ -->
+    <div class="notif-panel" id="notifPanel">
+        <div style="padding:20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;"><h3 class="font-display font-semibold text-base">Notifications</h3><button class="btn-ghost btn-sm" onclick="showToast('All read','success');document.querySelector('.notif-dot').style.display='none';">Mark all read</button></div>
+        <div style="padding:12px;">
+            <div class="alert-item" onclick="window.location.href='ai studio dashboard.html'"><span class="alert-dot" style="background:var(--success);box-shadow:0 0 8px rgba(16,185,129,0.4);"></span><div><div class="alert-title">Agent Deployed</div><div class="alert-desc">Inventory Guardian v1.4.0 is live in production</div></div></div>
+            <div class="alert-item" onclick="window.location.href='ai studio dashboard.html'"><span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.4);"></span><div><div class="alert-title">Test Suite Ready</div><div class="alert-desc">Customer Intelligence Agent passed 12/12 tests</div></div></div>
+            <div class="alert-item" onclick="window.location.href='ai studio dashboard.html'"><span class="alert-dot" style="background:var(--info);box-shadow:0 0 8px rgba(6,182,212,0.3);"></span><div><div class="alert-title">Knowledge Indexed</div><div class="alert-desc">3 new documents added to business knowledge</div></div></div>
+            <div class="alert-item" onclick="window.location.href='ai studio dashboard.html'"><span class="alert-dot" style="background:var(--purple);box-shadow:0 0 8px rgba(168,85,247,0.3);"></span><div><div class="alert-title">Recommendation</div><div class="alert-desc">Customer inactivity detected — build a reactivation agent</div></div></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ COMMAND PALETTE ═══════════════ -->
+    <div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCommandPalette()">
+        <div class="cmd-palette">
+            <div class="cmd-search">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input type="text" id="cmdInput" placeholder="Search AI Studio..." autocomplete="off">
+                <span class="search-kbd">ESC</span>
+            </div>
+            <div class="cmd-list" id="cmdList"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ HELLO HELA PANEL ═══════════════ -->
+    <div class="hela-panel" id="helaPanel">
+        <div class="hela-panel-head">
+            <div class="hp-orb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></div>
+            <div><div class="hp-title">Hello Hela</div><div class="hp-status" id="helaStatus">AI Studio · online</div></div>
+            <button class="hp-close" onclick="closeHelloHela()" aria-label="Close"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div class="hela-convo" id="helaConvo"></div>
+        <div class="hela-input">
+            <button class="hi-btn" onclick="simulateVoice()" aria-label="Voice"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm-7 10a7 7 0 0014 0m-7 7v4m-4 0h8"/></svg></button>
+            <input type="text" id="helaInput" placeholder="Describe what you want to build... e.g. 'Create an AI sales manager'" onkeydown="if(event.key==='Enter')sendHelaMessage()">
+            <button class="hi-btn send" onclick="sendHelaMessage()" aria-label="Send"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+        </div>
+    </div>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="main-content" id="mainContent">
+        <div class="dash-grid">
+
+            <!-- HELLO HELA COMMAND LAYER -->
+            <div class="span-12 reveal" id="overview">
+                <div class="liquid-glass hela-hero" onclick="openHelloHela()">
+                    <div class="hela-orb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></div>
+                    <div>
+                        <div class="hh-title">Hello Hela — AI Studio Command Layer</div>
+                        <div class="hh-sub">Describe what you want to build. Hela extracts requirements, designs the architecture, connects knowledge and tools, tests, verifies and prepares deployment.</div>
+                    </div>
+                    <div class="hh-hint">
+                        <span class="hh-kbd">Try: "Build me an AI agent that monitors inventory"</span>
+                        <span class="hh-kbd">⌘K</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI STUDIO GREETING LAYER -->
+            <div class="span-12 reveal delay-1">
+                <div class="dash-card">
+                    <div class="greeting-title">Good <span id="greetingWord">evening</span>, <span class="gradient-text-hela" id="greetingName">there</span>.</div>
+                    <div class="greeting-sub" id="greetingMessage">Welcome to AI Studio. Build an AI employee, automate a workflow, create a business application, or ask Hela to build it with you.</div>
+                    <div class="greeting-context" id="greetingContext"></div>
+                </div>
+            </div>
+
+            <!-- CREATION QUICK ACTIONS -->
+            <div class="span-12 reveal delay-2 section-anchor" id="creationSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Creation Hub</div><div class="card-subtitle">Turn an idea into a working AI system</div></div>
+                        <button class="btn-ghost btn-sm" onclick="openCommandPalette()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Search</button>
+                    </div>
+                    <div class="creation-grid" id="creationGrid"></div>
+                </div>
+            </div>
+
+            <!-- MY AI SYSTEMS + AI ACTIVITY -->
+            <div class="span-8 reveal delay-2 section-anchor" id="systemsSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">My AI Systems</div><div class="card-subtitle">Everything you have created, deployed and tested</div></div>
+                        <span class="status-pill running" id="systemsCountPill">0 systems</span>
+                    </div>
+                    <div class="creation-grid" id="systemsGrid" style="grid-template-columns:repeat(2,minmax(0,1fr));"></div>
+                </div>
+            </div>
+            <div class="span-4 reveal delay-3 section-anchor" id="activitySection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">AI Activity</div><div class="card-subtitle">What Hela is doing right now</div></div>
+                        <span class="live-dot"></span>
+                    </div>
+                    <div id="activityList"></div>
+                </div>
+            </div>
+
+            <!-- AI PROJECT WORKSPACE + RECOMMENDATIONS -->
+            <div class="span-8 reveal delay-2 section-anchor" id="workspaceSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">AI Project Workspace</div><div class="card-subtitle">Continue where you left off</div></div>
+                        <span class="status-pill queued" id="projectStagePill">in progress</span>
+                    </div>
+                    <div id="workspaceBody"></div>
+                </div>
+            </div>
+            <div class="span-4 reveal delay-3 section-anchor" id="recommendSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Recommended Builds</div><div class="card-subtitle" id="recSubtitle">Based on your business context</div></div>
+                    </div>
+                    <div id="recommendList" style="display:flex;flex-direction:column;gap:10px;"></div>
+                </div>
+            </div>
+
+            <!-- AGENTS + WORKFLOWS -->
+            <div class="span-6 reveal delay-2 section-anchor" id="agentsSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Agents</div><div class="card-subtitle">Deployed and in-testing AI agents</div></div>
+                        <button class="btn-primary btn-sm" onclick="openAgentBuilder()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>New Agent</button>
+                    </div>
+                    <div id="agentsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+            </div>
+            <div class="span-6 reveal delay-3 section-anchor" id="workflowsSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Workflows</div><div class="card-subtitle">Automated AI business processes</div></div>
+                        <button class="btn-primary btn-sm" onclick="openWorkflowBuilder()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>New Workflow</button>
+                    </div>
+                    <div id="workflowsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+            </div>
+
+            <!-- KNOWLEDGE / TOOLS + DEPLOYMENTS -->
+            <div class="span-8 reveal delay-2 section-anchor" id="knowledgeSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Knowledge &amp; Tools</div><div class="card-subtitle">What your AI systems can read and do</div></div>
+                        <button class="btn-ghost btn-sm" onclick="showToast('Knowledge connector opened','info')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/></svg>Connect</button>
+                    </div>
+                    <div class="creation-grid" id="knowledgeGrid" style="grid-template-columns:repeat(2,minmax(0,1fr));"></div>
+                    <div class="divider"></div>
+                    <div class="card-title" style="font-size:13px;margin-bottom:10px;" id="toolsSection">Tools</div>
+                    <div id="toolsGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+            </div>
+            <div class="span-4 reveal delay-3 section-anchor" id="deploySection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Deployments</div><div class="card-subtitle">Production AI systems</div></div>
+                    </div>
+                    <div id="deployList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div class="divider"></div>
+                    <div class="card-title" style="font-size:13px;margin-bottom:10px;">AI System Health</div>
+                    <div id="healthBody"></div>
+                </div>
+            </div>
+
+            <!-- MONITORING -->
+            <div class="span-12 reveal delay-2 section-anchor" id="monitorSection">
+                <div class="dash-card">
+                    <div class="card-header">
+                        <div><div class="card-title">Monitoring</div><div class="card-subtitle">Execution, latency, cost and reliability across all AI systems</div></div>
+                        <span class="status-pill running">live</span>
+                    </div>
+                    <div class="monitor-grid" id="monitorGrid"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ═══════════════ AGENT BUILDER MODAL ═══════════════ -->
+    <div class="modal-overlay" id="agentBuilderModal" onclick="if(event.target===this)closeModal('agentBuilderModal')">
+        <div class="modal">
+            <div class="modal-head">
+                <div class="mh-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8V4H8a4 4 0 00-4 4v4a4 4 0 004 4h8a4 4 0 004-4v-4a4 4 0 00-4-4h-4zM4 12v4a4 4 0 004 4h8a4 4 0 004-4v-4M8 8h.01M16 8h.01M8 12h8"/></svg></div>
+                <div><div class="mh-title">Agent Builder</div><div class="mh-sub">Configure identity, knowledge, tools, permissions and deployment</div></div>
+                <button class="mh-close" onclick="closeModal('agentBuilderModal')" aria-label="Close"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-bar" id="agentTabs">
+                    <div class="tab active" data-tab="identity" onclick="switchAgentTab('identity')">Identity</div>
+                    <div class="tab" data-tab="instructions" onclick="switchAgentTab('instructions')">Instructions</div>
+                    <div class="tab" data-tab="knowledge" onclick="switchAgentTab('knowledge')">Knowledge</div>
+                    <div class="tab" data-tab="tools" onclick="switchAgentTab('tools')">Tools</div>
+                    <div class="tab" data-tab="permissions" onclick="switchAgentTab('permissions')">Permissions</div>
+                    <div class="tab" data-tab="guardrails" onclick="switchAgentTab('guardrails')">Guardrails</div>
+                    <div class="tab" data-tab="testing" onclick="switchAgentTab('testing')">Testing</div>
+                    <div class="tab" data-tab="deployment" onclick="switchAgentTab('deployment')">Deployment</div>
+                </div>
+                <div id="agentTabIdentity">
+                    <div class="form-label">Agent name</div>
+                    <input class="form-input" id="agentNameInput" placeholder="e.g. Inventory Guardian">
+                    <div class="form-label">Role</div>
+                    <input class="form-input" id="agentRoleInput" placeholder="e.g. Inventory Intelligence Agent">
+                    <div class="form-label">Purpose</div>
+                    <textarea class="form-input" id="agentPurposeInput" placeholder="Monitor inventory and identify potential shortages..."></textarea>
+                    <div class="form-label">Objective</div>
+                    <input class="form-input" id="agentObjectiveInput" placeholder="e.g. Recommend reorder actions before stockouts occur">
+                </div>
+                <div id="agentTabInstructions" style="display:none;">
+                    <div class="form-label">System instructions</div>
+                    <textarea class="form-input" id="agentInstructionsInput" style="min-height:180px;" placeholder="You are the Inventory Intelligence Agent.&#10;&#10;Your responsibilities are to:&#10;1. Monitor inventory.&#10;2. Identify unusual demand.&#10;3. Detect reorder risk.&#10;4. Explain evidence.&#10;5. Recommend appropriate action."></textarea>
+                    <div class="form-label">Personality</div>
+                    <input class="form-input" id="agentPersonalityInput" placeholder="e.g. Clear, concise, evidence-first">
+                </div>
+                <div id="agentTabKnowledge" style="display:none;">
+                    <div class="form-label">Select knowledge sources (permission-aware)</div>
+                    <div id="knowledgeCheckList"></div>
+                </div>
+                <div id="agentTabTools" style="display:none;">
+                    <div class="form-label">Select tools</div>
+                    <div id="toolsCheckList"></div>
+                </div>
+                <div id="agentTabPermissions" style="display:none;">
+                    <div class="form-label">Knowledge permission model — agents only receive the data required for their task</div>
+                    <div id="permissionList"></div>
+                </div>
+                <div id="agentTabGuardrails" style="display:none;">
+                    <div class="form-label">Agent constitution</div>
+                    <div class="check-row"><input type="checkbox" id="guardEvidence" checked><div><div class="cr-label">Must provide evidence</div><div class="cr-desc">Every recommendation includes its evidence trail</div></div></div>
+                    <div class="check-row"><input type="checkbox" id="guardApproval"><div><div class="cr-label">Requires human approval for financial actions</div><div class="cr-desc">High-impact operations pause for review</div></div></div>
+                    <div class="check-row"><input type="checkbox" id="guardForbid" checked><div><div class="cr-label">Cannot delete financial records</div><div class="cr-desc">Forbidden actions are enforced at execution</div></div></div>
+                    <div class="check-row"><input type="checkbox" id="guardEscalate" checked><div><div class="cr-label">Escalate uncertainty to a human</div><div class="cr-desc">Low-confidence decisions route to review</div></div></div>
+                </div>
+                <div id="agentTabTesting" style="display:none;">
+                    <div class="form-label">Test input</div>
+                    <input class="form-input" id="agentTestInput" placeholder="e.g. Which inventory items are below reorder point?">
+                    <div class="form-label">Expected behavior</div>
+                    <input class="form-input" id="agentTestExpected" placeholder="e.g. List items and recommend reorder quantities">
+                    <div style="margin-top:14px;"><button class="btn-primary btn-sm" onclick="runAgentTest()">Run Test</button></div>
+                    <div class="test-result" id="agentTestResult"></div>
+                </div>
+                <div id="agentTabDeployment" style="display:none;">
+                    <div class="form-label">Environment</div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-ghost btn-sm" onclick="setEnv('staging',this)">Staging</button>
+                        <button class="btn-primary btn-sm" onclick="setEnv('production',this)">Production</button>
+                    </div>
+                    <div class="form-label">Version</div>
+                    <input class="form-input" id="agentVersionInput" value="1.0.0">
+                    <div style="margin-top:14px;"><button class="btn-success btn-sm" onclick="deployAgentFromBuilder()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px;margin-right:5px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2zM9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Deploy Agent</button></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost btn-sm" onclick="closeModal('agentBuilderModal')">Cancel</button>
+                <button class="btn-primary btn-sm" onclick="saveAgentFromBuilder()">Save Agent</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ WORKFLOW BUILDER MODAL ═══════════════ -->
+    <div class="modal-overlay" id="workflowModal" onclick="if(event.target===this)closeModal('workflowModal')">
+        <div class="modal">
+            <div class="modal-head">
+                <div class="mh-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v12m0 0a3 3 0 10-3 3m3-3a3 3 0 013 3m0 0h6a3 3 0 003-3V9m0 0a3 3 0 10-3-3m3 3a3 3 0 01-3-3"/></svg></div>
+                <div><div class="mh-title">Workflow Builder</div><div class="mh-sub">Compose triggers, conditions, AI reasoning and actions</div></div>
+                <button class="mh-close" onclick="closeModal('workflowModal')" aria-label="Close"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-label">Workflow name</div>
+                <input class="form-input" id="workflowNameInput" placeholder="e.g. Inventory Reorder Recommendation">
+                <div class="form-label">Build pipeline — click nodes to add them to the flow</div>
+                <div class="node-editor">
+                    <div class="node-palette" id="nodePalette"></div>
+                    <div class="node-canvas" id="nodeCanvas">
+                        <div class="nc-empty" id="nodeEmpty">Click nodes on the left to build your workflow.<br>Example: Trigger → Condition → AI Reasoning → Action → Notification</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost btn-sm" onclick="closeModal('workflowModal')">Cancel</button>
+                <button class="btn-primary btn-sm" onclick="testWorkflow()">Run Test</button>
+                <button class="btn-success btn-sm" onclick="saveWorkflowFromBuilder()">Save &amp; Deploy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ TESTING STUDIO MODAL ═══════════════ -->
+    <div class="modal-overlay" id="testModal" onclick="if(event.target===this)closeModal('testModal')">
+        <div class="modal" style="max-width:560px;">
+            <div class="modal-head">
+                <div class="mh-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v7.527a2 2 0 01-.211.896L4.72 20.55a1 1 0 00.9 1.45h12.76a1 1 0 00.9-1.45l-5.069-10.127A2 2 0 0114 9.527V2M8.5 2h7M7 16h10"/></svg></div>
+                <div><div class="mh-title">Testing Studio</div><div class="mh-sub">Evaluate accuracy, grounding, tool correctness and latency</div></div>
+                <button class="mh-close" onclick="closeModal('testModal')" aria-label="Close"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-label">Agent under test</div>
+                <select class="form-input" id="testAgentSelect"></select>
+                <div class="form-label">Input</div>
+                <input class="form-input" id="testInput" placeholder="e.g. Find inactive customers">
+                <div class="form-label">Expected behavior</div>
+                <input class="form-input" id="testExpected" placeholder="e.g. Return list of customers inactive 30+ days">
+                <div style="margin-top:14px;"><button class="btn-primary btn-sm" onclick="runStudioTest()">Run Test</button></div>
+                <div class="test-result" id="studioTestResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ BUILD PROGRESS MODAL ═══════════════ -->
+    <div class="modal-overlay" id="buildModal" onclick="if(event.target===this)closeModal('buildModal')">
+        <div class="modal" style="max-width:520px;">
+            <div class="modal-head">
+                <div class="mh-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div><div class="mh-title" id="buildModalTitle">Creating AI Agent</div><div class="mh-sub" id="buildModalSub">Hela is building your system</div></div>
+                <button class="mh-close" onclick="closeModal('buildModal')" aria-label="Close"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="build-steps" id="buildSteps"></div>
+                <div class="progress-track" style="margin-top:16px;"><div class="progress-fill" id="buildProgressFill" style="width:0%;"></div></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost btn-sm" onclick="closeModal('buildModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="theme.js" defer></script>
+    <script src="shared-auth.js" defer></script>
+    <script>
+    /* ═══════════════════════════════════════════════════════════════
+       HELACORE AI STUDIO — application logic
+       ═══════════════════════════════════════════════════════════════ */
+    'use strict';
+
+    /* ── Icon library (Lucide-style, consistent with index.html) ── */
+    const ICONS = {
+        sparkles:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',
+        branch:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v12m0 0a3 3 0 10-3 3m3-3a3 3 0 013 3m0 0h6a3 3 0 003-3V9m0 0a3 3 0 10-3-3m3 3a3 3 0 01-3-3"/>',
+        app:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm0 4h18M7 7h.01M11 7h.01"/>',
+        layers:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l9 5-9 5-9-5 9-5zm-9 10l9 5 9-5M3 17l9 5 9-5"/>',
+        chat:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>',
+        library:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 6l4 14M12 6v14M8 8v12M4 4v16"/>',
+        wrench:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>',
+        flask:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 2v7.527a2 2 0 01-.211.896L4.72 20.55a1 1 0 00.9 1.45h12.76a1 1 0 00.9-1.45l-5.069-10.127A2 2 0 0114 9.527V2M8.5 2h7M7 16h10"/>',
+        rocket:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2zM9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+        activity:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+        template:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 3h-7a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V4a1 1 0 00-1-1zm-10 0H3a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1V4a1 1 0 00-1-1zm10 10h-7a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1v-7a1 1 0 00-1-1zm-10 0H3a1 1 0 00-1 1v7a1 1 0 001 1h8a1 1 0 001-1v-7a1 1 0 00-1-1z"/>',
+        plus:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/>',
+        search:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>',
+        mic:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zm-7 10a7 7 0 0014 0m-7 7v4m-4 0h8"/>',
+        bot:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8V4H8a4 4 0 00-4 4v4a4 4 0 004 4h8a4 4 0 004-4v-4a4 4 0 00-4-4h-4zM4 12v4a4 4 0 004 4h8a4 4 0 004-4v-4M8 8h.01M16 8h.01M8 12h8"/>',
+        brain:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>',
+        zap:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',
+        users:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        box:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+        trend:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M23 6l-9.5 9.5-5-5L1 18m22-12h-7m7 0v7"/>',
+        clock:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+        play:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>',
+        pause:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4H6v16h4V4zm8 0h-4v16h4V4z"/>',
+        trash:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>',
+        eye:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178zM15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        x:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/>',
+        check:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 21a11.955 11.955 0 01-8.354-5.646z"/>',
+        warn:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4m0 4h.01"/>',
+        arrow:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7-7l7 7-7 7"/>',
+        chevron:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>',
+        gauge:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15l3.5-3.5M20.3 18a10 10 0 11-16.6 0"/>',
+        cpu:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9h6v6H9V9zm-7 3a8 8 0 0016 0M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 0l1.4-1.4M2 12h2m16 0h2"/>',
+        database:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c4.97 0 9-1.343 9-3s-4.03-3-9-3-9 1.343-9 3 4.03 3 9 3zm9 3c0 1.657-4.03 3-9 3s-9-1.343-9-3m18 6c0 1.657-4.03 3-9 3s-9-1.343-9-3"/>',
+        plug:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22v-5m0-10V2m-5 5h10a2 2 0 012 2v3a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2zM12 12v5"/>',
+        shield:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+        file:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8m8 4H8m2-8H8"/>',
+        code:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 16l4-4-4-4M6 8l-4 4 4 4m8-12l-4 16"/>',
+        settings:'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>'
+    };
+
+    /* ── Data: creation cards ── */
+    const CREATIONS = [
+        { icon:'bot', name:'Create AI Agent', desc:'Build an AI employee with identity, knowledge, tools and guardrails.', bg:'rgba(245,158,11,0.12)', color:'#f59e0b', kbd:'A', action:()=>openAgentBuilder() },
+        { icon:'branch', name:'Create AI Workflow', desc:'Compose triggers, conditions, AI reasoning and actions.', bg:'rgba(6,182,212,0.12)', color:'#06b6d4', kbd:'W', action:()=>openWorkflowBuilder() },
+        { icon:'app', name:'Build AI App', desc:'Describe an application and Hela generates requirements, schema, API and UI.', bg:'rgba(168,85,247,0.12)', color:'#a855f7', kbd:'B', action:()=>startBuild('AI App','app') },
+        { icon:'layers', name:'Generate Business System', desc:'Create ERP, CRM, inventory or accounting systems from an idea.', bg:'rgba(16,185,129,0.12)', color:'#10b981', kbd:'S', action:()=>startBuild('Business System','system') },
+        { icon:'chat', name:'Create AI Assistant', desc:'A conversational assistant trained on your business knowledge.', bg:'rgba(245,158,11,0.12)', color:'#f59e0b', kbd:'C', action:()=>startBuild('AI Assistant','assistant') },
+        { icon:'library', name:'Connect Knowledge', desc:'Attach documents, policies, records and operational data.', bg:'rgba(6,182,212,0.12)', color:'#06b6d4', kbd:'K', action:()=>{ showToast('Knowledge connector opened','info'); scrollToSection('knowledgeSection'); } },
+        { icon:'zap', name:'Create Automation', desc:'Automate repeated manual tasks with AI-powered workflows.', bg:'rgba(168,85,247,0.12)', color:'#a855f7', kbd:'U', action:()=>openWorkflowBuilder() },
+        { icon:'template', name:'Build From Template', desc:'Start from a proven template tuned for your industry.', bg:'rgba(16,185,129,0.12)', color:'#10b981', kbd:'T', action:()=>{ showToast('Templates opened','info'); scrollToSection('creationSection'); } }
+    ];
+
+    /* ── Data: AI systems ── */
+    let systems = [
+        { id:'agent_001', name:'Sales Intelligence', type:'Agent', status:'active', statusCls:'completed', version:'1.4.0', knowledge:6, tools:14, icon:'trend', color:'#10b981', bg:'rgba(16,185,129,0.12)', lastRun:'2h ago' },
+        { id:'workflow_001', name:'Inventory Guardian', type:'Workflow', status:'testing', statusCls:'running', version:'0.9.2', knowledge:3, tools:5, icon:'box', color:'#06b6d4', bg:'rgba(6,182,212,0.12)', lastRun:'testing' },
+        { id:'agent_002', name:'Customer Assistant', type:'Agent', status:'deployed', statusCls:'completed', version:'2.1.0', knowledge:4, tools:9, icon:'users', color:'#a855f7', bg:'rgba(168,85,247,0.12)', lastRun:'1h ago' },
+        { id:'workflow_002', name:'Weekly Executive Report', type:'Workflow', status:'active', statusCls:'completed', version:'1.0.3', knowledge:2, tools:4, icon:'file', color:'#f59e0b', bg:'rgba(245,158,11,0.12)', lastRun:'Mon 08:00' }
+    ];
+
+    /* ── Data: agents ── */
+    let agents = [
+        { id:'agent_001', name:'Sales Intelligence', role:'Sales Analysis Agent', status:'deployed', statusCls:'completed', tools:14, knowledge:6, icon:'trend', color:'#10b981', bg:'rgba(16,185,129,0.12)' },
+        { id:'agent_002', name:'Customer Assistant', role:'Customer Support Agent', status:'deployed', statusCls:'completed', tools:9, knowledge:4, icon:'users', color:'#a855f7', bg:'rgba(168,85,247,0.12)' },
+        { id:'agent_003', name:'Customer Intelligence', role:'CRM Intelligence Agent', status:'testing', statusCls:'running', tools:7, knowledge:5, icon:'brain', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' }
+    ];
+
+    /* ── Data: workflows ── */
+    let workflows = [
+        { id:'workflow_001', name:'Inventory Reorder Monitor', status:'testing', statusCls:'running', nodes:6, icon:'box', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' },
+        { id:'workflow_002', name:'Weekly Executive Report', status:'active', statusCls:'completed', nodes:5, icon:'file', color:'#f59e0b', bg:'rgba(245,158,11,0.12)' },
+        { id:'workflow_003', name:'Supplier Lead Time Watch', status:'draft', statusCls:'queued', nodes:4, icon:'plug', color:'#a855f7', bg:'rgba(168,85,247,0.12)' }
+    ];
+
+    /* ── Data: knowledge sources ── */
+    const KNOWLEDGE = [
+        { name:'Business Documents', desc:'Policies, contracts, SOPs', icon:'file', color:'#f59e0b', bg:'rgba(245,158,11,0.12)', status:'ok', label:'indexed' },
+        { name:'Product Information', desc:'Catalog, pricing, specs', icon:'box', color:'#10b981', bg:'rgba(16,185,129,0.12)', status:'ok', label:'indexed' },
+        { name:'Financial Records', desc:'Statements, invoices, ledgers', icon:'database', color:'#06b6d4', bg:'rgba(6,182,212,0.12)', status:'ok', label:'indexed' },
+        { name:'Customer Records', desc:'CRM, history, segments', icon:'users', color:'#a855f7', bg:'rgba(168,85,247,0.12)', status:'warn', label:'partial' }
+    ];
+
+    /* ── Data: tools ── */
+    const TOOLS = [
+        { name:'Search Customers', risk:'low', icon:'users', color:'#10b981' },
+        { name:'Query Inventory', risk:'low', icon:'box', color:'#06b6d4' },
+        { name:'Create Task', risk:'low', icon:'check', color:'#f59e0b' },
+        { name:'Generate Report', risk:'low', icon:'file', color:'#a855f7' },
+        { name:'Send Notification', risk:'medium', icon:'zap', color:'#f59e0b' },
+        { name:'Analyze Sales', risk:'medium', icon:'trend', color:'#10b981' },
+        { name:'Search Knowledge', risk:'low', icon:'library', color:'#06b6d4' },
+        { name:'Call API', risk:'high', icon:'plug', color:'#ef4444' }
+    ];
+
+    /* ── Data: deployments ── */
+    const DEPLOYMENTS = [
+        { name:'Sales Intelligence', ver:'v1.4.0', env:'Production', status:'Active', statusCls:'completed', exec:'1,842', success:'98.7%' },
+        { name:'Customer Assistant', ver:'v2.1.0', env:'Production', status:'Active', statusCls:'completed', exec:'3,105', success:'99.1%' },
+        { name:'Inventory Guardian', ver:'v0.9.2', env:'Staging', status:'Testing', statusCls:'running', exec:'214', success:'96.2%' }
+    ];
+
+    /* ── Data: activity pool ── */
+    let activityPool = [
+        { text:'Inventory Guardian v0.9.2 passed 12/12 tests', src:'testing', color:'#10b981', time:'4m ago' },
+        { text:'Knowledge source "Financial Records" indexed', src:'knowledge', color:'#06b6d4', time:'18m ago' },
+        { text:'Customer Intelligence agent version created', src:'agents', color:'#a855f7', time:'42m ago' },
+        { text:'Weekly Executive Report workflow executed', src:'workflows', color:'#f59e0b', time:'1h ago' },
+        { text:'Sales Intelligence completed 14 analyses this week', src:'agents', color:'#10b981', time:'2h ago' },
+        { text:'Supplier Lead Time Watch draft saved', src:'workflows', color:'#06b6d4', time:'3h ago' }
+    ];
+    const liveEvents = [
+        { text:'Agent build completed — Customer Intelligence', src:'build', color:'#10b981' },
+        { text:'Workflow test run finished — 98% success', src:'testing', color:'#06b6d4' },
+        { text:'Tool permission updated for Sales Intelligence', src:'security', color:'#f59e0b' },
+        { text:'Deployment health check passed', src:'deploy', color:'#10b981' },
+        { text:'New recommendation generated from business events', src:'recommend', color:'#a855f7' }
+    ];
+
+    /* ── Personalization context (from shared-auth.js) ── */
+    let ctx = { firstName:'there', bizName:'your business', role:'Business Owner', industry:'', industryLabel:'', size:'', sizeLabel:'', revenue:0, expenses:0, cash:0, customers:0 };
+
+    function loadContext() {
+        const A = window.HelacoreAuth;
+        if (!A) return;
+        ctx.firstName = A.getVal('first_name') || 'there';
+        ctx.bizName = A.getVal('business_name','business_name') || A.getVal('company_name','company_name') || 'your business';
+        ctx.role = A.getVal('role','role') || 'Business Owner';
+        ctx.industry = A.getVal('industry','industry') || '';
+        ctx.industryLabel = A.mapVal ? A.mapVal('industry', ctx.industry) : ctx.industry;
+        ctx.size = A.getVal('business_size','business_size') || '';
+        ctx.sizeLabel = A.mapVal ? A.mapVal('business_size', ctx.size) : ctx.size;
+        const ws = A.currentWorkspace || {};
+        ctx.revenue = Number(ws.monthly_revenue || ws.revenue || 0);
+        ctx.expenses = Number(ws.monthly_expenses || ws.expenses || 0);
+        ctx.cash = Number(ws.cash_balance || ws.cash || 0);
+        ctx.customers = Number(ws.active_customers || ws.customers || 0);
+    }
+
+    /* ── Recommendation engine (role + industry + business events) ── */
+    function buildRecommendations() {
+        const recs = [];
+        const existing = new Set(systems.map(s => s.name.toLowerCase()));
+        const push = (name, why, icon, color, bg) => {
+            if (!existing.has(name.toLowerCase())) recs.push({ name, why, icon, color, bg });
+        };
+        /* Business events from Home dashboard state */
+        if (ctx.customers > 0 && ctx.customers < 60) push('Customer Reactivation Agent', 'Customer inactivity has increased — reactivate dormant customers with AI follow-ups.', 'users', '#a855f7', 'rgba(168,85,247,0.12)');
+        if (ctx.expenses > 0 && ctx.cash < ctx.expenses * 2) push('Cash Flow Guardian', 'Cash flow is under pressure — an agent can monitor and protect liquidity.', 'database', '#f59e0b', 'rgba(245,158,11,0.12)');
+        if (ctx.revenue > 0) push('Weekly Executive Report Agent', 'Your business generates revenue data — automate the executive summary.', 'file', '#10b981', 'rgba(16,185,129,0.12)');
+        /* Industry influence */
+        const ind = (ctx.industry || '').toLowerCase();
+        if (ind === 'retail' || ind === 'food') push('Inventory Monitoring Agent', 'Retail businesses benefit from continuous stock intelligence.', 'box', '#06b6d4', 'rgba(6,182,212,0.12)');
+        if (ind === 'agriculture') push('Farm Intelligence Agent', 'Crop planning and market intelligence tuned for agriculture.', 'trend', '#10b981', 'rgba(16,185,129,0.12)');
+        if (ind === 'manufacturing') push('Supplier Intelligence Workflow', 'Track supplier lead times and production inputs.', 'plug', '#f59e0b', 'rgba(245,158,11,0.12)');
+        if (ind === 'finance') push('Financial Intelligence Agent', 'Monitor margins, receivables and risk signals.', 'database', '#06b6d4', 'rgba(6,182,212,0.12)');
+        /* Role influence */
+        const role = (ctx.role || '').toLowerCase();
+        if (role.includes('ceo') || role.includes('executive') || role.includes('owner')) push('Executive Decision Agent', 'Strategy and decision support for leadership.', 'brain', '#a855f7', 'rgba(168,85,247,0.12)');
+        if (role.includes('operation') || role.includes('manager')) push('Operations Agent', 'Monitor operations, workflows and escalations.', 'cpu', '#06b6d4', 'rgba(6,182,212,0.12)');
+        /* Defaults */
+        push('Sales Intelligence Agent', 'Analyze sales trends and surface opportunities.', 'trend', '#10b981', 'rgba(16,185,129,0.12)');
+        push('Customer Support Assistant', 'Answer customer questions from your knowledge base.', 'chat', '#a855f7', 'rgba(168,85,247,0.12)');
+        return recs.slice(0, 4);
+    }
+
+    /* ── Greeting engine ── */
+    function generateGreeting() {
+        const hour = new Date().getHours();
+        let word = 'evening';
+        if (hour < 12) word = 'morning';
+        else if (hour < 17) word = 'afternoon';
+        const g = document.getElementById('greetingWord');
+        if (g) g.textContent = word;
+        const msg = document.getElementById('greetingMessage');
+        if (msg) {
+            const ind = ctx.industryLabel ? ' for your ' + ctx.industryLabel.toLowerCase() + ' business' : '';
+            msg.innerHTML = `Welcome to AI Studio. Build an AI employee, automate a workflow, create a business application, or ask Hela to build it with you${ind}. <strong style="color:var(--text-primary);">${ctx.bizName}</strong> is ready.`;
+        }
+        const c = document.getElementById('greetingContext');
+        const active = systems.filter(s => s.status === 'active' || s.status === 'deployed').length;
+        const testing = systems.filter(s => s.status === 'testing').length;
+        c.innerHTML = `
+            <span class="ctx-chip"><span class="dot" style="background:var(--hela-emerald);"></span>${systems.length} AI systems</span>
+            <span class="ctx-chip"><span class="dot" style="background:var(--hela-amber);"></span>${active} active</span>
+            <span class="ctx-chip"><span class="dot" style="background:var(--hela-cyan);"></span>${testing} in testing</span>
+            <span class="ctx-chip"><span class="dot" style="background:var(--purple);"></span>${ctx.industryLabel || 'Business'} context</span>`;
+    }
+
+    /* ── Render: creation hub ── */
+    function renderCreations() {
+        const grid = document.getElementById('creationGrid');
+        grid.innerHTML = CREATIONS.map(c => `
+            <div class="creation-card liquid-glass-dark" onclick="${c.action.toString().includes('openAgentBuilder') ? 'openAgentBuilder()' : c.action.toString().includes('openWorkflowBuilder') ? 'openWorkflowBuilder()' : c.action.toString().includes('startBuild') ? c.action.toString().match(/startBuild\('([^']+)','([^']+)'\)/)[0] : c.action.toString().includes('showToast') ? c.action.toString().match(/showToast\('([^']+)','([^']+)'\)/)[0] : c.action.toString().includes('scrollToSection') ? c.action.toString().match(/scrollToSection\('([^']+)'\)/)[0] : ''}">
+                <div class="cc-icon" style="background:${c.bg};color:${c.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[c.icon]}</svg></div>
+                <div class="cc-title">${c.name}</div>
+                <div class="cc-desc">${c.desc}</div>
+                <span class="cc-kbd">${c.kbd}</span>
+            </div>`).join('');
+    }
+
+    /* ── Render: my AI systems ── */
+    function renderSystems() {
+        const grid = document.getElementById('systemsGrid');
+        grid.innerHTML = systems.map(s => `
+            <div class="sys-card" onclick="openSystem('${s.id}')">
+                <div class="sc-head">
+                    <div class="sc-icon" style="background:${s.bg};color:${s.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[s.icon]}</svg></div>
+                    <div><div class="sc-name">${s.name}</div><div class="sc-type">${s.type} · v${s.version}</div></div>
+                    <span class="status-pill ${s.statusCls} sc-status">${s.status}</span>
+                </div>
+                <div class="sc-meta">
+                    <div class="sm-item"><strong>${s.tools}</strong>tools</div>
+                    <div class="sm-item"><strong>${s.knowledge}</strong>knowledge sets</div>
+                    <div class="sm-item"><strong>${s.lastRun}</strong>last run</div>
+                </div>
+                <div class="sc-open">Open <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.arrow}</svg></div>
+            </div>`).join('');
+        const pill = document.getElementById('systemsCountPill');
+        if (pill) pill.textContent = systems.length + ' systems';
+    }
+
+    /* ── Render: agents ── */
+    function renderAgents() {
+        const list = document.getElementById('agentsList');
+        list.innerHTML = agents.map(a => `
+            <div class="agent-row">
+                <div class="ar-icon" style="background:${a.bg};color:${a.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[a.icon]}</svg></div>
+                <div><div class="ar-name">${a.name}</div><div class="ar-meta">${a.role} · ${a.tools} tools · ${a.knowledge} knowledge</div></div>
+                <span class="status-pill ${a.statusCls}">${a.status}</span>
+                <div class="ar-actions">
+                    <button class="btn-ghost btn-sm" onclick="openTestModal('${a.id}')">Test</button>
+                    <button class="btn-primary btn-sm" onclick="openAgentBuilder('${a.id}')">Edit</button>
+                </div>
+            </div>`).join('');
+    }
+
+    /* ── Render: workflows ── */
+    function renderWorkflows() {
+        const list = document.getElementById('workflowsList');
+        list.innerHTML = workflows.map(w => `
+            <div class="agent-row">
+                <div class="ar-icon" style="background:${w.bg};color:${w.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[w.icon]}</svg></div>
+                <div><div class="ar-name">${w.name}</div><div class="ar-meta">${w.nodes} nodes · ${w.status}</div></div>
+                <span class="status-pill ${w.statusCls}">${w.status}</span>
+                <div class="ar-actions">
+                    <button class="btn-ghost btn-sm" onclick="openWorkflowBuilder('${w.id}')">Edit</button>
+                    <button class="btn-success btn-sm" onclick="deployWorkflow('${w.id}')">Deploy</button>
+                </div>
+            </div>`).join('');
+    }
+
+    /* ── Render: activity ── */
+    function renderActivity() {
+        const list = document.getElementById('activityList');
+        list.innerHTML = activityPool.map(a => `
+            <div class="activity-item">
+                <span class="ai-dot" style="background:${a.color};box-shadow:0 0 8px ${a.color}66;"></span>
+                <div class="ai-body">
+                    <div class="ai-text">${a.text}</div>
+                    <div class="ai-time"><span class="ai-src">${a.src}</span> · ${a.time}</div>
+                </div>
+            </div>`).join('');
+    }
+    function pushLiveEvent() {
+        const e = liveEvents[Math.floor(Math.random() * liveEvents.length)];
+        activityPool.unshift({ text:e.text, src:e.src, color:e.color, time:'just now' });
+        if (activityPool.length > 8) activityPool.pop();
+        renderActivity();
+    }
+
+    /* ── Render: recommendations ── */
+    function renderRecommendations() {
+        const recs = buildRecommendations();
+        const list = document.getElementById('recommendList');
+        list.innerHTML = recs.map(r => `
+            <div class="rec-card">
+                <div class="rc-head">
+                    <div class="rc-icon" style="background:${r.bg};color:${r.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[r.icon]}</svg></div>
+                    <div><div class="rc-name">${r.name}</div></div>
+                </div>
+                <div class="rc-why">Why: ${r.why}</div>
+                <div class="rc-actions">
+                    <button class="btn-primary btn-sm" onclick="buildFromRecommendation('${r.name.replace(/'/g,"\\'")}')">Build</button>
+                    <button class="btn-ghost btn-sm" onclick="showToast('Added to templates','info')">Template</button>
+                </div>
+            </div>`).join('');
+        const sub = document.getElementById('recSubtitle');
+        if (sub) sub.textContent = 'From ' + (ctx.industryLabel || 'your business') + ' context · ' + (ctx.role || 'your role');
+    }
+
+    /* ── Render: workspace (continue building) ── */
+    function renderWorkspace() {
+        const body = document.getElementById('workspaceBody');
+        const stages = [
+            { label:'Specification', done:true }, { label:'Architecture', done:true },
+            { label:'Knowledge', done:true }, { label:'Tools', done:true },
+            { label:'Agent logic', done:false, current:true }, { label:'Testing', done:false }, { label:'Deployment', done:false }
+        ];
+        body.innerHTML = `
+            <div class="workspace-state">
+                <div class="ws-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.brain}</svg></div>
+                <div><div class="ws-label">Continue building</div><div class="ws-title">Customer Intelligence Agent</div></div>
+                <div class="ws-actions">
+                    <button class="btn-primary btn-sm" onclick="continueBuild()">Continue Building</button>
+                </div>
+            </div>
+            <div class="pipeline">
+                ${stages.map((s,i) => `
+                    <div class="pipeline-step ${s.done ? 'done' : ''} ${s.current ? 'current' : ''}">
+                        <div class="ps-ic">${s.done ? '✓' : i + 1}</div>
+                        <span>${s.label}</span>
+                        ${s.done ? '<span class="ps-check"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">' + ICONS.check + '</svg></span>' : ''}
+                    </div>`).join('')}
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:70%;"></div></div>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:8px;">70% complete · stage: agent_logic · created by you</div>`;
+    }
+
+    /* ── Render: knowledge + tools ── */
+    function renderKnowledge() {
+        const grid = document.getElementById('knowledgeGrid');
+        grid.innerHTML = KNOWLEDGE.map(k => `
+            <div class="k-tile">
+                <div class="kt-icon" style="background:${k.bg};color:${k.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[k.icon]}</svg></div>
+                <div><div class="kt-name">${k.name}</div><div class="kt-desc">${k.desc}</div></div>
+                <span class="kt-status ${k.status}"><span class="s-dot"></span>${k.label}</span>
+            </div>`).join('');
+        const tools = document.getElementById('toolsGrid');
+        tools.innerHTML = TOOLS.map(t => `
+            <div class="k-tile">
+                <div class="kt-icon" style="background:rgba(255,255,255,0.06);color:${t.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[t.icon]}</svg></div>
+                <div><div class="kt-name">${t.name}</div><div class="kt-desc">risk: ${t.risk}</div></div>
+                <span class="kt-status ok"><span class="s-dot"></span>available</span>
+            </div>`).join('');
+    }
+
+    /* ── Render: deployments + health ── */
+    function renderDeployments() {
+        const list = document.getElementById('deployList');
+        list.innerHTML = DEPLOYMENTS.map(d => `
+            <div class="deploy-row">
+                <div><div class="dr-name">${d.name}</div><div class="dr-ver">${d.ver} · ${d.env}</div></div>
+                <div class="dr-stat">
+                    <span class="status-pill ${d.statusCls}">${d.status}</span>
+                </div>
+            </div>`).join('');
+        const health = document.getElementById('healthBody');
+        const overall = 92;
+        const color = overall >= 70 ? 'var(--hela-emerald)' : overall >= 40 ? 'var(--hela-amber)' : 'var(--danger)';
+        const deg = Math.round(overall / 100 * 360);
+        health.innerHTML = `
+            <div class="health-ring" style="background:conic-gradient(${color} ${deg}deg, rgba(255,255,255,0.08) ${deg}deg);">
+                <div class="ring-inner"><div class="ring-val" style="color:${color};">${overall}</div><div class="ring-label">/ 100</div></div>
+            </div>
+            <div class="health-label">Excellent — all deployed systems healthy</div>
+            <div class="health-bars">
+                <div class="health-bar-row"><span class="hb-label">Success rate</span><div class="hb-track"><div class="hb-fill" style="width:98.7%;background:var(--hela-emerald);"></div></div><span class="hb-val">98.7%</span></div>
+                <div class="health-bar-row"><span class="hb-label">Avg latency</span><div class="hb-track"><div class="hb-fill" style="width:82%;background:var(--hela-cyan);"></div></div><span class="hb-val">1.8s</span></div>
+                <div class="health-bar-row"><span class="hb-label">Error rate</span><div class="hb-track"><div class="hb-fill" style="width:4%;background:var(--danger);"></div></div><span class="hb-val">0.4%</span></div>
+            </div>`;
+    }
+
+    /* ── Render: monitoring ── */
+    function renderMonitoring() {
+        const stats = [
+            { label:'Executions', value:'5,161', sub:'this month', pct:72, color:'var(--hela-emerald)' },
+            { label:'Avg latency', value:'1.8s', sub:'-12% vs last week', pct:58, color:'var(--hela-cyan)' },
+            { label:'Errors', value:'21', sub:'0.4% of executions', pct:8, color:'var(--danger)' },
+            { label:'Tool calls', value:'12,480', sub:'across 8 tools', pct:84, color:'var(--hela-amber)' },
+            { label:'Token usage', value:'4.2M', sub:'this month', pct:66, color:'var(--purple)' },
+            { label:'Est. AI cost', value:'KES 18,400', sub:'per agent avg KES 2,300', pct:48, color:'var(--hela-emerald)' }
+        ];
+        const grid = document.getElementById('monitorGrid');
+        grid.innerHTML = stats.map(s => `
+            <div class="monitor-stat">
+                <div class="ms-label">${s.label}</div>
+                <div class="ms-value">${s.value}</div>
+                <div class="ms-sub">${s.sub}</div>
+                <div class="ms-bar"><div style="width:${s.pct}%;background:${s.color};"></div></div>
+            </div>`).join('');
+    }
+
+    /* ── Hello Hela: intent engine ── */
+    function sendHelaMessage() {
+        const input = document.getElementById('helaInput');
+        const text = (input.value || '').trim();
+        if (!text) return;
+        input.value = '';
+        const convo = document.getElementById('helaConvo');
+        convo.innerHTML += `<div class="chat-bubble user">${escapeHtml(text)}</div>`;
+        convo.scrollTop = convo.scrollHeight;
+        const typing = `<div class="chat-bubble ai"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+        convo.innerHTML += typing;
+        convo.scrollTop = convo.scrollHeight;
+        setTimeout(() => {
+            convo.innerHTML = convo.innerHTML.replace(typing, '');
+            const intent = parseIntent(text);
+            if (intent.type === 'create_agent') {
+                convo.innerHTML += `<div class="chat-bubble ai">I'll create an <strong>${intent.agent}</strong> for you. Interpreting intent: <strong>CREATE_AI_AGENT</strong>.<div class="cb-evidence"><div class="ev-label">Extracted requirements</div>${intent.capabilities.map(c => '· ' + c).join('<br>')}</div></div>`;
+                convo.scrollTop = convo.scrollHeight;
+                startBuild(intent.agent, 'agent');
+            } else if (intent.type === 'create_workflow') {
+                convo.innerHTML += `<div class="chat-bubble ai">I'll build a workflow for <strong>${intent.agent}</strong>. Interpreting intent: <strong>CREATE_WORKFLOW</strong>.<div class="cb-evidence"><div class="ev-label">Pipeline</div>Trigger → Condition → AI Reasoning → Action → Notification</div></div>`;
+                convo.scrollTop = convo.scrollHeight;
+                startBuild(intent.agent + ' Workflow', 'workflow');
+            } else {
+                convo.innerHTML += `<div class="chat-bubble ai">I can help you build that. Try: <em>"Create an AI sales manager"</em>, <em>"Build me an agent that monitors inventory"</em>, or <em>"Automate my weekly report"</em>.<div class="cb-evidence"><div class="ev-label">AI Studio</div>Describe an idea → Hela generates the system → test → deploy → monitor</div></div>`;
+                convo.scrollTop = convo.scrollHeight;
+            }
+        }, 900);
+    }
+    function parseIntent(text) {
+        const t = text.toLowerCase();
+        if (t.includes('workflow') || t.includes('automate') || t.includes('automation')) {
+            return { type:'create_workflow', agent: extractName(text, 'workflow'), capabilities:['Trigger definition','Condition logic','AI reasoning step','Action + notification'] };
+        }
+        if (t.includes('agent') || t.includes('assistant') || t.includes('bot') || t.includes('monitor') || t.includes('manager') || t.includes('build')) {
+            return { type:'create_agent', agent: extractName(text, 'agent'), capabilities:['Customer analysis','Sales analysis','CRM access','Report generation','Task creation'] };
+        }
+        return { type:'unknown', agent:'', capabilities:[] };
+    }
+    function extractName(text, kind) {
+        const cleaned = text.replace(/^(hello hela[,\s]*|hey hela[,\s]*|please[,\s]*|can you[,\s]*|build me[,\s]*|create[,\s]*|an?[,\s]*|ai[,\s]*|that[,\s]*)/gi, '').replace(/[.!?]+$/g, '').trim();
+        const words = cleaned.split(/\s+/).slice(0, 4).join(' ');
+        const named = words.replace(/\b(agent|workflow|assistant|bot|automation|monitors?|for me|that monitors|which recommends)\b/gi, '').trim();
+        const cap = (named || words || 'AI System').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        return cap || 'AI System';
+    }
+    function simulateVoice() {
+        const status = document.getElementById('helaStatus');
+        status.innerHTML = '<span class="waveform"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span> listening...';
+        setTimeout(() => {
+            status.textContent = 'AI Studio · online';
+            document.getElementById('helaInput').value = 'Create an AI sales manager';
+            showToast('Voice input simulated — try sending it', 'info');
+        }, 1800);
+    }
+
+    /* ── Build progress simulation ── */
+    function startBuild(name, kind) {
+        const title = { agent:'Creating AI Agent', workflow:'Creating AI Workflow', app:'Building AI App', system:'Generating Business System', assistant:'Creating AI Assistant' }[kind] || 'Creating AI System';
+        document.getElementById('buildModalTitle').textContent = title;
+        document.getElementById('buildModalSub').textContent = name + ' — Hela is building your system';
+        const steps = [
+            'Understanding requirements', 'Designing architecture', 'Selecting knowledge',
+            'Configuring tools', 'Generating agent logic', 'Running tests', 'Preparing deployment'
+        ];
+        const box = document.getElementById('buildSteps');
+        box.innerHTML = steps.map((s, i) => `
+            <div class="build-step" id="bs${i}">
+                <div class="bs-ic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.check}</svg></div>
+                <span>${s}</span>
+            </div>`).join('');
+        openModal('buildModal');
+        const fill = document.getElementById('buildProgressFill');
+        fill.style.width = '0%';
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i > 0) {
+                const prev = document.getElementById('bs' + (i - 1));
+                if (prev) prev.classList.add('done');
+            }
+            if (i < steps.length) {
+                const cur = document.getElementById('bs' + i);
+                if (cur) { cur.classList.add('current'); cur.querySelector('.bs-ic').innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="as-spin"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'; }
+                fill.style.width = Math.round((i + 1) / steps.length * 100) + '%';
+                i++;
+            } else {
+                clearInterval(timer);
+                fill.style.width = '100%';
+                const last = document.getElementById('bs' + (steps.length - 1));
+                if (last) last.classList.add('done');
+                document.getElementById('buildModalSub').textContent = name + ' — build complete';
+                showToast(name + ' created in AI Studio', 'success');
+                addSystem({ name, type: kind === 'workflow' ? 'Workflow' : 'Agent', status:'testing', statusCls:'running', version:'0.1.0', knowledge:2, tools:4, icon: kind === 'workflow' ? 'branch' : 'bot', color:'#06b6d4', bg:'rgba(6,182,212,0.12)', lastRun:'just now' });
+                addActivity('Build completed — ' + name, 'build', '#10b981');
+            }
+        }, 800);
+    }
+    function continueBuild() {
+        startBuild('Customer Intelligence Agent', 'agent');
+    }
+    function buildFromRecommendation(name) {
+        startBuild(name, 'agent');
+    }
+
+    /* ── Agent builder ── */
+    function openAgentBuilder(id) {
+        const agent = agents.find(a => a.id === id);
+        if (agent) {
+            document.getElementById('agentNameInput').value = agent.name;
+            document.getElementById('agentRoleInput').value = agent.role;
+            document.getElementById('agentPurposeInput').value = 'Monitor and analyze ' + agent.name.toLowerCase() + ' signals across the business.';
+            document.getElementById('agentObjectiveInput').value = 'Provide evidence-backed recommendations.';
+        }
+        renderKnowledgeChecks();
+        renderToolsChecks();
+        renderPermissions();
+        switchAgentTab('identity');
+        openModal('agentBuilderModal');
+    }
+    function switchAgentTab(tab) {
+        document.querySelectorAll('#agentTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        ['identity','instructions','knowledge','tools','permissions','guardrails','testing','deployment'].forEach(t => {
+            const el = document.getElementById('agentTab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (el) el.style.display = (t === tab) ? 'block' : 'none';
+        });
+    }
+    function renderKnowledgeChecks() {
+        const box = document.getElementById('knowledgeCheckList');
+        box.innerHTML = KNOWLEDGE.map((k, i) => `
+            <div class="check-row"><input type="checkbox" id="kc${i}" ${i < 3 ? 'checked' : ''}><div><div class="cr-label">${k.name}</div><div class="cr-desc">${k.desc}</div></div></div>`).join('');
+    }
+    function renderToolsChecks() {
+        const box = document.getElementById('toolsCheckList');
+        box.innerHTML = TOOLS.map((t, i) => `
+            <div class="check-row"><input type="checkbox" id="tc${i}" ${i < 5 ? 'checked' : ''}><div><div class="cr-label">${t.name}</div><div class="cr-desc">risk level</div></div><span class="cr-risk ${t.risk}">${t.risk}</span></div>`).join('');
+    }
+    function renderPermissions() {
+        const box = document.getElementById('permissionList');
+        const rows = [
+            { res:'inventory', access:'read' }, { res:'suppliers', access:'read' },
+            { res:'customers', access:'read' }, { res:'financials', access:'none' }
+        ];
+        box.innerHTML = rows.map(r => `
+            <div class="check-row">
+                <div><div class="cr-label">${r.res}</div><div class="cr-desc">resource access</div></div>
+                <select class="form-input" style="width:110px;margin-left:auto;padding:6px 10px;font-size:12px;" onchange="showToast('Permission updated: ' + this.value,'info')">
+                    <option value="read" ${r.access === 'read' ? 'selected' : ''}>read</option>
+                    <option value="write" ${r.access === 'write' ? 'selected' : ''}>write</option>
+                    <option value="none" ${r.access === 'none' ? 'selected' : ''}>none</option>
+                </select>
+            </div>`).join('');
+    }
+    function setEnv(env, btn) {
+        document.querySelectorAll('#agentTabDeployment .btn-sm').forEach(b => { b.className = 'btn-ghost btn-sm'; });
+        btn.className = env === 'production' ? 'btn-primary btn-sm' : 'btn-ghost btn-sm';
+        if (env === 'production') btn.className = 'btn-primary btn-sm';
+        showToast('Environment: ' + env, 'info');
+    }
+    function runAgentTest() {
+        const input = document.getElementById('agentTestInput').value || 'Which inventory items are below reorder point?';
+        const result = document.getElementById('agentTestResult');
+        result.className = 'test-result pass show';
+        result.innerHTML = `
+            <div class="tr-head"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.check}</svg>PASS — response generated correctly</div>
+            <div class="tr-row"><span>Tools used</span><span>inventory.query · supplier.lookup</span></div>
+            <div class="tr-row"><span>Evidence</span><span>3 sources retrieved</span></div>
+            <div class="tr-row"><span>Latency</span><span>1.8 seconds</span></div>
+            <div class="tr-row"><span>Permission compliance</span><span>verified</span></div>`;
+        showToast('Agent test passed', 'success');
+    }
+    function deployAgentFromBuilder() {
+        const name = document.getElementById('agentNameInput').value || 'New Agent';
+        const ver = document.getElementById('agentVersionInput').value || '1.0.0';
+        closeModal('agentBuilderModal');
+        showToast(name + ' v' + ver + ' deployed to production', 'success');
+        addSystem({ name, type:'Agent', status:'deployed', statusCls:'completed', version:ver, knowledge:3, tools:6, icon:'bot', color:'#10b981', bg:'rgba(16,185,129,0.12)', lastRun:'just now' });
+        addActivity(name + ' deployed to production', 'deploy', '#10b981');
+    }
+    function saveAgentFromBuilder() {
+        const name = document.getElementById('agentNameInput').value || 'New Agent';
+        const role = document.getElementById('agentRoleInput').value || 'AI Agent';
+        closeModal('agentBuilderModal');
+        showToast(name + ' saved to AI Studio', 'success');
+        agents.push({ id:'agent_' + Date.now(), name, role, status:'draft', statusCls:'queued', tools:4, knowledge:2, icon:'bot', color:'#a855f7', bg:'rgba(168,85,247,0.12)' });
+        renderAgents();
+        addActivity('Agent draft saved — ' + name, 'agents', '#a855f7');
+    }
+
+    /* ── Workflow builder ── */
+    const NODE_TYPES = [
+        { key:'trigger', name:'Trigger', icon:'zap', color:'#f59e0b', bg:'rgba(245,158,11,0.12)' },
+        { key:'condition', name:'Condition', icon:'branch', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' },
+        { key:'ai', name:'AI Reasoning', icon:'brain', color:'#a855f7', bg:'rgba(168,85,247,0.12)' },
+        { key:'query', name:'Database Query', icon:'database', color:'#10b981', bg:'rgba(16,185,129,0.12)' },
+        { key:'knowledge', name:'Knowledge Search', icon:'library', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' },
+        { key:'api', name:'API Call', icon:'plug', color:'#ef4444', bg:'rgba(239,68,68,0.12)' },
+        { key:'action', name:'Action', icon:'check', color:'#10b981', bg:'rgba(16,185,129,0.12)' },
+        { key:'approval', name:'Human Approval', icon:'shield', color:'#f59e0b', bg:'rgba(245,158,11,0.12)' },
+        { key:'notify', name:'Notification', icon:'chat', color:'#a855f7', bg:'rgba(168,85,247,0.12)' },
+        { key:'verify', name:'Verification', icon:'eye', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' }
+    ];
+    let wfNodes = [];
+    function openWorkflowBuilder(id) {
+        const wf = workflows.find(w => w.id === id);
+        if (wf) document.getElementById('workflowNameInput').value = wf.name;
+        wfNodes = [];
+        const palette = document.getElementById('nodePalette');
+        palette.innerHTML = NODE_TYPES.map(n => `
+            <div class="np-item" onclick="addNode('${n.key}')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[n.icon]}</svg>${n.name}</div>`).join('');
+        renderNodeCanvas();
+        openModal('workflowModal');
+    }
+    function addNode(key) {
+        const n = NODE_TYPES.find(x => x.key === key);
+        wfNodes.push(n);
+        renderNodeCanvas();
+    }
+    function removeNode(i) {
+        wfNodes.splice(i, 1);
+        renderNodeCanvas();
+    }
+    function renderNodeCanvas() {
+        const canvas = document.getElementById('nodeCanvas');
+        const empty = document.getElementById('nodeEmpty');
+        if (empty) empty.style.display = wfNodes.length ? 'none' : 'flex';
+        const existing = canvas.querySelectorAll('.wf-node, .wf-connector');
+        existing.forEach(e => e.remove());
+        wfNodes.forEach((n, i) => {
+            const node = document.createElement('div');
+            node.className = 'wf-node';
+            node.innerHTML = `<div class="wn-icon" style="background:${n.bg};color:${n.color};"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[n.icon]}</svg></div><span>${n.name}</span><div class="wn-del" onclick="removeNode(${i})"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.x}</svg></div>`;
+            canvas.appendChild(node);
+            if (i < wfNodes.length - 1) {
+                const conn = document.createElement('div');
+                conn.className = 'wf-connector';
+                conn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.chevron}</svg>`;
+                canvas.appendChild(conn);
+            }
+        });
+    }
+    function testWorkflow() {
+        if (wfNodes.length < 2) { showToast('Add at least 2 nodes to test', 'error'); return; }
+        showToast('Workflow test run — 98% success', 'success');
+        addActivity('Workflow test passed — ' + (document.getElementById('workflowNameInput').value || 'Untitled'), 'testing', '#06b6d4');
+    }
+    function saveWorkflowFromBuilder() {
+        const name = document.getElementById('workflowNameInput').value || 'New Workflow';
+        closeModal('workflowModal');
+        showToast(name + ' saved and deployed to staging', 'success');
+        workflows.push({ id:'workflow_' + Date.now(), name, status:'testing', statusCls:'running', nodes:wfNodes.length || 4, icon:'branch', color:'#06b6d4', bg:'rgba(6,182,212,0.12)' });
+        renderWorkflows();
+        addSystem({ name, type:'Workflow', status:'testing', statusCls:'running', version:'0.1.0', knowledge:1, tools:3, icon:'branch', color:'#06b6d4', bg:'rgba(6,182,212,0.12)', lastRun:'testing' });
+        addActivity('Workflow deployed — ' + name, 'deploy', '#06b6d4');
+    }
+    function deployWorkflow(id) {
+        const wf = workflows.find(w => w.id === id);
+        if (!wf) return;
+        wf.status = 'active'; wf.statusCls = 'completed';
+        renderWorkflows();
+        showToast(wf.name + ' deployed to production', 'success');
+        addActivity(wf.name + ' deployed to production', 'deploy', '#10b981');
+    }
+
+    /* ── Testing studio ── */
+    function openTestModal(agentId) {
+        const sel = document.getElementById('testAgentSelect');
+        sel.innerHTML = agents.map(a => `<option value="${a.id}" ${a.id === agentId ? 'selected' : ''}>${a.name}</option>`).join('');
+        document.getElementById('studioTestResult').className = 'test-result';
+        openModal('testModal');
+    }
+    function runStudioTest() {
+        const input = document.getElementById('testInput').value || 'Find inactive customers';
+        const result = document.getElementById('studioTestResult');
+        result.className = 'test-result pass show';
+        result.innerHTML = `
+            <div class="tr-head"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS.check}</svg>PASS — response generated correctly</div>
+            <div class="tr-row"><span>Input</span><span>${escapeHtml(input)}</span></div>
+            <div class="tr-row"><span>Tools used</span><span>customer.search · analytics.sales</span></div>
+            <div class="tr-row"><span>Evidence</span><span>3 sources</span></div>
+            <div class="tr-row"><span>Latency</span><span>1.8 seconds</span></div>
+            <div class="tr-row"><span>Evaluation</span><span>accuracy · grounding · tool correctness · permission compliance</span></div>`;
+        showToast('Test suite passed', 'success');
+    }
+
+    /* ── System helpers ── */
+    function addSystem(s) {
+        systems.unshift(s);
+        renderSystems();
+    }
+    function addActivity(text, src, color) {
+        activityPool.unshift({ text, src, color, time:'just now' });
+        if (activityPool.length > 8) activityPool.pop();
+        renderActivity();
+    }
+    function openSystem(id) {
+        const s = systems.find(x => x.id === id);
+        if (!s) return;
+        if (s.type === 'Workflow') openWorkflowBuilder();
+        else openAgentBuilder(id);
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Command palette ── */
+    const COMMANDS = [
+        { group:'Create', items:[
+            { label:'Create Agent', desc:'Open the Agent Builder', icon:'bot', kbd:'A', run:()=>openAgentBuilder() },
+            { label:'Create Workflow', desc:'Open the Workflow Builder', icon:'branch', kbd:'W', run:()=>openWorkflowBuilder() },
+            { label:'Build AI App', desc:'Generate an application from an idea', icon:'app', kbd:'B', run:()=>startBuild('AI App','app') },
+            { label:'Connect Knowledge', desc:'Attach documents and data', icon:'library', kbd:'K', run:()=>{ closeCommandPalette(); showToast('Knowledge connector opened','info'); scrollToSection('knowledgeSection'); } }
+        ]},
+        { group:'Manage', items:[
+            { label:'Run Test', desc:'Open the Testing Studio', icon:'flask', kbd:'T', run:()=>openTestModal() },
+            { label:'Deploy Agent', desc:'Deploy the selected agent', icon:'rocket', kbd:'D', run:()=>{ closeCommandPalette(); showToast('Deployment center opened','info'); scrollToSection('deploySection'); } },
+            { label:'Open Templates', desc:'Browse industry templates', icon:'template', kbd:'P', run:()=>{ closeCommandPalette(); showToast('Templates opened','info'); scrollToSection('creationSection'); } },
+            { label:'Ask Hela', desc:'Open the conversational builder', icon:'chat', kbd:'H', run:()=>{ closeCommandPalette(); openHelloHela(); } }
+        ]}
+    ];
+    function openCommandPalette() {
+        document.getElementById('cmdOverlay').classList.add('open');
+        const list = document.getElementById('cmdList');
+        list.innerHTML = COMMANDS.map(g => `
+            <div class="cmd-group-label">${g.group}</div>
+            ${g.items.map((c, i) => `
+                <div class="cmd-item" onclick="runCommand(${JSON.stringify(g.items.indexOf(c))}, '${g.group}')">
+                    <div class="ci-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${ICONS[c.icon]}</svg></div>
+                    <div><div class="ci-label">${c.label}</div><div class="ci-desc">${c.desc}</div></div>
+                    <span class="ci-kbd">${c.kbd}</span>
+                </div>`).join('')}`).join('');
+        setTimeout(() => document.getElementById('cmdInput').focus(), 50);
+    }
+    function runCommand(idx, group) {
+        const g = COMMANDS.find(x => x.group === group);
+        if (g && g.items[idx]) { closeCommandPalette(); g.items[idx].run(); }
+    }
+    function closeCommandPalette() { document.getElementById('cmdOverlay').classList.remove('open'); }
+
+    /* ── Modals / panels / nav ── */
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function openHelloHela() { document.getElementById('helaPanel').classList.add('open'); document.getElementById('helaInput').focus(); }
+    function closeHelloHela() { document.getElementById('helaPanel').classList.remove('open'); }
+    function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+    function scrollToSection(id) {
+        closeSidebar();
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+        document.querySelectorAll('.studio-subnav .ss-item').forEach(s => s.classList.toggle('active', s.getAttribute('href') === '#' + id));
+    }
+    function showToast(msg, type) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast-item ' + type;
+        const icons = { success:ICONS.check, error:ICONS.warn, info:ICONS.zap };
+        toast.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[type] || icons.info}</svg><span>${msg}</span>`;
+        container.appendChild(toast);
+        requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3200);
+    }
+
+    /* ── Clock ── */
+    function updateClock() {
+        const now = new Date();
+        const t = document.getElementById('clockTime');
+        const d = document.getElementById('clockDate');
+        if (t) t.textContent = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+        if (d) d.textContent = now.toLocaleDateString([], { weekday:'short', day:'numeric', month:'short' });
+    }
+
+    /* ── Pointer-tracking liquid cards ── */
+    document.addEventListener('pointermove', function(e) {
+        document.querySelectorAll('.dash-card').forEach(card => {
+            const r = card.getBoundingClientRect();
+            card.style.setProperty('--pointer-x', ((e.clientX - r.left) / r.width).toFixed(3));
+            card.style.setProperty('--pointer-y', ((e.clientY - r.top) / r.height).toFixed(3));
+        });
+    });
+
+    /* ── Keyboard shortcuts ── */
+    document.addEventListener('keydown', function(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandPalette(); }
+        if (e.key === 'Escape') {
+            closeCommandPalette();
+            document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+            closeHelloHela();
+        }
+    });
+
+    /* ── User data + personalization (shared-auth.js) ── */
+    function populateUser() {
+        const A = HelacoreAuth;
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
+        set('sidebarUserName', A.fullName());
+        set('sidebarUserRole', A.getVal('role','role') || 'Business Owner');
+        set('topbarUserName', A.fullName());
+        set('topbarUserRole', A.getVal('role','role') || 'Business Owner');
+        set('greetingName', A.getVal('first_name') || 'there');
+        const av = A.initials();
+        const av1 = document.getElementById('sidebarAvatar');
+        const av2 = document.getElementById('topbarAvatar');
+        if (av1) av1.textContent = av;
+        if (av2) av2.textContent = av;
+        A.applyAvatarToAll();
+    }
+    function populateStudio() {
+        loadContext();
+        generateGreeting();
+        renderRecommendations();
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', function() {
+        renderCreations();
+        renderSystems();
+        renderAgents();
+        renderWorkflows();
+        renderActivity();
+        renderRecommendations();
+        renderWorkspace();
+        renderKnowledge();
+        renderDeployments();
+        renderMonitoring();
+        updateClock();
+        setInterval(updateClock, 30000);
+        setInterval(pushLiveEvent, 14000);
+        document.querySelectorAll('.reveal').forEach((el, i) => {
+            setTimeout(() => el.classList.add('active'), 80 + i * 70);
+        });
+        /* Auth gate + personalization. Runs here (not at top level) because
+           shared-auth.js and the Supabase client are deferred scripts that
+           only execute after parsing — before DOMContentLoaded fires. */
+        HelacoreAuth.init(function() {
+            populateUser();
+            populateStudio();
+        });
+    });
+    </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>

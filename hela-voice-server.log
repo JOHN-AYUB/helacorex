@@ -1,0 +1,6 @@
+[HelaVoice] SQLite storage ready at /Users/johnshalom/Downloads/helacore final document copy 3 17.02.21/helacore (3)/hela-voice-data/hela-voice.db
+(node:94359) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[HelaVoice] API server listening on http://127.0.0.1:8787
+[HelaVoice] Qwen model: qwen-plus | provider: https://dashscope.aliyuncs.com/compatible-mode/v1 | key: NOT SET
+[HelaVoice] Endpoints: /api/voice/health /chat /memory /sessions /config /audit

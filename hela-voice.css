@@ -1,0 +1,236 @@
+/* ============================================================================
+ * HelaCore Hela Voice — Hello Hela Hero Voice Layer Styles
+ * Advanced voice command controls embedded in the "Hello Hela" hero section.
+ * ========================================================================== */
+
+#hela-voice-root {
+  --hv-bg: #0d1117;
+  --hv-bg-2: #161b22;
+  --hv-border: #30363d;
+  --hv-accent: #22c55e;
+  --hv-accent-2: #10b981;
+  --hv-text: #e6edf3;
+  --hv-text-dim: #8b949e;
+  --hv-danger: #f85149;
+  --hv-warn: #d29922;
+  --hv-info: #58a6ff;
+  position: relative;
+  z-index: 2147483000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--hv-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   HERO VOICE LAYER (inside the Hello Hela hero section)
+   ════════════════════════════════════════════════════════════════════════ */
+.hh-voice {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.25);
+}
+.hh-voice-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Mic button (click-to-talk toggle) */
+.hh-voice-mic {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--hv-accent);
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--hv-accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.hh-voice-mic:hover { background: rgba(34, 197, 94, 0.22); }
+.hh-voice-mic.active {
+  background: var(--hv-accent);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
+  animation: hh-voice-mic-pulse 1.2s ease-in-out infinite;
+}
+.hh-voice-mic.disabled { opacity: 0.5; cursor: not-allowed; }
+
+@keyframes hh-voice-mic-pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 26px rgba(34, 197, 94, 0.75); }
+}
+
+/* Status */
+.hh-voice-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--hv-text-dim);
+  flex-shrink: 0;
+  min-width: 170px;
+}
+.hh-voice-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hv-text-dim);
+  flex-shrink: 0;
+}
+.hh-voice-status.listening .hh-voice-dot { background: var(--hv-danger); animation: hh-voice-blink 0.8s infinite; }
+.hh-voice-status.thinking .hh-voice-dot { background: var(--hv-warn); animation: hh-voice-blink 0.6s infinite; }
+.hh-voice-status.executing .hh-voice-dot { background: var(--hv-info); }
+.hh-voice-status.speaking .hh-voice-dot { background: var(--hv-accent); }
+.hh-voice-status.error .hh-voice-dot { background: var(--hv-danger); }
+.hh-voice-status.wake .hh-voice-dot { background: var(--hv-accent); }
+.hh-voice-status.completed .hh-voice-dot { background: var(--hv-accent); }
+.hh-voice-status.waiting .hh-voice-dot { background: var(--hv-info); animation: hh-voice-blink 0.6s infinite; }
+.hh-voice-status.approval .hh-voice-dot { background: var(--hv-warn); }
+
+/* Transcript */
+.hh-voice-transcript {
+  flex: 1;
+  min-width: 140px;
+  max-width: 380px;
+  max-height: 40px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11.5px;
+}
+.hh-voice-transcript-line {
+  padding: 2px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hh-voice-transcript-line.user { background: rgba(34, 197, 94, 0.12); color: var(--hv-text); }
+.hh-voice-transcript-line.hela { background: var(--hv-bg-2); color: var(--hv-text); }
+.hh-voice-transcript-line.interim { color: var(--hv-text-dim); font-style: italic; }
+.hh-voice-transcript-line.translation { color: var(--hv-info); font-size: 10.5px; }
+
+/* Response */
+.hh-voice-response {
+  flex: 1;
+  min-width: 180px;
+  max-width: 480px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(16, 185, 129, 0.06));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  font-size: 12px;
+  color: var(--hv-text);
+  display: none;
+  max-height: 56px;
+  overflow-y: auto;
+}
+.hh-voice-response.visible { display: block; }
+
+/* Input row */
+.hh-voice-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.hh-voice-input-row input {
+  width: 200px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--hv-border);
+  background: var(--hv-bg-2);
+  color: var(--hv-text);
+  font-size: 11.5px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.hh-voice-input-row input:focus { border-color: var(--hv-accent); }
+.hh-voice-input-row input::placeholder { color: var(--hv-text-dim); }
+.hh-voice-send {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--hv-accent);
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--hv-accent);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.hh-voice-send:hover { background: rgba(34, 197, 94, 0.25); }
+
+/* Actions */
+.hh-voice-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.hh-voice-server-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--hv-text-dim);
+  border: 1px solid var(--hv-border);
+}
+.hh-voice-server-dot.online { background: var(--hv-accent); box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+.hh-voice-lang {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--hv-accent);
+}
+.hh-voice-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid var(--hv-border);
+  background: transparent;
+  color: var(--hv-text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.hh-voice-icon:hover { background: rgba(255, 255, 255, 0.06); color: var(--hv-text); }
+
+/* Scrollbars */
+.hh-voice-transcript::-webkit-scrollbar,
+.hh-voice-response::-webkit-scrollbar { width: 5px; height: 5px; }
+.hh-voice-transcript::-webkit-scrollbar-thumb,
+.hh-voice-response::-webkit-scrollbar-thumb { background: var(--hv-border); border-radius: 3px; }
+.hh-voice-transcript::-webkit-scrollbar-track,
+.hh-voice-response::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hh-voice-row { gap: 6px; }
+  .hh-voice-transcript { max-width: 100%; }
+  .hh-voice-response { max-width: 100%; min-width: 100%; order: 5; }
+  .hh-voice-input-row input { width: 130px; }
+  .hh-voice-status { min-width: 0; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hh-voice-mic.active, .hh-voice-dot { animation: none !important; }
+}

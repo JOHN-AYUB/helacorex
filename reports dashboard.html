@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Reports</title>
+    <!-- Preconnect to CDNs for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://megtqhibcdlbpuisvtgo.supabase.co" crossorigin>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--hela-amber:#f59e0b;--hela-gold:#d97706;--hela-emerald:#10b981;--hela-cyan:#06b6d4;--liquid-radius-sm:12px;--liquid-radius-md:20px;--liquid-radius-lg:28px;--bg-primary:#050507;--bg-secondary:#0a0a0f;--bg-tertiary:#111118;--text-primary:#ffffff;--text-secondary:#a1a1aa;--text-muted:#71717a;--glass-bg:rgba(255,255,255,0.08);--glass-bg-hover:rgba(255,255,255,0.12);--glass-border:rgba(255,255,255,0.15);--glass-border-hover:rgba(255,255,255,0.25);--glass-shadow:0 8px 32px rgba(0,0,0,0.3);--dark-glass-bg:rgba(10,10,15,0.6);--dark-glass-border:rgba(255,255,255,0.1);--dark-glass-shadow:0 4px 20px rgba(0,0,0,0.4);--input-bg:rgba(255,255,255,0.05);--input-border:rgba(255,255,255,0.1);--input-focus-border:rgba(245,158,11,0.5);--input-focus-shadow:0 0 20px rgba(245,158,11,0.1);--input-text:#ffffff;--input-placeholder:#71717a;--border-subtle:rgba(255,255,255,0.1);--scrollbar-track:#050507;--scrollbar-thumb:#f59e0b;--gradient-text:linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);--btn-gradient:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));--btn-gradient-hover:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));--sidebar-w:260px;--topbar-h:72px;--danger:#ef4444;--warning:#f59e0b;--success:#10b981;--info:#06b6d4;--purple:#a855f7;--nav-hover-bg:rgba(255,255,255,0.1);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow:hidden;height:100vh;}
+        .font-display{font-family:'Space Grotesk',sans-serif;}
+        .gradient-text-hela{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px;}
+        .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;z-index:40;transition:transform .4s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+        .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-logo .logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .sidebar-logo .logo-icon svg{width:22px;height:22px;color:#fff;}
+        .sidebar-nav{flex:1;overflow-y:auto;padding:12px 10px;}
+        .sidebar-nav::-webkit-scrollbar{width:3px;}
+        .nav-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:12px 14px 6px;}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;color:var(--text-secondary);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .25s ease;position:relative;margin-bottom:2px;white-space:nowrap;text-decoration:none;}
+        .nav-item:hover{background:var(--nav-hover-bg);color:var(--text-primary);}
+        .nav-item.active{background:var(--btn-gradient);color:var(--text-primary);border:1px solid rgba(245,158,11,0.2);box-shadow:0 2px 12px rgba(245,158,11,0.1);}
+        .nav-item .nav-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .nav-item .nav-icon svg{width:18px;height:18px;}
+        .nav-badge{margin-left:auto;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;}
+        .nav-badge.new{background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(245,158,11,0.3));color:#c084fc;border:1px solid rgba(168,85,247,0.3);}
+        .nav-badge.count{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+        .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .25s;}
+        .sidebar-user:hover{background:var(--nav-hover-bg);}
+        .sidebar-user .avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;}
+        .sidebar-user .user-info{overflow:hidden;}
+        .sidebar-user .user-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sidebar-user .user-role{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--bg-primary);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:30;transition:left .4s cubic-bezier(0.16,1,0.3,1);}
+        .topbar-left h1{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:var(--text-primary);}
+        .topbar-left h1 span{color:var(--text-muted);font-weight:400;font-size:14px;margin-left:8px;}
+        .topbar-search{position:relative;width:320px;}
+        .topbar-search input{width:100%;padding:9px 14px 9px 40px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:12px;color:var(--input-text);font-size:13px;font-family:'Inter',sans-serif;transition:all .3s;}
+        .topbar-search input::placeholder{color:var(--input-placeholder);}
+        .topbar-search input:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .topbar-search .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+        .topbar-search .search-icon svg{width:16px;height:16px;}
+        .topbar-search .search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:2px 6px;border-radius:4px;background:var(--glass-bg);border:1px solid var(--border-subtle);font-size:10px;color:var(--text-muted);}
+        .topbar-right{display:flex;align-items:center;gap:8px;}
+        .topbar-btn{width:40px;height:40px;border-radius:12px;background:var(--input-bg);border:1px solid var(--input-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;color:var(--text-secondary);position:relative;}
+        .topbar-btn:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .topbar-btn svg{width:18px;height:18px;}
+        .topbar-btn .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--bg-primary);}
+        .main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:24px 28px 40px;transition:margin-left .4s cubic-bezier(0.16,1,0.3,1);}
+        .stat-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;position:relative;overflow:hidden;}
+        .stat-card:hover{border-color:var(--glass-border-hover);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+        .stat-card .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .stat-card .stat-icon svg{width:20px;height:20px;}
+        .stat-card .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;}
+        .stat-card .stat-value{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--text-primary);line-height:1.2;}
+        .stat-card .stat-change{font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:9999px;margin-top:6px;}
+        .stat-card .stat-change.up{background:rgba(16,185,129,0.12);color:#34d399;}
+        .stat-card .stat-change.down{background:rgba(239,68,68,0.12);color:#f87171;}
+        .stat-card .stat-change svg{width:12px;height:12px;}
+        .chart-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;}
+        .chart-card:hover{border-color:var(--glass-border-hover);}
+        .chart-card .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .chart-card .chart-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--text-primary);}
+        .chart-card .chart-subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;}
+        .btn-sm{padding:7px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;border:none;}
+        .btn-primary{background:var(--btn-gradient);border:1px solid rgba(245,158,11,0.3);color:var(--text-primary);box-shadow:0 2px 8px rgba(245,158,11,0.1);}
+        .btn-primary:hover{background:var(--btn-gradient-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,0.2);}
+        .btn-ghost{background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);}
+        .btn-ghost:hover{border-color:var(--glass-border-hover);color:var(--text-primary);background:var(--glass-bg-hover);}
+        .btn-success{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399;}
+        .btn-success:hover{background:rgba(16,185,129,0.25);transform:translateY(-1px);}
+        .status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;}
+        .status-pill.completed{background:rgba(16,185,129,0.12);color:#34d399;}
+        .status-pill.running{background:rgba(6,182,212,0.12);color:#22d3ee;}
+        .status-pill.failed{background:rgba(239,68,68,0.12);color:#f87171;}
+        .status-pill.queued{background:rgba(168,85,247,0.12);color:#c084fc;}
+        .status-pill.high{background:rgba(16,185,129,0.12);color:#34d399;}
+        .status-pill.medium{background:rgba(245,158,11,0.12);color:#fbbf24;}
+        .status-pill.low{background:rgba(239,68,68,0.12);color:#f87171;}
+        .filter-chip{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-secondary);}
+        .filter-chip:hover{border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .filter-chip.active{background:var(--btn-gradient);border-color:rgba(245,158,11,0.3);color:var(--text-primary);}
+        .toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+        .toast-item{padding:14px 20px;border-radius:var(--liquid-radius-sm);backdrop-filter:blur(20px);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(0.16,1,0.3,1);max-width:360px;display:flex;align-items:center;gap:10px;}
+        .toast-item.show{transform:translateX(0);opacity:1;}
+        .toast-item.success{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);}
+        .toast-item.error{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);}
+        .toast-item.info{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);}
+        .toast-item svg{width:18px;height:18px;flex-shrink:0;}
+        .toast-item span{font-size:13px;font-weight:500;color:var(--text-primary);}
+        .notif-panel{position:fixed;top:var(--topbar-h);right:0;width:380px;max-height:calc(100vh - var(--topbar-h));background:var(--bg-secondary);border-left:1px solid var(--border-subtle);z-index:35;transform:translateX(100%);transition:transform .35s cubic-bezier(0.16,1,0.3,1);overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,0.3);}
+        .notif-panel.open{transform:translateX(0);}
+        .sidebar-toggle{display:none;position:fixed;bottom:24px;left:24px;z-index:50;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#10b981);border:none;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.3);align-items:center;justify-content:center;transition:all .3s;}
+        .sidebar-toggle:hover{transform:scale(1.05);}
+        .sidebar-toggle svg{width:22px;height:22px;}
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;backdrop-filter:blur(4px);}
+        .dash-grid{display:grid;grid-template-columns:1fr 340px;gap:16px;}
+        .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-column:1/-1;}
+        .report-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;grid-column:1/-1;}
+        .report-card{padding:18px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+        .report-card:hover{border-color:var(--glass-border-hover);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+        .report-card .report-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:12px;}
+        .report-card .report-icon svg{width:19px;height:19px;}
+        .report-card .report-name{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
+        .report-card .report-desc{font-size:11.5px;color:var(--text-muted);line-height:1.4;flex:1;margin-bottom:12px;}
+        .report-card .report-meta{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+        .report-card .report-link{font-size:11.5px;font-weight:600;color:var(--hela-amber);display:flex;align-items:center;gap:4px;}
+        .report-card .report-link svg{width:13px;height:13px;}
+        .profile-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);}
+        .profile-row:last-child{border-bottom:none;}
+        .profile-row .p-label{font-size:11px;color:var(--text-muted);width:90px;flex-shrink:0;}
+        .profile-row .p-value{font-size:12.5px;font-weight:500;color:var(--text-primary);}
+        .ai-insight-card{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(16,185,129,0.12));border:1px solid rgba(245,158,11,0.25);}
+        .ai-insight-card .ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;background:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));font-size:11px;font-weight:600;color:var(--text-primary);}
+        .ai-insight-card .ai-badge svg{width:13px;height:13px;}
+        .report-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);}
+        .report-row:last-child{border-bottom:none;}
+        .report-row .r-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+        .report-row .r-name{font-size:12.5px;font-weight:500;color:var(--text-primary);flex:1;}
+        .report-row .r-time{font-size:11px;color:var(--text-muted);}
+        .report-row .r-status{font-size:11px;font-weight:600;}
+        .kpi-tile{text-align:center;padding:14px 10px;border-radius:var(--liquid-radius-sm);background:var(--input-bg);border:1px solid var(--input-border);}
+        .kpi-tile .k-val{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--text-primary);}
+        .kpi-tile .k-label{font-size:10px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.06em;}
+        @media(max-width:1024px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.topbar{left:0;}.main-content{margin-left:0;}.sidebar-toggle{display:flex;}.sidebar-overlay.show{display:block;}.dash-grid{grid-template-columns:1fr;}.stat-grid{grid-template-columns:repeat(2,1fr);}.report-grid{grid-template-columns:1fr;}}
+        @media(max-width:768px){.topbar-search{display:none;}.topbar{padding:0 16px;}.notif-panel{width:100%;}.main-content{padding:16px;}.stat-grid{grid-template-columns:1fr 1fr;}}
+        @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+    </style>
+</head>
+<body class="antialiased">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><div><div class="font-display font-bold text-base tracking-tight" style="color:var(--text-primary)">Hela<span style="color:var(--hela-amber)">core</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:-1px;">AI Business Advisor</div></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item" href="dashboard.html" data-page="dashboard.html" onclick="switchPage('dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-2a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg></span>Dashboard</a>
+            <a class="nav-item" href="money dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>HelaCore Money</a>
+            <a class="nav-item" href="ask hela dashboard.html" data-page="ask hela dashboard.html" onclick="switchPage('ask hela dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>Ask Hela</a>
+<a class="nav-item" href="helaone dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12zm0 3a3 3 0 100 6 3 3 0 000-6z"/></svg></span>HelaOne</a>
+<a class="nav-item" href="helabank dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M4 21V10m4 11V10m4 11V10m4 11V10m4 11V10M2 10l10-7 10 7M6 6V4h4v2"/></svg></span>HelaBank</a>
+            <a class="nav-item" href="ai studio dashboard.html" data-page="ai studio dashboard.html" onclick="switchPage('ai studio dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></span>AI Studio</a>
+            <a class="nav-item" href="ai agents dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>AI Agents</a>
+<a class="nav-item" href="projects dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></span>Projects</a>
+            <a class="nav-item" href="financial overview dashboard.html" data-page="financial overview dashboard.html" onclick="switchPage('financial overview dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Financial Overview</a>
+            <a class="nav-item" href="transactions dashboard.html" data-page="transactions dashboard.html" onclick="switchPage('transactions dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></span>Transactions</a>
+            <div class="nav-section-label" style="margin-top:8px;">Operations</div>
+            <a class="nav-item" href="inventory dashboard.html" data-page="inventory dashboard.html" onclick="switchPage('inventory dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>Inventory<span class="nav-badge count">3</span></a>
+            <a class="nav-item" href="customers dashboard.html" data-page="customers dashboard.html" onclick="switchPage('customers dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Customers</a>
+            <a class="nav-item" href="suppliers dashboard.html" data-page="suppliers dashboard.html" onclick="switchPage('suppliers dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg></span>Suppliers</a>
+            <a class="nav-item" href="loan and financing dashboard.html" data-page="loan and financing dashboard.html" onclick="switchPage('loan and financing dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>Loans & Financing</a>
+            <div class="nav-section-label" style="margin-top:8px;">Intelligence</div>
+            <a class="nav-item" href="ai simulations dashboard.html" data-page="ai simulations dashboard.html" onclick="switchPage('ai simulations dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>AI Simulations</a>
+            <a class="nav-item" href="market intelligence dashboard.html" data-page="market intelligence dashboard.html" onclick="switchPage('market intelligence dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3z"/></svg></span>Market Intelligence</a>
+            <a class="nav-item" href="opportunities dashboard.html" data-page="opportunities dashboard.html" onclick="switchPage('opportunities dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>Opportunities</a>
+            <a class="nav-item active" href="reports dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Reports</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="settings dashboard.html" data-page="reports dashboard.html" onclick="switchPage('reports dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Settings</a>
+            <a class="nav-item" href="help center dashboard.html" data-page="settings dashboard.html" onclick="switchPage('settings dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Help Center</a>
+            <a class="nav-item" onclick="HelacoreAuth.handleLogout()" style="color:#f87171;"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>Log Out</a>
+            <div class="sidebar-user" style="margin-top:8px;"><div class="avatar" id="sidebarAvatar">?</div><div class="user-info"><div class="user-name" id="sidebarUserName">Loading...</div><div class="user-role" id="sidebarUserRole">Business Owner</div></div></div>
+        </div>
+    </aside>
+
+    <!-- TOPBAR -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left"><h1>Reports <span>Analytics & Exports</span></h1></div>
+        <div class="topbar-search"><span class="search-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span><input type="text" placeholder="Search reports..." id="globalSearch"><span class="search-kbd">Ctrl+K</span></div>
+        <div class="topbar-right">
+            <button class="topbar-btn" onclick="showToast('No new messages','info')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></button>
+            <button class="topbar-btn" onclick="toggleNotifPanel()" id="notifBtn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+            <button class="topbar-btn" onclick="window.location.href='settings dashboard.html'"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+            <div style="width:40px;height:40px;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--input-border);transition:all .25s;" onclick="window.location.href='settings dashboard.html'"><div id="topbarAvatar" style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;">?</div></div>
+        </div>
+    </header>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notif-panel" id="notifPanel">
+        <div style="padding:20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;"><h3 class="font-display font-semibold text-base">Notifications</h3><button class="btn-ghost btn-sm" onclick="showToast('All read','success');document.querySelector('.notif-dot').style.display='none';">Mark all read</button></div>
+        <div style="padding:12px;">
+            <div class="alert-item" onclick="window.location.href='reports dashboard.html'"><span class="alert-dot" style="background:var(--success);box-shadow:0 0 8px rgba(16,185,129,0.4);"></span><div><div class="alert-title">Report Ready</div><div class="alert-desc">Monthly financial report generated</div></div></div>
+            <div class="alert-item" onclick="window.location.href='inventory dashboard.html'"><span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.4);"></span><div><div class="alert-title">Low Stock Alert</div><div class="alert-desc">3 inventory items below reorder threshold</div></div></div>
+            <div class="alert-item" onclick="window.location.href='ask hela dashboard.html'"><span class="alert-dot" style="background:var(--info);box-shadow:0 0 8px rgba(6,182,212,0.3);"></span><div><div class="alert-title">New AI Insight</div><div class="alert-desc">Cash flow optimization opportunity detected</div></div></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+        <div class="dash-grid">
+            <!-- LEFT COLUMN -->
+            <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+                <!-- Greeting -->
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <h2 class="font-display" style="font-size:22px;font-weight:700;margin-bottom:4px;">Reports & Analytics</h2>
+                        <p style="font-size:13px;color:var(--text-secondary);">Generated from your interactions across <strong style="color:var(--text-primary);" id="businessName">your business</strong>.</p>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button class="btn-ghost btn-sm" onclick="exportAllReports()">Export All</button>
+                        <button class="btn-primary btn-sm" onclick="generateReport('custom')"><span style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Report</span></button>
+                    </div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                            <div class="stat-icon" style="background:rgba(16,185,129,0.12);"><svg fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                            <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>+3</span>
+                        </div>
+                        <div class="stat-label">Reports Generated</div>
+                        <div class="stat-value" id="statReports">0</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">this month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                            <div class="stat-icon" style="background:rgba(245,158,11,0.12);"><svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></div>
+                            <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>Ready</span>
+                        </div>
+                        <div class="stat-label">Exports</div>
+                        <div class="stat-value" id="statExports">0</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">CSV downloads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                            <div class="stat-icon" style="background:rgba(6,182,212,0.12);"><svg fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+                            <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>Live</span>
+                        </div>
+                        <div class="stat-label">Data Sources</div>
+                        <div class="stat-value" id="statSources">0</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">modules connected</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                            <div class="stat-icon" style="background:rgba(168,85,247,0.12);"><svg fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+                            <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>AI</span>
+                        </div>
+                        <div class="stat-label">AI Insights</div>
+                        <div class="stat-value" id="statInsights">0</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">included in reports</div>
+                    </div>
+                </div>
+
+                <!-- Report Cards -->
+                <div class="chart-card" style="padding:16px 18px;">
+                    <div class="chart-header">
+                        <div><div class="chart-title">Available Reports</div><div class="chart-subtitle">Generated from your live business data</div></div>
+                        <div style="display:flex;gap:6px;">
+                            <button class="filter-chip active" onclick="setReportFilter(this,'all')">All</button>
+                            <button class="filter-chip" onclick="setReportFilter(this,'ops')">Operations</button>
+                            <button class="filter-chip" onclick="setReportFilter(this,'intel')">Intelligence</button>
+                        </div>
+                    </div>
+                    <div class="report-grid" id="reportGrid"></div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+                <!-- AI Insight -->
+                <div class="chart-card ai-insight-card">
+                    <div class="chart-header">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;">
+                                <svg width="16" height="16" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            </div>
+                            <div><div class="chart-title">AI Report Insight</div><div class="chart-subtitle">What your data says</div></div>
+                        </div>
+                        <span class="ai-badge"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Live</span>
+                    </div>
+                    <div id="aiInsightText" style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;">
+                        Analyzing your business data to surface the most impactful report...
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+                        <button class="btn-primary btn-sm" onclick="generateReport('ai')">Generate AI Report</button>
+                        <button class="btn-ghost btn-sm" onclick="window.location.href='ask hela dashboard.html'">Ask Hela</button>
+                    </div>
+                </div>
+
+                <!-- Recent Reports -->
+                <div class="chart-card">
+                    <div class="chart-header"><div><div class="chart-title">Recent Reports</div><div class="chart-subtitle">Based on your interactions</div></div></div>
+                    <div id="recentReports">
+                        <div style="font-size:12.5px;color:var(--text-muted);padding:12px 0;text-align:center;">No reports generated yet. Generate one to see it here.</div>
+                    </div>
+                </div>
+
+                <!-- Report KPIs -->
+                <div class="chart-card">
+                    <div class="chart-header"><div><div class="chart-title">Report KPIs</div><div class="chart-subtitle">Key metrics across reports</div></div></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="kpi-tile"><div class="k-val" id="kpiRevenue">KES 0</div><div class="k-label">Revenue</div></div>
+                        <div class="kpi-tile"><div class="k-val" id="kpiExpenses">KES 0</div><div class="k-label">Expenses</div></div>
+                        <div class="kpi-tile"><div class="k-val" id="kpiMargin">0%</div><div class="k-label">Margin</div></div>
+                        <div class="kpi-tile"><div class="k-val" id="kpiCash">KES 0</div><div class="k-label">Cash</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="theme.js" defer></script>
+    <script src="shared-auth.js" defer></script>
+<script src="live-data.js" defer></script>
+    <script defer>
+        /* ===== REPORT DATA ===== */
+        const reportIconColors = [
+            {bg:'rgba(6,182,212,0.12)',stroke:'#22d3ee'},
+            {bg:'rgba(245,158,11,0.12)',stroke:'#fbbf24'},
+            {bg:'rgba(16,185,129,0.12)',stroke:'#34d399'},
+            {bg:'rgba(168,85,247,0.12)',stroke:'#c084fc'},
+            {bg:'rgba(239,68,68,0.12)',stroke:'#f87171'},
+            {bg:'rgba(249,115,22,0.12)',stroke:'#fb923c'},
+            {bg:'rgba(34,197,94,0.12)',stroke:'#4ade80'},
+            {bg:'rgba(236,72,153,0.12)',stroke:'#f472b6'},
+            {bg:'rgba(99,102,241,0.12)',stroke:'#818cf8'},
+        ];
+        const reportIcons = [
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>',
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
+        ];
+        const reports = [
+            { name:"Financial Report", desc:"Revenue, expenses, cash flow and profitability — your complete financial picture", href:"financial overview dashboard.html", cat:"ops", iconIdx:0, type:"financial" },
+            { name:"Transactions Report", desc:"Every transaction categorized, reconciled and summarized", href:"transactions dashboard.html", cat:"ops", iconIdx:1, type:"transactions" },
+            { name:"Inventory Report", desc:"Stock levels, turnover rates and reorder alerts", href:"inventory dashboard.html", cat:"ops", iconIdx:2, type:"inventory" },
+            { name:"Customers Report", desc:"Customer growth, retention and lifetime value analysis", href:"customers dashboard.html", cat:"ops", iconIdx:3, type:"customers" },
+            { name:"Suppliers Report", desc:"Supplier performance, risk and diversification", href:"suppliers dashboard.html", cat:"ops", iconIdx:4, type:"suppliers" },
+            { name:"Loans Report", desc:"Debt position, repayment schedule and financing options", href:"loan and financing dashboard.html", cat:"ops", iconIdx:5, type:"loans" },
+            { name:"Simulations Report", desc:"What-if scenarios and their projected outcomes", href:"ai simulations dashboard.html", cat:"intel", iconIdx:6, type:"simulations" },
+            { name:"Opportunities Report", desc:"Growth areas ranked by potential impact", href:"opportunities dashboard.html", cat:"intel", iconIdx:7, type:"opportunities" },
+            { name:"Market Report", desc:"Industry trends, competitors and regional demand", href:"market intelligence dashboard.html", cat:"intel", iconIdx:8, type:"market" },
+        ];
+
+        /* ===== REPORT HISTORY (localStorage) ===== */
+        function getReportHistory() {
+            try { return JSON.parse(localStorage.getItem('helacore-report-history') || '[]'); } catch (e) { return []; }
+        }
+        function saveReportHistory(history) {
+            try { localStorage.setItem('helacore-report-history', JSON.stringify(history.slice(0, 20))); } catch (e) {}
+        }
+        function addReportToHistory(name, type) {
+            const history = getReportHistory();
+            history.unshift({ name: name, type: type, time: new Date().toISOString(), status: 'completed' });
+            saveReportHistory(history);
+            renderRecentReports();
+            updateStats();
+        }
+
+        /* ===== RENDER ===== */
+        function renderReports(data) {
+            const grid = document.getElementById('reportGrid');
+            grid.innerHTML = data.map((r, i) => {
+                const ic = reportIconColors[r.iconIdx % reportIconColors.length];
+                return `<div class="report-card" onclick="generateReport('${r.type}')">
+                    <div class="report-icon" style="background:${ic.bg};"><svg fill="none" stroke="${ic.stroke}" viewBox="0 0 24 24">${reportIcons[r.iconIdx % reportIcons.length]}</svg></div>
+                    <div class="report-name">${r.name}</div>
+                    <div class="report-desc">${r.desc}</div>
+                    <div class="report-meta">
+                        <span class="report-link">Generate <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+                        <span class="status-pill completed">Ready</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        let currentReportFilter = 'all';
+        function setReportFilter(el, view) {
+            currentReportFilter = view;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            const filtered = view === 'all' ? reports : reports.filter(r => r.cat === view);
+            renderReports(filtered);
+        }
+
+        /* ===== GENERATE REPORT ===== */
+        function generateReport(type) {
+            const A = window.HelacoreAuth || {};
+            const ws = A.currentWorkspace || {};
+            const revenue = Number(ws.monthly_revenue || ws.revenue || 0);
+            const expenses = Number(ws.monthly_expenses || ws.expenses || 0);
+            const cash = Number(ws.cash_balance || ws.cash || 0);
+            const customers = Number(ws.active_customers || ws.customers || 0);
+            const bizName = A.getVal ? (A.getVal('business_name','business_name') || A.getVal('company_name','company_name') || 'My Business') : 'My Business';
+
+            const report = reports.find(r => r.type === type) || reports[0];
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+            let rows = [];
+            if (type === 'financial' || type === 'custom') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Monthly Revenue', 'KES ' + revenue.toLocaleString()],
+                    ['Monthly Expenses', 'KES ' + expenses.toLocaleString()],
+                    ['Net Margin', ((revenue - expenses) / Math.max(1, revenue) * 100).toFixed(1) + '%'],
+                    ['Cash Balance', 'KES ' + cash.toLocaleString()],
+                    ['Active Customers', customers.toLocaleString()],
+                ];
+            } else if (type === 'transactions') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Total Transactions', Math.max(1, Math.round(customers * 3.2)).toLocaleString()],
+                    ['Monthly Revenue', 'KES ' + revenue.toLocaleString()],
+                    ['Monthly Expenses', 'KES ' + expenses.toLocaleString()],
+                    ['Net Cash Flow', 'KES ' + (revenue - expenses).toLocaleString()],
+                ];
+            } else if (type === 'inventory') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Stock Items', Math.max(1, Math.round(customers * 1.4)).toLocaleString()],
+                    ['Low Stock Alerts', '3'],
+                    ['Inventory Turnover', '4.2x'],
+                    ['Reorder Points', '12'],
+                ];
+            } else if (type === 'customers') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Active Customers', customers.toLocaleString()],
+                    ['New This Quarter', Math.max(1, Math.round(customers * 0.12)).toLocaleString()],
+                    ['Retention Rate', '78%'],
+                    ['Avg. Lifetime Value', 'KES ' + Math.max(1000, Math.round(revenue / Math.max(1, customers))).toLocaleString()],
+                ];
+            } else if (type === 'suppliers') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Active Suppliers', Math.max(1, Math.round(customers * 0.3)).toLocaleString()],
+                    ['On-Time Delivery', '92%'],
+                    ['Supplier Risk', 'Low'],
+                    ['Diversification', 'Good'],
+                ];
+            } else if (type === 'loans') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Total Debt', 'KES ' + Math.max(0, Math.round(cash * 0.4)).toLocaleString()],
+                    ['Monthly Payment', 'KES ' + Math.max(0, Math.round(cash * 0.05)).toLocaleString()],
+                    ['Debt-to-Income', '32%'],
+                    ['Financing Options', '3 available'],
+                ];
+            } else if (type === 'simulations') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Scenarios Run', '4'],
+                    ['Best Case ROI', '+18%'],
+                    ['Worst Case Risk', '-6%'],
+                    ['Confidence', '92%'],
+                ];
+            } else if (type === 'opportunities') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Open Opportunities', Math.max(1, Math.round(customers * 0.08)).toLocaleString()],
+                    ['High Priority', '2'],
+                    ['Projected Impact', '+12% revenue'],
+                    ['Time to Capture', '3 months'],
+                ];
+            } else if (type === 'market') {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Market Size', 'KES 4.2B'],
+                    ['Growth Rate', '+8% YoY'],
+                    ['Competition', 'Medium'],
+                    ['Open Opportunities', '5'],
+                ];
+            } else {
+                rows = [
+                    ['Metric', 'Value'],
+                    ['Business', bizName],
+                    ['Report Date', dateStr],
+                    ['Monthly Revenue', 'KES ' + revenue.toLocaleString()],
+                    ['Monthly Expenses', 'KES ' + expenses.toLocaleString()],
+                    ['Cash Balance', 'KES ' + cash.toLocaleString()],
+                    ['Active Customers', customers.toLocaleString()],
+                ];
+            }
+
+            // Build CSV
+            const csv = rows.map(r => r.join(',')).join('\n');
+            downloadCSV(csv, report.name.replace(/\s+/g, '_').toLowerCase() + '_' + now.toISOString().slice(0,10) + '.csv');
+            addReportToHistory(report.name, type);
+            showToast(report.name + ' generated & downloaded', 'success');
+        }
+
+        /* ===== EXPORT ===== */
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function exportAllReports() {
+            const A = window.HelacoreAuth || {};
+            const ws = A.currentWorkspace || {};
+            const revenue = Number(ws.monthly_revenue || ws.revenue || 0);
+            const expenses = Number(ws.monthly_expenses || ws.expenses || 0);
+            const cash = Number(ws.cash_balance || ws.cash || 0);
+            const customers = Number(ws.active_customers || ws.customers || 0);
+            const bizName = A.getVal ? (A.getVal('business_name','business_name') || 'My Business') : 'My Business';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+            const rows = [
+                ['Helacore Business Report'],
+                ['Business', bizName],
+                ['Generated', dateStr],
+                [''],
+                ['Metric', 'Value'],
+                ['Monthly Revenue', 'KES ' + revenue.toLocaleString()],
+                ['Monthly Expenses', 'KES ' + expenses.toLocaleString()],
+                ['Net Margin', ((revenue - expenses) / Math.max(1, revenue) * 100).toFixed(1) + '%'],
+                ['Cash Balance', 'KES ' + cash.toLocaleString()],
+                ['Active Customers', customers.toLocaleString()],
+                ['Reports Available', reports.length],
+                ['AI Insights', '5'],
+            ];
+            downloadCSV(rows.map(r => r.join(',')).join('\n'), 'helacore_full_report_' + now.toISOString().slice(0,10) + '.csv');
+            addReportToHistory('Full Business Report', 'all');
+            showToast('Full business report exported', 'success');
+        }
+
+        /* ===== RECENT REPORTS ===== */
+        function renderRecentReports() {
+            const container = document.getElementById('recentReports');
+            const history = getReportHistory();
+            if (!history.length) {
+                container.innerHTML = '<div style="font-size:12.5px;color:var(--text-muted);padding:12px 0;text-align:center;">No reports generated yet. Generate one to see it here.</div>';
+                return;
+            }
+            const colors = ['var(--success)', 'var(--warning)', 'var(--info)', 'var(--purple)', 'var(--danger)'];
+            container.innerHTML = history.map((h, i) => {
+                const time = new Date(h.time);
+                const timeStr = time.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' ' + time.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+                return `<div class="report-row">
+                    <span class="r-dot" style="background:${colors[i % colors.length]};"></span>
+                    <span class="r-name">${h.name}</span>
+                    <span class="r-time">${timeStr}</span>
+                    <span class="r-status" style="color:var(--success);">Done</span>
+                </div>`;
+            }).join('');
+        }
+
+        /* ===== STATS ===== */
+        function updateStats() {
+            const history = getReportHistory();
+            const thisMonth = history.filter(h => {
+                const d = new Date(h.time);
+                const now = new Date();
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).length;
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            set('statReports', thisMonth);
+            set('statExports', history.length);
+            set('statSources', reports.length);
+            /* AI insights scale with live business signals */
+            const L = window.HelacoreLive;
+            const f = (L && L.financials) ? L.financials() : { revenue:0, customers:0, profit:0 };
+            const insights = 4 + (f.revenue > 0 ? 1 : 0) + (f.customers > 0 ? 1 : 0) + (f.profit > 0 ? 1 : 0);
+            set('statInsights', insights);
+        }
+
+        /* ===== USER DATA ===== */
+        function populateUser() {
+            const A = HelacoreAuth;
+            const nameEl = document.getElementById('sidebarUserName');
+            const roleEl = document.getElementById('sidebarUserRole');
+            const avEl = document.getElementById('sidebarAvatar');
+            const topAvEl = document.getElementById('topbarAvatar');
+            if (nameEl) nameEl.textContent = A.fullName();
+            if (roleEl) roleEl.textContent = A.getVal('role','role') || 'Business Owner';
+            if (avEl) avEl.textContent = A.initials();
+            if (topAvEl) topAvEl.textContent = A.initials();
+        }
+
+        function populateProfile() {
+            const A = HelacoreAuth;
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+
+            const bizName = A.getVal('business_name','business_name') || A.getVal('company_name','company_name') || 'your business';
+            set('businessName', bizName);
+
+            const ws = A.currentWorkspace || {};
+            const revenue = ws.monthly_revenue || ws.revenue || 0;
+            const expenses = ws.monthly_expenses || ws.expenses || 0;
+            const cash = ws.cash_balance || ws.cash || 0;
+            const customers = ws.active_customers || ws.customers || 0;
+
+            set('kpiRevenue', revenue ? 'KES ' + Number(revenue).toLocaleString() : 'KES 0');
+            set('kpiExpenses', expenses ? 'KES ' + Number(expenses).toLocaleString() : 'KES 0');
+            set('kpiMargin', revenue ? Math.round((revenue - expenses) / revenue * 100) + '%' : '0%');
+            set('kpiCash', cash ? 'KES ' + Number(cash).toLocaleString() : 'KES 0');
+
+            // AI insight
+            const margin = revenue ? (revenue - expenses) / revenue * 100 : 0;
+            const insightEl = document.getElementById('aiInsightText');
+            if (insightEl) {
+                if (margin >= 20) {
+                    insightEl.innerHTML = `Your <strong style="color:var(--hela-emerald);">profit margin is strong</strong> (${Math.round(margin)}%). Generate the <strong style="color:var(--hela-amber);">Financial Report</strong> to share with stakeholders, and use <strong style="color:var(--hela-amber);">AI Simulations</strong> to model reinvestment scenarios.`;
+                } else if (margin >= 0) {
+                    insightEl.innerHTML = `Your margin is <strong style="color:var(--hela-amber);">moderate</strong> (${Math.round(margin)}%). The <strong style="color:var(--hela-amber);">Transactions Report</strong> can help identify cost-cutting opportunities.`;
+                } else {
+                    insightEl.innerHTML = `Your business is <strong style="color:var(--danger);">operating at a loss</strong> (${Math.round(margin)}% margin). Generate the <strong style="color:var(--hela-amber);">Financial Report</strong> and consult <strong style="color:var(--hela-amber);">Ask Hela</strong> for a recovery plan.`;
+                }
+            }
+        }
+
+        /* ===== SIDEBAR / TOAST / NOTIF ===== */
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+        function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+        function showToast(msg, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-item ' + type;
+            const icons = { success:'<svg fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 21a11.955 11.955 0 01-8.354-5.646z"/></svg>', error:'<svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>', info:'<svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' };
+            toast.innerHTML = (icons[type]||icons.info) + '<span>' + msg + '</span>';
+            container.appendChild(toast);
+            requestAnimationFrame(() => { requestAnimationFrame(() => { toast.classList.add('show'); }); });
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+        }
+        function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const btn = document.getElementById('notifBtn');
+            if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
+        });
+        document.addEventListener('keydown', function(e) { if ((e.ctrlKey||e.metaKey) && e.key==='k') { e.preventDefault(); document.getElementById('globalSearch').focus(); } });
+
+        /* ===== INIT ===== */
+        document.addEventListener('DOMContentLoaded', function() {
+            renderReports(reports);
+            renderRecentReports();
+            updateStats();
+        });
+
+        HelacoreAuth.init(function() {
+            populateUser();
+            populateProfile();
+            updateStats();
+        });
+    </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>

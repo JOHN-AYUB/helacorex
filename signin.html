@@ -776,37 +776,38 @@
             if (!sb) throw new Error('Supabase not configured');
 
             // Attempt sign in with email/password
-            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            const { data: signInData, error } = await sb.auth.signInWithPassword({ email, password });
 
+            // Check for Supabase errors first
             if (error) {
-                // If invalid credentials, show error
+                if (error.message.includes('Email not confirmed')) {
+                    document.getElementById('unverified-banner').style.display = 'flex';
+                    throw new Error('Please verify your email address before signing in.');
+                }
                 if (error.message.includes('Invalid login') || error.message.includes('Invalid credentials') || error.status === 401) {
                     throw new Error('Invalid email or password. Please check your credentials and try again.');
                 }
                 throw error;
             }
 
-            const user = data.user;
+            const user = signInData?.user;
+            const session = signInData?.session;
+
+            if (!user) {
+                throw new Error('Sign in failed. Please try again.');
+            }
 
             // CRITICAL VERIFICATION GATE: Only verified users can proceed
             if (!user.email_confirmed_at && !user.phone_confirmed_at) {
-                // User exists but is NOT verified — show banner
                 document.getElementById('unverified-banner').style.display = 'flex';
                 throw new Error('Please verify your email address before signing in. We sent a verification code to ' + email);
             }
 
-            // User is verified — check session and redirect to dashboard
-            if (data.session) {
-                showToast('Welcome back, ' + (user.user_metadata?.first_name || 'User') + '!', 'success');
-                // Store session persistence preference
-                if (!rememberMe) {
-                    // Session will be cleared on browser close naturally
-                }
-                // Redirect to dashboard after short delay
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1200);
-            }
+            // User is verified — redirect to dashboard
+            showToast('Welcome back, ' + (user.user_metadata?.first_name || 'User') + '!', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
 
         } catch (err) {
             console.error('Login error:', err);
@@ -1383,5 +1384,11 @@
     console.log('%c Replace SUPABASE_URL and SUPABASE_ANON_KEY with your actual credentials.', 'color:#f59e0b;font-size:12px;');
     console.log('%c Verification gate: Only users with email_confirmed_at will be redirected to dashboard.', 'color:#10b981;font-size:12px;');
     </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
 </body>
 </html>

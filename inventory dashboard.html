@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--hela-amber:#f59e0b;--hela-gold:#d97706;--hela-emerald:#10b981;--hela-cyan:#06b6d4;--liquid-radius-sm:12px;--liquid-radius-md:20px;--liquid-radius-lg:28px;--bg-primary:#050507;--bg-secondary:#0a0a0f;--bg-tertiary:#111118;--text-primary:#ffffff;--text-secondary:#a1a1aa;--text-muted:#71717a;--glass-bg:rgba(255,255,255,0.08);--glass-bg-hover:rgba(255,255,255,0.12);--glass-border:rgba(255,255,255,0.15);--glass-border-hover:rgba(255,255,255,0.25);--glass-shadow:0 8px 32px rgba(0,0,0,0.3);--glass-inset-top:inset 0 1px 1px rgba(255,255,255,0.2);--glass-inset-bottom:inset 0 -1px 1px rgba(255,255,255,0.05);--glass-shine:rgba(255,255,255,0.1);--dark-glass-bg:rgba(10,10,15,0.6);--dark-glass-border:rgba(255,255,255,0.1);--dark-glass-shadow:0 4px 20px rgba(0,0,0,0.4);--input-bg:rgba(255,255,255,0.05);--input-border:rgba(255,255,255,0.1);--input-focus-border:rgba(245,158,11,0.5);--input-focus-shadow:0 0 20px rgba(245,158,11,0.1);--input-text:#ffffff;--input-placeholder:#71717a;--border-subtle:rgba(255,255,255,0.1);--scrollbar-track:#050507;--scrollbar-thumb:#f59e0b;--gradient-text:linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);--btn-gradient:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));--btn-gradient-hover:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));--chart-grid:rgba(255,255,255,0.05);--sidebar-w:260px;--topbar-h:72px;--danger:#ef4444;--warning:#f59e0b;--success:#10b981;--info:#06b6d4;--purple:#a855f7;--nav-hover-bg:rgba(255,255,255,0.1);}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow:hidden;height:100vh;}
+        .font-display{font-family:'Space Grotesk',sans-serif;}
+        .gradient-text-hela{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px;}
+        .liquid-glass-dark{background:var(--dark-glass-bg);backdrop-filter:blur(20px) saturate(150%);border:1px solid var(--dark-glass-border);box-shadow:var(--dark-glass-shadow);border-radius:var(--liquid-radius-md);transition:all .3s ease;}
+        .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;z-index:40;transition:transform .4s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+        .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-logo .logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .sidebar-logo .logo-icon svg{width:22px;height:22px;color:#fff;}
+        .sidebar-nav{flex:1;overflow-y:auto;padding:12px 10px;}
+        .sidebar-nav::-webkit-scrollbar{width:3px;}
+        .nav-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:12px 14px 6px;}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;color:var(--text-secondary);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .25s ease;position:relative;margin-bottom:2px;white-space:nowrap;text-decoration:none;}
+        .nav-item:hover{background:var(--nav-hover-bg);color:var(--text-primary);}
+        .nav-item.active{background:var(--btn-gradient);color:var(--text-primary);border:1px solid rgba(245,158,11,0.2);box-shadow:0 2px 12px rgba(245,158,11,0.1);}
+        .nav-item .nav-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .nav-item .nav-icon svg{width:18px;height:18px;}
+        .nav-badge{margin-left:auto;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;}
+        .nav-badge.new{background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(245,158,11,0.3));color:#c084fc;border:1px solid rgba(168,85,247,0.3);}
+        .nav-badge.count{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+        .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .25s;}
+        .sidebar-user:hover{background:var(--nav-hover-bg);}
+        .sidebar-user .avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;}
+        .sidebar-user .user-info{overflow:hidden;}
+        .sidebar-user .user-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sidebar-user .user-role{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--bg-primary);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:30;transition:left .4s cubic-bezier(0.16,1,0.3,1);}
+        .topbar-left h1{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:var(--text-primary);}
+        .topbar-left h1 span{color:var(--text-muted);font-weight:400;font-size:14px;margin-left:8px;}
+        .topbar-search{position:relative;width:320px;}
+        .topbar-search input{width:100%;padding:9px 14px 9px 40px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:12px;color:var(--input-text);font-size:13px;font-family:'Inter',sans-serif;transition:all .3s;}
+        .topbar-search input::placeholder{color:var(--input-placeholder);}
+        .topbar-search input:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .topbar-search .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+        .topbar-search .search-icon svg{width:16px;height:16px;}
+        .topbar-search .search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:2px 6px;border-radius:4px;background:var(--glass-bg);border:1px solid var(--border-subtle);font-size:10px;color:var(--text-muted);}
+        .topbar-right{display:flex;align-items:center;gap:8px;}
+        .topbar-btn{width:40px;height:40px;border-radius:12px;background:var(--input-bg);border:1px solid var(--input-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;color:var(--text-secondary);position:relative;}
+        .topbar-btn:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .topbar-btn svg{width:18px;height:18px;}
+        .topbar-btn .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--bg-primary);}
+        .main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:24px 28px 40px;transition:margin-left .4s cubic-bezier(0.16,1,0.3,1);}
+        .stat-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;position:relative;overflow:hidden;}
+        .stat-card:hover{border-color:var(--glass-border-hover);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+        .stat-card .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .stat-card .stat-icon svg{width:20px;height:20px;}
+        .stat-card .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;}
+        .stat-card .stat-value{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--text-primary);line-height:1.2;}
+        .stat-card .stat-change{font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:9999px;margin-top:6px;}
+        .stat-card .stat-change.up{background:rgba(16,185,129,0.12);color:#34d399;}
+        .stat-card .stat-change.down{background:rgba(239,68,68,0.12);color:#f87171;}
+        .stat-card .stat-change svg{width:12px;height:12px;}
+        .chart-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;}
+        .chart-card:hover{border-color:var(--glass-border-hover);}
+        .chart-card .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .chart-card .chart-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--text-primary);}
+        .chart-card .chart-subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;}
+        .btn-sm{padding:7px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;border:none;}
+        .btn-primary{background:var(--btn-gradient);border:1px solid rgba(245,158,11,0.3);color:var(--text-primary);box-shadow:0 2px 8px rgba(245,158,11,0.1);}
+        .btn-primary:hover{background:var(--btn-gradient-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,0.2);}
+        .btn-ghost{background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);}
+        .btn-ghost:hover{border-color:var(--glass-border-hover);color:var(--text-primary);background:var(--glass-bg-hover);}
+        .btn-danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;}
+        .btn-danger:hover{background:rgba(239,68,68,0.25);transform:translateY(-1px);}
+        .btn-success{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34d399;}
+        .btn-success:hover{background:rgba(16,185,129,0.25);transform:translateY(-1px);}
+        .page-section{display:none;animation:fadeInPage .4s ease;}
+        .page-section.active{display:block;}
+        @keyframes fadeInPage{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+        .data-table{width:100%;border-collapse:separate;border-spacing:0;}
+        .data-table thead th{padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);text-align:left;border-bottom:1px solid var(--border-subtle);background:var(--input-bg);position:sticky;top:0;z-index:2;}
+        .data-table thead th:first-child{border-radius:10px 0 0 0;}
+        .data-table thead th:last-child{border-radius:0 10px 0 0;}
+        .data-table tbody td{padding:11px 14px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border-subtle);}
+        .data-table tbody tr{transition:background .2s;}
+        .data-table tbody tr:hover{background:var(--glass-bg-hover);}
+        .data-table tbody tr:last-child td{border-bottom:none;}
+        .status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;}
+        .status-pill.completed{background:rgba(16,185,129,0.12);color:#34d399;}
+        .status-pill.pending{background:rgba(245,158,11,0.12);color:#fbbf24;}
+        .status-pill.failed{background:rgba(239,68,68,0.12);color:#f87171;}
+        .status-pill.active{background:rgba(6,182,212,0.12);color:#22d3ee;}
+        .status-pill.low{background:rgba(239,68,68,0.12);color:#f87171;}
+        .status-pill.in-stock{background:rgba(16,185,129,0.12);color:#34d399;}
+        .status-pill.moderate{background:rgba(245,158,11,0.12);color:#fbbf24;}
+        .status-pill.out-of-stock{background:rgba(239,68,68,0.15);color:#f87171;}
+        .filter-chip{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-secondary);}
+        .filter-chip:hover{border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .filter-chip.active{background:var(--btn-gradient);border-color:rgba(245,158,11,0.3);color:var(--text-primary);}
+        .form-input-liquid{background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--liquid-radius-sm);padding:10px 14px;color:var(--input-text);transition:all .3s;width:100%;font-family:'Inter',sans-serif;font-size:13px;}
+        .form-input-liquid::placeholder{color:var(--input-placeholder);}
+        .form-input-liquid:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+        .toast-item{padding:14px 20px;border-radius:var(--liquid-radius-sm);backdrop-filter:blur(20px);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(0.16,1,0.3,1);max-width:360px;display:flex;align-items:center;gap:10px;}
+        .toast-item.show{transform:translateX(0);opacity:1;}
+        .toast-item.success{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);}
+        .toast-item.error{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);}
+        .toast-item.info{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);}
+        .toast-item svg{width:18px;height:18px;flex-shrink:0;}
+        .toast-item span{font-size:13px;font-weight:500;color:var(--text-primary);}
+        .notif-panel{position:fixed;top:var(--topbar-h);right:0;width:380px;max-height:calc(100vh - var(--topbar-h));background:var(--bg-secondary);border-left:1px solid var(--border-subtle);z-index:35;transform:translateX(100%);transition:transform .35s cubic-bezier(0.16,1,0.3,1);overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,0.3);}
+        .notif-panel.open{transform:translateX(0);}
+        .sidebar-toggle{display:none;position:fixed;bottom:24px;left:24px;z-index:50;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#10b981);border:none;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.3);align-items:center;justify-content:center;transition:all .3s;}
+        .sidebar-toggle:hover{transform:scale(1.05);}
+        .sidebar-toggle svg{width:22px;height:22px;}
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;backdrop-filter:blur(4px);}
+        .inv-layout{display:grid;grid-template-columns:1fr 320px;gap:16px;}
+        .inv-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-column:1/-1;}
+        .inv-mid-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;grid-column:1/-1;}
+        .legend-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--text-secondary);}
+        .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+        .legend-val{margin-left:auto;font-weight:600;color:var(--text-primary);font-size:12px;}
+        .cat-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0;}
+        .table-wrap{max-height:440px;overflow-y:auto;border-radius:var(--liquid-radius-md);border:1px solid var(--dark-glass-border);background:var(--dark-glass-bg);}
+        .table-wrap::-webkit-scrollbar{width:4px;}
+        .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--liquid-radius-sm);background:var(--input-bg);border:1px solid var(--input-border);margin-bottom:8px;transition:all .25s;cursor:pointer;}
+        .alert-item:hover{border-color:var(--glass-border-hover);background:var(--glass-bg-hover);}
+        .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+        .alert-item .alert-title{font-size:12.5px;font-weight:600;color:var(--text-primary);}
+        .alert-item .alert-desc{font-size:11px;color:var(--text-muted);margin-top:2px;}
+        .restock-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-subtle);}
+        .restock-item:last-child{border-bottom:none;}
+        .restock-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .restock-icon svg{width:15px;height:15px;}
+        .restock-text{flex:1;min-width:0;}
+        .restock-name{font-size:12.5px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .restock-sub{font-size:11px;color:var(--text-muted);}
+        .restock-action{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .25s;border:none;white-space:nowrap;}
+        .top-sell-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-subtle);}
+        .top-sell-item:last-child{border-bottom:none;}
+        .top-sell-rank{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+        .top-sell-name{font-size:12.5px;font-weight:500;color:var(--text-primary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .top-sell-val{font-size:12px;font-weight:600;color:var(--text-primary);font-family:'Space Grotesk',sans-serif;white-space:nowrap;}
+        .health-ring{position:relative;width:120px;height:120px;margin:0 auto 12px;}
+        .health-ring svg{transform:rotate(-90deg);}
+        .health-ring .ring-bg{fill:none;stroke:var(--input-bg);stroke-width:8;}
+        .health-ring .ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1);}
+        .health-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+        .health-score{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;line-height:1;}
+        .health-label{font-size:11px;color:var(--text-muted);margin-top:2px;}
+        .health-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:600;margin:0 auto;}
+        .ai-chat-bubble{padding:10px 14px;border-radius:14px 14px 14px 4px;background:var(--glass-bg);border:1px solid var(--glass-border);font-size:12.5px;color:var(--text-secondary);line-height:1.5;margin-bottom:8px;max-width:95%;}
+        .ai-chat-bubble.user{border-radius:14px 14px 4px 14px;background:var(--btn-gradient);border-color:rgba(245,158,11,0.2);margin-left:auto;text-align:right;}
+        .ai-typing{display:flex;gap:4px;padding:10px 14px;}
+        .ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:typingBounce 1.4s infinite ease-in-out;}
+        .ai-typing span:nth-child(2){animation-delay:.2s;}
+        .ai-typing span:nth-child(3){animation-delay:.4s;}
+        @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+        .inv-amount{font-family:'Space Grotesk',sans-serif;font-weight:600;}
+        .stock-bar{width:60px;height:6px;border-radius:3px;background:var(--input-bg);overflow:hidden;flex-shrink:0;}
+        .stock-bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+        @media(max-width:1024px){.sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}.topbar{left:0;}.main-content{margin-left:0;}.sidebar-toggle{display:flex;}.sidebar-overlay.show{display:block;}.inv-layout{grid-template-columns:1fr;}.inv-stat-grid{grid-template-columns:repeat(2,1fr);}.inv-mid-grid{grid-template-columns:1fr;}}
+        @media(max-width:768px){.topbar-search{display:none;}.topbar{padding:0 16px;}.notif-panel{width:100%;}.main-content{padding:16px;}.inv-stat-grid{grid-template-columns:1fr 1fr;}}
+        @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+    </style>
+</head>
+<body class="antialiased">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><div class="logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><div><div class="font-display font-bold text-base tracking-tight" style="color:var(--text-primary)">Hela<span style="color:var(--hela-amber)">core</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:-1px;">AI Business Advisor</div></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item " data-page="dashboard" onclick="switchPage('dashboard',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-2a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg></span>Dashboard</a>
+            <a class="nav-item" href="money dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>HelaCore Money</a>
+            <a class="nav-item " href="ask hela dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>Ask Hela</a>
+<a class="nav-item" href="helaone dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12zm0 3a3 3 0 100 6 3 3 0 000-6z"/></svg></span>HelaOne</a>
+<a class="nav-item" href="helabank dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M4 21V10m4 11V10m4 11V10m4 11V10m4 11V10M2 10l10-7 10 7M6 6V4h4v2"/></svg></span>HelaBank</a>
+            <a class="nav-item " href="ai studio dashboard.html" data-page="ai studio dashboard.html" onclick="switchPage('ai studio dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></span>AI Studio</a>
+            <a class="nav-item" href="ai agents dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>AI Agents</a>
+<a class="nav-item" href="projects dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></span>Projects</a>
+            <a class="nav-item " data-page="financial" onclick="switchPage('financial',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Financial Overview</a>
+            <a class="nav-item " data-page="transactions" onclick="switchPage('transactions',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></span>Transactions</a>
+            <div class="nav-section-label" style="margin-top:8px;">Operations</div>
+            <a class="nav-item active" data-page="inventory" onclick="switchPage('inventory',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>Inventory<span class="nav-badge count">3</span></a>
+            <a class="nav-item" href="customers dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Customers</a>
+            <a class="nav-item " data-page="loans" onclick="switchPage('loans',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>Loans & Financing</a>
+            <div class="nav-section-label" style="margin-top:8px;">Intelligence</div>
+            <a class="nav-item " data-page="simulations" onclick="switchPage('simulations',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>AI Simulations</a>
+            <a class="nav-item " data-page="market" onclick="switchPage('market',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Market Intelligence</a>
+            <a class="nav-item " data-page="opportunities" onclick="switchPage('opportunities',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>Opportunities</a>
+            <a class="nav-item " data-page="reports" onclick="switchPage('reports',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Reports</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="settings dashboard.html" data-page="dashboard.html" onclick="switchPage('dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Settings</a>
+            <a class="nav-item" href="help center dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Help Center</a>
+            <a class="nav-item" onclick="HelacoreAuth.handleLogout()" style="color:#f87171;"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>Log Out</a>
+            <div class="sidebar-user" style="margin-top:8px;"><div class="avatar" id="sidebarAvatar">?</div><div class="user-info"><div class="user-name" id="sidebarUserName">Loading...</div><div class="user-role" id="sidebarUserRole">Business Owner</div></div></div>
+        </div>
+    </aside>
+
+    <!-- TOPBAR -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left"><h1 id="page-title">Inventory <span>Stock Management</span></h1></div>
+        <div class="topbar-search"><span class="search-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span><input type="text" placeholder="Search inventory..." id="globalSearch"><span class="search-kbd">Ctrl+K</span></div>
+        <div class="topbar-right">
+            <button class="topbar-btn" onclick="showToast('No new messages','info')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></button>
+            <button class="topbar-btn" onclick="toggleNotifPanel()" id="notifBtn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+            <button class="topbar-btn" onclick="showToast('Settings coming soon','info')"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+            <div class="topbar-avatar" onclick="window.location.href='settings dashboard.html'" style="width:40px;height:40px;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--input-border);transition:all .25s;"><div id="topbarAvatar" style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;">?</div></div>
+        </div>
+    </header>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notif-panel" id="notifPanel">
+        <div style="padding:20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;"><h3 class="font-display font-semibold text-base">Notifications</h3><button class="btn-ghost btn-sm" onclick="showToast('All read','success');document.querySelector('.notif-dot').style.display='none';">Mark all read</button></div>
+        <div style="padding:12px;">
+            <div class="alert-item" onclick="showToast('Navigating to Sugar item','info')"><span class="alert-dot" style="background:var(--danger);box-shadow:0 0 8px rgba(239,68,68,0.4);"></span><div><div class="alert-title">Low Stock Alert</div><div class="alert-desc">Sugar (5kg) — 8 units remaining</div></div></div>
+            <div class="alert-item" onclick="showToast('Opening payment details','info')"><span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.4);"></span><div><div class="alert-title">Payment Due</div><div class="alert-desc">KES 15,000 to Maize Suppliers tomorrow</div></div></div>
+            <div class="alert-item" onclick="showToast('Opening restock page','info')"><span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.3);"></span><div><div class="alert-title">Restock Reminder</div><div class="alert-desc">Cooking Oil (20L) — 12 units, reorder at 15</div></div></div>
+            <div class="alert-item" onclick="showToast('Opening inventory analytics','info')"><span class="alert-dot" style="background:var(--info);box-shadow:0 0 8px rgba(6,182,212,0.3);"></span><div><div class="alert-title">Inventory Value Up</div><div class="alert-desc">Total inventory value increased 12% this week</div></div></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+        <section class="page-section active" id="page-inventory">
+            <div class="inv-layout">
+                <!-- LEFT COLUMN -->
+                <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+                    <!-- Header -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h2 class="font-display" style="font-size:22px;font-weight:700;margin-bottom:4px;">Inventory Overview</h2>
+                            <p style="font-size:13px;color:var(--text-secondary);">Real-time stock management for <strong style="color:var(--text-primary);">Kamau Fresh Produce</strong></p>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <input type="text" class="form-input-liquid" placeholder="Search items..." style="width:180px;" id="invSearch" oninput="filterInventory()">
+                            <select class="form-input-liquid" style="width:130px;" id="invCatFilter" onchange="filterInventory()">
+                                <option value="all">All Categories</option>
+                                <option value="Grains">Grains</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Dairy">Dairy</option>
+                                <option value="Beverages">Beverages</option>
+                                <option value="Household">Household</option>
+                                <option value="Fruits">Fruits</option>
+                            </select>
+                            <select class="form-input-liquid" style="width:130px;" id="invStatusFilter" onchange="filterInventory()">
+                                <option value="all">All Status</option>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                            </select>
+                            <button class="btn-primary btn-sm" onclick="showToast('Exporting inventory report...','success')">
+                                <span style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Export</span>
+                            </button>
+                            <button class="btn-primary btn-sm" onclick="showAddItemModal()">
+                                <span style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Add Item</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stat Cards -->
+                    <div class="inv-stat-grid">
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(6,182,212,0.12);"><svg fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>12%</span>
+                            </div>
+                            <div class="stat-label">Total Value</div>
+                            <div class="stat-value" id="invStatValue">KES 198,760</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">across all items</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(245,158,11,0.12);"><svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>5%</span>
+                            </div>
+                            <div class="stat-label">Total Items</div>
+                            <div class="stat-value" id="invStatItems">248</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">unique SKUs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(239,68,68,0.12);"><svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg></div>
+                                <span class="stat-change down"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>3 new</span>
+                            </div>
+                            <div class="stat-label">Low Stock</div>
+                            <div class="stat-value" style="color:var(--danger);" id="invStatLow">18</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">need restocking</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(168,85,247,0.12);"><svg fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+                                <span class="stat-change down"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>2 added</span>
+                            </div>
+                            <div class="stat-label">Out of Stock</div>
+                            <div class="stat-value" style="color:#c084fc;" id="invStatOut">5</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">require urgent order</div>
+                        </div>
+                    </div>
+
+                    <!-- Mid Row: Value Trend + Health Score -->
+                    <div class="inv-mid-grid">
+                        <div class="chart-card">
+                            <div class="chart-header"><div><div class="chart-title">Inventory Value Trend</div><div class="chart-subtitle">Total stock value over last 30 days</div></div>
+                                <div style="display:flex;gap:6px;">
+                                    <button class="btn-ghost btn-sm" style="padding:5px 10px;font-size:11px;" onclick="updateValueChart('7d')" id="btn7d">7D</button>
+                                    <button class="btn-ghost btn-sm" style="padding:5px 10px;font-size:11px;" onclick="updateValueChart('14d')" id="btn14d">14D</button>
+                                    <button class="btn-primary btn-sm" style="padding:5px 10px;font-size:11px;" onclick="updateValueChart('30d')" id="btn30d">30D</button>
+                                </div>
+                            </div>
+                            <canvas id="valueTrendChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                            <div class="chart-title" style="align-self:flex-start;margin-bottom:4px;">Health Score</div>
+                            <div class="chart-subtitle" style="align-self:flex-start;margin-bottom:16px;">Overall inventory status</div>
+                            <div class="health-ring">
+                                <svg width="120" height="120" viewBox="0 0 120 120">
+                                    <circle class="ring-bg" cx="60" cy="60" r="50"/>
+                                    <circle class="ring-fg" cx="60" cy="60" r="50" stroke="url(#healthGrad)" stroke-dasharray="314" stroke-dashoffset="314" id="healthRing"/>
+                                    <defs><linearGradient id="healthGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+                                </svg>
+                                <div class="health-center">
+                                    <div class="health-score gradient-text-hela" id="healthScoreNum">0</div>
+                                    <div class="health-label">/ 100</div>
+                                </div>
+                            </div>
+                            <div class="health-badge" style="background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.2);">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 21a11.955 11.955 0 01-8.354-5.646z"/></svg>
+                                Good
+                            </div>
+                            <div style="margin-top:14px;width:100%;">
+                                <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;"><span style="color:var(--text-muted);">Stock Accuracy</span><span style="color:var(--text-primary);font-weight:600;">94%</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-top:1px solid var(--border-subtle);"><span style="color:var(--text-muted);">Turnover Rate</span><span style="color:var(--text-primary);font-weight:600;">3.2x</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:11px;border-top:1px solid var(--border-subtle);"><span style="color:var(--text-muted);">Days of Supply</span><span style="color:var(--text-primary);font-weight:600;">18 days</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Alerts + Restock Recommendations Row -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                        <div class="chart-card" style="padding:16px 18px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                                <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" fill="none" stroke="var(--danger)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                    Low Stock Alerts
+                                </div>
+                                <span style="font-size:11px;color:var(--danger);font-weight:600;">18 items</span>
+                            </div>
+                            <div class="alert-item" onclick="showToast('Opening Sugar details','info')">
+                                <span class="alert-dot" style="background:var(--danger);box-shadow:0 0 8px rgba(239,68,68,0.4);"></span>
+                                <div style="flex:1;"><div class="alert-title">Sugar (5kg)</div><div class="alert-desc">8 units left — Reorder point: 20</div></div>
+                                <span style="font-size:12px;font-weight:700;color:var(--danger);font-family:'Space Grotesk',sans-serif;">8</span>
+                            </div>
+                            <div class="alert-item" onclick="showToast('Opening Cooking Oil details','info')">
+                                <span class="alert-dot" style="background:var(--danger);box-shadow:0 0 8px rgba(239,68,68,0.3);"></span>
+                                <div style="flex:1;"><div class="alert-title">Cooking Oil (20L)</div><div class="alert-desc">12 units left — Reorder point: 15</div></div>
+                                <span style="font-size:12px;font-weight:700;color:var(--danger);font-family:'Space Grotesk',sans-serif;">12</span>
+                            </div>
+                            <div class="alert-item" onclick="showToast('Opening Wheat Flour details','info')">
+                                <span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.3);"></span>
+                                <div style="flex:1;"><div class="alert-title">Wheat Flour (2kg)</div><div class="alert-desc">15 units left — Reorder point: 25</div></div>
+                                <span style="font-size:12px;font-weight:700;color:var(--hela-amber);font-family:'Space Grotesk',sans-serif;">15</span>
+                            </div>
+                            <div class="alert-item" onclick="showToast('Opening Rice details','info')">
+                                <span class="alert-dot" style="background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.2);"></span>
+                                <div style="flex:1;"><div class="alert-title">Rice (5kg Basmati)</div><div class="alert-desc">18 units left — Reorder point: 30</div></div>
+                                <span style="font-size:12px;font-weight:700;color:var(--hela-amber);font-family:'Space Grotesk',sans-serif;">18</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-card" style="padding:16px 18px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                                <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" fill="none" stroke="var(--hela-emerald)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                                    Restock Recommendations
+                                </div>
+                                <span style="font-size:11px;color:var(--hela-emerald);font-weight:600;">AI Suggested</span>
+                            </div>
+                            <div class="restock-item">
+                                <div class="restock-icon" style="background:rgba(239,68,68,0.12);"><svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <div class="restock-text"><div class="restock-name">Sugar (5kg)</div><div class="restock-sub">Order 50 units — KES 12,500</div></div>
+                                <button class="restock-action btn-success" onclick="showToast('Sugar added to order','success')">Order</button>
+                            </div>
+                            <div class="restock-item">
+                                <div class="restock-icon" style="background:rgba(245,158,11,0.12);"><svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <div class="restock-text"><div class="restock-name">Cooking Oil (20L)</div><div class="restock-sub">Order 30 units — KES 27,000</div></div>
+                                <button class="restock-action btn-success" onclick="showToast('Cooking Oil added to order','success')">Order</button>
+                            </div>
+                            <div class="restock-item">
+                                <div class="restock-icon" style="background:rgba(245,158,11,0.12);"><svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <div class="restock-text"><div class="restock-name">Wheat Flour (2kg)</div><div class="restock-sub">Order 60 units — KES 9,000</div></div>
+                                <button class="restock-action btn-success" onclick="showToast('Wheat Flour added to order','success')">Order</button>
+                            </div>
+                            <div class="restock-item">
+                                <div class="restock-icon" style="background:rgba(168,85,247,0.12);"><svg fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+                                <div class="restock-text"><div class="restock-name">Rice (5kg Basmati)</div><div class="restock-sub">Order 40 units — KES 20,000</div></div>
+                                <button class="restock-action btn-success" onclick="showToast('Rice added to order','success')">Order</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full Inventory Table -->
+                    <div class="chart-card" style="padding:0;overflow:hidden;">
+                        <div class="chart-header" style="padding:16px 20px 0;">
+                            <div><div class="chart-title">All Inventory</div><div class="chart-subtitle">Showing <span id="invCount">24</span> items</div></div>
+                            <div style="display:flex;gap:6px;">
+                                <button class="filter-chip active" onclick="setInvView(this,'all')">All</button>
+                                <button class="filter-chip" onclick="setInvView(this,'low')">Low Stock</button>
+                                <button class="filter-chip" onclick="setInvView(this,'out')">Out of Stock</button>
+                            </div>
+                        </div>
+                        <div class="table-wrap" id="invTableWrap" style="margin-top:12px;">
+                            <table class="data-table" id="invTable">
+                                <thead><tr><th>Item</th><th>SKU</th><th>Category</th><th>Stock</th><th>Unit Price</th><th>Total Value</th><th>Status</th><th style="width:60px;"></th></tr></thead>
+                                <tbody id="invBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <!-- AI Assistant -->
+                    <div class="chart-card" style="padding:16px 18px;display:flex;flex-direction:column;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <div style="width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;">
+                                <svg width="14" height="14" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            </div>
+                            AI Inventory Assistant
+                        </div>
+                        <div id="aiChatArea" style="flex:1;max-height:200px;overflow-y:auto;margin-bottom:10px;">
+                            <div class="ai-chat-bubble">Based on current trends, I recommend ordering <strong style="color:var(--hela-amber);">Sugar</strong> and <strong style="color:var(--hela-amber);">Cooking Oil</strong> within the next 3 days to avoid stockouts. Your maize supply looks healthy for 2+ weeks.</div>
+                        </div>
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" class="form-input-liquid" placeholder="Ask about inventory..." id="aiInput" style="flex:1;padding:8px 12px;font-size:12px;" onkeydown="if(event.key==='Enter')sendAiMessage()">
+                            <button class="btn-primary btn-sm" style="padding:8px 12px;" onclick="sendAiMessage()">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Top Selling Items -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            Top Selling Items
+                        </div>
+                        <div class="top-sell-item"><div class="top-sell-rank" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;">1</div><div class="top-sell-name">Maize Flour (2kg)</div><span class="top-sell-val" style="color:var(--hela-emerald);">342 units</span></div>
+                        <div class="top-sell-item"><div class="top-sell-rank" style="background:linear-gradient(135deg,#a1a1aa,#71717a);color:#fff;">2</div><div class="top-sell-name">Sugar (5kg)</div><span class="top-sell-val" style="color:var(--hela-emerald);">287 units</span></div>
+                        <div class="top-sell-item"><div class="top-sell-rank" style="background:linear-gradient(135deg,#b45309,#92400e);color:#fff;">3</div><div class="top-sell-name">Cooking Oil (1L)</div><span class="top-sell-val" style="color:var(--hela-emerald);">256 units</span></div>
+                        <div class="top-sell-item"><div class="top-sell-rank" style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--border-subtle);">4</div><div class="top-sell-name">Rice (5kg)</div><span class="top-sell-val">198 units</span></div>
+                        <div class="top-sell-item"><div class="top-sell-rank" style="background:var(--input-bg);color:var(--text-muted);border:1px solid var(--border-subtle);">5</div><div class="top-sell-name">Fresh Milk (1L)</div><span class="top-sell-val">176 units</span></div>
+                    </div>
+
+                    <!-- Category Distribution -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                            Category Distribution
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:center;padding:4px 0;"><canvas id="categoryDistChart" width="180" height="180" style="width:160px;height:160px;"></canvas></div>
+                        <div id="catDistLegend" style="margin-top:10px;"></div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            Quick Stats
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);"><span style="font-size:12px;color:var(--text-muted);">Avg. Item Value</span><span style="font-size:13px;font-weight:600;color:var(--text-primary);font-family:'Space Grotesk',sans-serif;">KES 802</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);"><span style="font-size:12px;color:var(--text-muted);">Highest Value Item</span><span style="font-size:13px;font-weight:600;color:var(--hela-emerald);font-family:'Space Grotesk',sans-serif;">KES 68,400</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);"><span style="font-size:12px;color:var(--text-muted);">Pending Orders</span><span style="font-size:13px;font-weight:600;color:var(--hela-amber);font-family:'Space Grotesk',sans-serif;">3 orders</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle);"><span style="font-size:12px;color:var(--text-muted);">Expired Items</span><span style="font-size:13px;font-weight:600;color:var(--danger);font-family:'Space Grotesk',sans-serif;">2 items</span></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;"><span style="font-size:12px;color:var(--text-muted);">Last Restocked</span><span style="font-size:13px;font-weight:600;color:var(--text-primary);font-family:'Space Grotesk',sans-serif;">2 days ago</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ADD ITEM MODAL -->
+    <div id="addItemModal" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeAddItemModal()">
+        <div style="background:var(--bg-secondary);border:1px solid var(--dark-glass-border);border-radius:var(--liquid-radius-md);width:440px;max-width:90vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.5);animation:fadeInPage .3s ease;">
+            <div style="padding:20px 24px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;">
+                <h3 class="font-display" style="font-size:16px;font-weight:600;">Add New Item</h3>
+                <button onclick="closeAddItemModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;transition:color .2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+                <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Item Name</label><input type="text" class="form-input-liquid" placeholder="e.g. Sugar (5kg)" id="newItemName"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">SKU</label><input type="text" class="form-input-liquid" placeholder="e.g. SUG-005" id="newItemSku"></div>
+                    <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Category</label><select class="form-input-liquid" id="newItemCat"><option>Grains</option><option>Vegetables</option><option>Dairy</option><option>Beverages</option><option>Household</option><option>Fruits</option></select></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Stock Quantity</label><input type="number" class="form-input-liquid" placeholder="0" id="newItemStock" min="0"></div>
+                    <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Unit Price (KES)</label><input type="number" class="form-input-liquid" placeholder="0" id="newItemPrice" min="0"></div>
+                </div>
+                <div><label style="font-size:12px;font-weight:500;color:var(--text-muted);display:block;margin-bottom:6px;">Reorder Point</label><input type="number" class="form-input-liquid" placeholder="Minimum stock level" id="newItemReorder" min="0"></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+                    <button class="btn-ghost btn-sm" onclick="closeAddItemModal()">Cancel</button>
+                    <button class="btn-primary btn-sm" onclick="addNewItem()">Add Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <script src="theme.js" defer></script>
+<script src="shared-auth.js"></script>
+<script src="live-data.js"></script>
+    <script>
+    /* ===== USER DATA (from shared-auth.js) ===== */
+    function populateUser() {
+        const A = HelacoreAuth;
+        const nameEl = document.getElementById('sidebarUserName');
+        const roleEl = document.getElementById('sidebarUserRole');
+        const avEl = document.getElementById('sidebarAvatar');
+        const topAvEl = document.getElementById('topbarAvatar');
+        if (nameEl) nameEl.textContent = A.fullName();
+        if (roleEl) roleEl.textContent = A.getVal('role','role') || 'Business Owner';
+        if (avEl) avEl.textContent = A.initials();
+        if (topAvEl) topAvEl.textContent = A.initials();
+    }
+
+    /* ===== INVENTORY DATA ===== */
+    const inventoryData = [
+        { name:"Maize Flour (2kg)", sku:"MF-001", cat:"Grains", stock:120, price:150, reorder:30, maxStock:200 },
+        { name:"Sugar (5kg)", sku:"SUG-002", cat:"Household", stock:8, price:250, reorder:20, maxStock:100 },
+        { name:"Cooking Oil (20L)", sku:"CO-003", cat:"Household", stock:12, price:900, reorder:15, maxStock:60 },
+        { name:"Cooking Oil (1L)", sku:"CO-004", cat:"Household", stock:85, price:180, reorder:25, maxStock:150 },
+        { name:"Rice (5kg Basmati)", sku:"RC-005", cat:"Grains", stock:18, price:500, reorder:30, maxStock:80 },
+        { name:"Wheat Flour (2kg)", sku:"WF-006", cat:"Grains", stock:15, price:150, reorder:25, maxStock:100 },
+        { name:"Fresh Milk (1L)", sku:"MK-007", cat:"Dairy", stock:64, price:120, reorder:20, maxStock:100 },
+        { name:"Yoghurt (500ml)", sku:"YG-008", cat:"Dairy", stock:42, price:100, reorder:15, maxStock:80 },
+        { name:"Tomatoes (1kg)", sku:"TM-009", cat:"Vegetables", stock:35, price:80, reorder:20, maxStock:60 },
+        { name:"Onions (1kg)", sku:"ON-010", cat:"Vegetables", stock:48, price:60, reorder:25, maxStock:80 },
+        { name:"Potatoes (1kg)", sku:"PT-011", cat:"Vegetables", stock:56, price:70, reorder:30, maxStock:100 },
+        { name:"Bananas (1 bunch)", sku:"BN-012", cat:"Fruits", stock:0, price:50, reorder:15, maxStock:50 },
+        { name:"Oranges (1kg)", sku:"OR-013", cat:"Fruits", stock:28, price:120, reorder:15, maxStock:60 },
+        { name:"Mangoes (1kg)", sku:"MG-014", cat:"Fruits", stock:0, price:200, reorder:10, maxStock:40 },
+        { name:"Soda (300ml)", sku:"SD-015", cat:"Beverages", stock:96, price:40, reorder:30, maxStock:200 },
+        { name:"Juice (1L)", sku:"JC-016", cat:"Beverages", stock:38, price:150, reorder:20, maxStock:80 },
+        { name:"Water (500ml)", sku:"WT-017", cat:"Beverages", stock:144, price:30, reorder:50, maxStock:300 },
+        { name:"Detergent (1kg)", sku:"DT-018", cat:"Household", stock:22, price:280, reorder:10, maxStock:50 },
+        { name:"Soap Bar", sku:"SB-019", cat:"Household", stock:0, price:50, reorder:20, maxStock:80 },
+        { name:"Kales (1 bundle)", sku:"KL-020", cat:"Vegetables", stock:30, price:30, reorder:15, maxStock:50 },
+        { name:"Cabbage (1pc)", sku:"CB-021", cat:"Vegetables", stock:0, price:40, reorder:10, maxStock:40 },
+        { name:"Beans (1kg)", sku:"BN-022", cat:"Grains", stock:72, price:180, reorder:20, maxStock:100 },
+        { name:"Green Peas (1kg)", sku:"GP-023", cat:"Grains", stock:0, price:160, reorder:15, maxStock:60 },
+        { name:"Tea Leaves (500g)", sku:"TL-024", cat:"Beverages", stock:55, price:200, reorder:15, maxStock:80 },
+    ];
+
+    const catColors = {
+        "Grains":"#f59e0b","Vegetables":"#10b981","Dairy":"#06b6d4",
+        "Beverages":"#a855f7","Household":"#ef4444","Fruits":"#f97316"
+    };
+
+    /* ===== RENDER INVENTORY TABLE ===== */
+    function getStatus(item) {
+        if (item.stock === 0) return { label:"Out of Stock", cls:"out-of-stock" };
+        if (item.stock <= item.reorder) return { label:"Low Stock", cls:"low" };
+        return { label:"In Stock", cls:"in-stock" };
+    }
+
+    function renderInventory(data) {
+        const tbody = document.getElementById('invBody');
+        document.getElementById('invCount').textContent = data.length;
+        tbody.innerHTML = data.map(item => {
+            const st = getStatus(item);
+            const pct = Math.min(100, Math.round((item.stock / item.maxStock) * 100));
+            const barColor = item.stock === 0 ? 'var(--danger)' : item.stock <= item.reorder ? 'var(--hela-amber)' : 'var(--hela-emerald)';
+            const totalVal = (item.stock * item.price).toLocaleString();
+            return `<tr>
+                <td style="font-weight:500;color:var(--text-primary);"><span class="cat-dot" style="background:${catColors[item.cat] || '#71717a'};"></span>${item.name}</td>
+                <td style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--text-muted);">${item.sku}</td>
+                <td><span style="font-size:12px;">${item.cat}</span></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--text-primary);min-width:30px;">${item.stock}</span><div class="stock-bar"><div class="stock-bar-fill" style="width:${pct}%;background:${barColor};"></div></div></div></td>
+                <td style="font-family:'Space Grotesk',sans-serif;font-weight:500;">KES ${item.price.toLocaleString()}</td>
+                <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--text-primary);">KES ${totalVal}</td>
+                <td><span class="status-pill ${st.cls}">${st.label}</span></td>
+                <td><button onclick="showToast('Editing ${item.name}','info')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;transition:color .2s;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'"><svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button></td>
+            </tr>`;
+        }).join('');
+    }
+
+    /* ===== FILTERS ===== */
+    let currentView = 'all';
+    function setInvView(el, view) {
+        currentView = view;
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        filterInventory();
+    }
+
+    function filterInventory() {
+        const search = document.getElementById('invSearch').value.toLowerCase();
+        const cat = document.getElementById('invCatFilter').value;
+        const status = document.getElementById('invStatusFilter').value;
+        let filtered = inventoryData.filter(item => {
+            const matchSearch = item.name.toLowerCase().includes(search) || item.sku.toLowerCase().includes(search);
+            const matchCat = cat === 'all' || item.cat === cat;
+            const st = getStatus(item);
+            const matchStatus = status === 'all' || st.label === status;
+            let matchView = true;
+            if (currentView === 'low') matchView = st.label === 'Low Stock';
+            if (currentView === 'out') matchView = st.label === 'Out of Stock';
+            return matchSearch && matchCat && matchStatus && matchView;
+        });
+        renderInventory(filtered);
+    }
+
+    /* ===== ADD ITEM MODAL ===== */
+    function showAddItemModal() {
+        const m = document.getElementById('addItemModal');
+        m.style.display = 'flex';
+    }
+    function closeAddItemModal() {
+        document.getElementById('addItemModal').style.display = 'none';
+        ['newItemName','newItemSku','newItemStock','newItemPrice','newItemReorder'].forEach(id => document.getElementById(id).value = '');
+    }
+    function addNewItem() {
+        const name = document.getElementById('newItemName').value.trim();
+        const sku = document.getElementById('newItemSku').value.trim();
+        const cat = document.getElementById('newItemCat').value;
+        const stock = parseInt(document.getElementById('newItemStock').value) || 0;
+        const price = parseInt(document.getElementById('newItemPrice').value) || 0;
+        const reorder = parseInt(document.getElementById('newItemReorder').value) || 10;
+        if (!name) { showToast('Please enter item name','error'); return; }
+        if (!sku) { showToast('Please enter SKU','error'); return; }
+        if (price <= 0) { showToast('Please enter valid price','error'); return; }
+        inventoryData.unshift({ name, sku, cat, stock, price, reorder, maxStock: reorder * 5 });
+        closeAddItemModal();
+        filterInventory();
+        showToast(`"${name}" added successfully`,'success');
+    }
+
+    /* ===== AI CHAT ===== */
+    const aiResponses = [
+        "Based on your sales velocity, Maize Flour should be restocked within 5 days. Current stock covers approximately 12 days of demand.",
+        "I noticed Cooking Oil (20L) has a declining stock trend. Consider placing a bulk order — you could save ~8% with a 50-unit order from FreshGrain Co.",
+        "Your dairy items have the highest turnover rate at 4.8x. Keep a closer eye on expiration dates for Fresh Milk and Yoghurt.",
+        "Recommendation: Reduce Wheat Flour reorder point from 25 to 20. Your sales pattern shows consistent but moderate demand.",
+        "Your Fruits category has 2 out-of-stock items. Mangoes and Bananas are seasonal — consider alternative suppliers or substitute products.",
+        "Inventory accuracy is at 94%. Consider doing a physical count this weekend to reconcile the 6% discrepancy, mostly in Vegetables."
+    ];
+    let aiIdx = 0;
+    function sendAiMessage() {
+        const input = document.getElementById('aiInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        const area = document.getElementById('aiChatArea');
+        area.innerHTML += `<div class="ai-chat-bubble user">${msg}</div>`;
+        input.value = '';
+        area.innerHTML += `<div class="ai-typing" id="aiTyping"><span></span><span></span><span></span></div>`;
+        area.scrollTop = area.scrollHeight;
+        setTimeout(() => {
+            const typing = document.getElementById('aiTyping');
+            if (typing) typing.remove();
+            area.innerHTML += `<div class="ai-chat-bubble">${aiResponses[aiIdx % aiResponses.length]}</div>`;
+            aiIdx++;
+            area.scrollTop = area.scrollHeight;
+        }, 1200);
+    }
+
+    /* ===== CHARTS ===== */
+    function initValueTrendChart(baseVal) {
+        const ctx = document.getElementById('valueTrendChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
+        gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        const labels30 = [];
+        const data30 = [];
+        let val = baseVal || 168000;
+        const startVal = val;
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            labels30.push(d.toLocaleDateString('en', { month:'short', day:'numeric' }));
+            const progress = (29 - i) / 29;
+            val = Math.round(startVal * (0.82 + 0.18 * progress) + (Math.random() - 0.5) * 2000);
+            data30.push(Math.max(0, val));
+        }
+        data30[29] = Math.round(startVal);
+        if (window.valueChart) { window.valueChart.destroy(); }
+        window.valueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels30,
+                datasets: [{
+                    label: 'Inventory Value',
+                    data: data30,
+                    borderColor: '#f59e0b',
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: '#f59e0b',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: {
+                    backgroundColor: 'rgba(10,10,15,0.9)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    titleFont: { family: 'Space Grotesk', size: 12, weight: '600' },
+                    bodyFont: { family: 'Inter', size: 11 },
+                    padding: 10, cornerRadius: 8,
+                    callbacks: { label: ctx => 'KES ' + ctx.parsed.y.toLocaleString() }
+                }},
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#71717a', font: { size: 10 }, maxTicksLimit: 8 }, border: { display: false } },
+                    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#71717a', font: { size: 10, family: 'Space Grotesk' }, callback: v => 'KES ' + (v/1000).toFixed(0) + 'k' }, border: { display: false } }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
+        });
+    }
+
+    function updateValueChart(period) {
+        document.querySelectorAll('[id^="btn"]').forEach(b => { b.className = 'btn-ghost btn-sm'; b.style.cssText = 'padding:5px 10px;font-size:11px;'; });
+        const activeBtn = document.getElementById('btn' + period);
+        activeBtn.className = 'btn-primary btn-sm';
+        activeBtn.style.cssText = 'padding:5px 10px;font-size:11px;';
+        const days = period === '7d' ? 7 : period === '14d' ? 14 : 30;
+        const labels = [];
+        const data = [];
+        const baseVal = (window.__liveInvValue || 180000);
+        const startVal = baseVal * (period === '7d' ? 0.94 : period === '14d' ? 0.97 : 0.82);
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            labels.push(d.toLocaleDateString('en', { month:'short', day:'numeric' }));
+            const progress = (days - 1 - i) / (days - 1 || 1);
+            data.push(Math.max(0, Math.round(startVal * (1 + (1 - 1) * progress) + (baseVal - startVal) * progress + (Math.random() - 0.5) * 1500)));
+        }
+        data[days - 1] = Math.round(baseVal);
+        window.valueChart.data.labels = labels;
+        window.valueChart.data.datasets[0].data = data;
+        window.valueChart.update('active');
+    }
+
+    function initCategoryDistChart() {
+        const cats = {};
+        inventoryData.forEach(item => {
+            cats[item.cat] = (cats[item.cat] || 0) + (item.stock * item.price);
+        });
+        const labels = Object.keys(cats);
+        const data = Object.values(cats);
+        const colors = labels.map(l => catColors[l] || '#71717a');
+        const ctx = document.getElementById('categoryDistChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: 'transparent', borderWidth: 0, hoverOffset: 6 }] },
+            options: {
+                responsive: false, cutout: '68%',
+                plugins: { legend: { display: false }, tooltip: {
+                    backgroundColor: 'rgba(10,10,15,0.9)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+                    titleFont: { family: 'Space Grotesk', size: 12, weight: '600' },
+                    bodyFont: { family: 'Inter', size: 11 },
+                    padding: 10, cornerRadius: 8,
+                    callbacks: { label: ctx => 'KES ' + ctx.parsed.toLocaleString() }
+                }}
+            }
+        });
+        const legend = document.getElementById('catDistLegend');
+        const total = data.reduce((a, b) => a + b, 0);
+        legend.innerHTML = labels.map((l, i) => `<div class="legend-item"><div class="legend-dot" style="background:${colors[i]};"></div><span>${l}</span><span class="legend-val">KES ${Math.round(data[i]).toLocaleString()}</span></div>`).join('');
+    }
+
+    /* ===== HEALTH SCORE ANIMATION ===== */
+    function animateHealthScore() {
+        const target = 82;
+        const ring = document.getElementById('healthRing');
+        const numEl = document.getElementById('healthScoreNum');
+        const circumference = 314;
+        const offset = circumference - (circumference * target / 100);
+        let current = 0;
+        const duration = 1500;
+        const start = performance.now();
+        function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            current = Math.round(eased * target);
+            numEl.textContent = current;
+            ring.style.strokeDashoffset = circumference - (circumference * eased * target / 100);
+            if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    /* ===== SIDEBAR / NAV / TOAST / NOTIF ===== */
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+    }
+    function switchPage(page, el) {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById('page-' + page);
+        if (target) { target.classList.add('active'); }
+        const titles = { dashboard:'Dashboard', 'ai-advisor':'AI Advisor', financial:'Financial Overview', transactions:'Transactions', inventory:'Inventory', customers:'Customers', loans:'Loans & Financing', simulations:'AI Simulations', market:'Market Intelligence', opportunities:'Opportunities', reports:'Reports' };
+        const subs = { dashboard:'Business Overview', 'ai-advisor':'Smart Insights', financial:'Revenue & Expenses', transactions:'All Records', inventory:'Stock Management', customers:'CRM', loans:'Financing Options', simulations:'What-If Analysis', market:'Trends & Data', opportunities:'Growth Areas', reports:'Analytics' };
+        document.getElementById('page-title').innerHTML = (titles[page] || 'Dashboard') + ' <span>' + (subs[page] || '') + '</span>';
+        closeSidebar();
+    }
+    function showToast(msg, type) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast-item ' + type;
+        const icons = { success:'<svg fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 21a11.955 11.955 0 01-8.354-5.646z"/></svg>', error:'<svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>', info:'<svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' };
+        toast.innerHTML = (icons[type] || icons.info) + '<span>' + msg + '</span>';
+        container.appendChild(toast);
+        requestAnimationFrame(() => { requestAnimationFrame(() => { toast.classList.add('show'); }); });
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+    }
+    function toggleNotifPanel() {
+        document.getElementById('notifPanel').classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+        const panel = document.getElementById('notifPanel');
+        const btn = document.getElementById('notifBtn');
+        if (panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
+            panel.classList.remove('open');
+        }
+    });
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('globalSearch').focus(); }
+    });
+
+    /* ===== INIT ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        renderInventory(inventoryData);
+        initValueTrendChart();
+        initCategoryDistChart();
+        setTimeout(animateHealthScore, 300);
+    });
+
+    /* ===== LIVE DATA (same source as dashboard.html) ===== */
+    function populateLiveData() {
+        const L = window.HelacoreLive;
+        if (!L) return;
+        const f = L.financials();
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        /* Inventory value ≈ 1.5 months of revenue on hand; item counts scale with revenue */
+        const invValue = Math.max(0, Math.round(f.revenue * 1.5));
+        const items = Math.max(10, Math.round(f.revenue / 800));
+        const low = Math.max(0, Math.round(items * 0.07));
+        const out = Math.max(0, Math.round(items * 0.02));
+        window.__liveInvValue = invValue;
+        set('invStatValue', L.fmt(invValue));
+        set('invStatItems', items + '');
+        set('invStatLow', low + '');
+        set('invStatOut', out + '');
+        /* Scale inventory prices so the table + category chart reflect live value */
+        const staticTotal = inventoryData.reduce((a, i) => a + (i.stock * i.price), 0) || 1;
+        const k = invValue / staticTotal;
+        inventoryData.forEach(i => { i.price = Math.max(1, Math.round(i.price * k)); });
+        renderInventory(inventoryData);
+        initCategoryDistChart();
+        initValueTrendChart(invValue);
+        /* Health score — same weighted composite as dashboard.html */
+        const liquidity = Math.min(100, Math.max(0, (f.cash || 0) / Math.max(1, f.expenses || 0) * 100));
+        const profitability = Math.min(100, Math.max(0, f.profit / Math.max(1, f.revenue || 0) * 100));
+        const cashflow = Math.min(100, Math.max(0, (f.cash || 0) / Math.max(1, f.expenses || 0) * 100));
+        const stability = Math.round((liquidity + cashflow) / 2);
+        const growth = Math.min(100, Math.max(0, 55 + (f.revenue > 0 ? 25 : 0) + (f.customers > 0 ? 12 : 0)));
+        const overall = Math.round(liquidity * 0.25 + profitability * 0.25 + cashflow * 0.20 + stability * 0.15 + growth * 0.15);
+        const numEl = document.getElementById('healthScoreNum');
+        const ring = document.getElementById('healthRing');
+        if (numEl) numEl.textContent = overall;
+        if (ring) ring.style.strokeDashoffset = 314 - (314 * overall / 100);
+    }
+    HelacoreAuth.init(function() {
+        populateUser();
+        populateLiveData();
+    });
+    </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>

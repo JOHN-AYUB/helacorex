@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber:#f59e0b;--hela-gold:#d97706;--hela-emerald:#10b981;--hela-cyan:#06b6d4;
+            --liquid-radius-sm:12px;--liquid-radius-md:20px;--liquid-radius-lg:28px;--liquid-radius-xl:36px;
+            --bg-primary:#050507;--bg-secondary:#0a0a0f;--bg-tertiary:#111118;
+            --text-primary:#ffffff;--text-secondary:#a1a1aa;--text-muted:#71717a;--text-inverse:#09090b;
+            --glass-bg:rgba(255,255,255,0.08);--glass-bg-hover:rgba(255,255,255,0.12);
+            --glass-border:rgba(255,255,255,0.15);--glass-border-hover:rgba(255,255,255,0.25);
+            --glass-shadow:0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top:inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom:inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine:rgba(255,255,255,0.1);
+            --dark-glass-bg:rgba(10,10,15,0.6);--dark-glass-border:rgba(255,255,255,0.1);
+            --dark-glass-shadow:0 4px 20px rgba(0,0,0,0.4);
+            --input-bg:rgba(255,255,255,0.05);--input-border:rgba(255,255,255,0.1);
+            --input-focus-border:rgba(245,158,11,0.5);--input-focus-shadow:0 0 20px rgba(245,158,11,0.1);
+            --input-text:#ffffff;--input-placeholder:#71717a;
+            --border-subtle:rgba(255,255,255,0.1);--border-footer:rgba(255,255,255,0.1);
+            --footer-bg:rgba(0,0,0,0.2);--scrollbar-track:#050507;--scrollbar-thumb:#f59e0b;
+            --canvas-opacity:0.6;
+            --gradient-text:linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover:linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --chart-grid:rgba(255,255,255,0.05);--chart-line:rgba(245,158,11,0.6);--chart-fill:rgba(245,158,11,0.1);
+            --mobile-menu-bg:rgba(10,10,15,0.95);
+            --social-bg:rgba(255,255,255,0.05);--social-bg-hover:rgba(255,255,255,0.1);
+            --social-icon:#a1a1aa;--social-icon-hover:#ffffff;
+            --nav-hover-bg:rgba(255,255,255,0.1);--stats-bg:rgba(255,255,255,0.05);
+            --tag-bg:rgba(255,255,255,0.1);
+            --sidebar-w:260px;--topbar-h:72px;
+            --danger:#ef4444;--warning:#f59e0b;--success:#10b981;--info:#06b6d4;
+            --purple:#a855f7;--purple-glow:rgba(168,85,247,0.15);
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow:hidden;height:100vh;transition:background .5s ease,color .5s ease;}
+        .font-display{font-family:'Space Grotesk',sans-serif;}
+        .gradient-text-hela{background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .text-theme-primary{color:var(--text-primary)}.text-theme-secondary{color:var(--text-secondary)}.text-theme-muted{color:var(--text-muted)}
+        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px;}
+
+        .liquid-glass{background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom);position:relative;overflow:hidden;border-radius:var(--liquid-radius-lg);transition:all .4s ease;}
+        .liquid-glass::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%);border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0;pointer-events:none;z-index:1;}
+        .liquid-glass::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--glass-shine),transparent);transition:left .7s ease-out;pointer-events:none;z-index:2;}
+        .liquid-glass:hover::after{left:100%;}
+        .liquid-glass:hover{border-color:var(--glass-border-hover);}
+        .liquid-glass-dark{background:var(--dark-glass-bg);backdrop-filter:blur(20px) saturate(150%);border:1px solid var(--dark-glass-border);box-shadow:var(--dark-glass-shadow);border-radius:var(--liquid-radius-md);transition:all .3s ease;}
+        .liquid-glass-sm{background:var(--dark-glass-bg);backdrop-filter:blur(16px) saturate(150%);border:1px solid var(--dark-glass-border);box-shadow:var(--dark-glass-shadow);border-radius:var(--liquid-radius-sm);transition:all .3s ease;position:relative;overflow:hidden;}
+        .liquid-glass-sm:hover{border-color:var(--glass-border-hover);background:var(--glass-bg-hover);}
+
+        .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;z-index:40;transition:transform .4s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+        .sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-logo .logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .sidebar-logo .logo-icon svg{width:22px;height:22px;color:#fff;}
+        .sidebar-nav{flex:1;overflow-y:auto;padding:12px 10px;}
+        .sidebar-nav::-webkit-scrollbar{width:3px;}
+        .nav-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:12px 14px 6px;}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;color:var(--text-secondary);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .25s ease;position:relative;margin-bottom:2px;white-space:nowrap;text-decoration:none;}
+        .nav-item:hover{background:var(--nav-hover-bg);color:var(--text-primary);}
+        .nav-item.active{background:var(--btn-gradient);color:var(--text-primary);border:1px solid rgba(245,158,11,0.2);box-shadow:0 2px 12px rgba(245,158,11,0.1);}
+        .nav-item .nav-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .nav-item .nav-icon svg{width:18px;height:18px;}
+        .nav-badge{margin-left:auto;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;letter-spacing:0.02em;}
+        .nav-badge.new{background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(245,158,11,0.3));color:#c084fc;border:1px solid rgba(168,85,247,0.3);}
+        .nav-badge.count{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+        .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border-subtle);flex-shrink:0;}
+        .sidebar-user{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;cursor:pointer;transition:all .25s;}
+        .sidebar-user:hover{background:var(--nav-hover-bg);}
+        .sidebar-user .avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;}
+        .sidebar-user .user-info{overflow:hidden;}
+        .sidebar-user .user-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .sidebar-user .user-role{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+        .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--bg-primary);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:30;transition:left .4s cubic-bezier(0.16,1,0.3,1);}
+        .topbar-left{display:flex;align-items:center;gap:16px;}
+        .topbar-left h1{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;color:var(--text-primary);}
+        .topbar-left h1 span{color:var(--text-muted);font-weight:400;font-size:14px;margin-left:8px;}
+        .topbar-search{position:relative;width:320px;}
+        .topbar-search input{width:100%;padding:9px 14px 9px 40px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:12px;color:var(--input-text);font-size:13px;font-family:'Inter',sans-serif;transition:all .3s;}
+        .topbar-search input::placeholder{color:var(--input-placeholder);}
+        .topbar-search input:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+        .topbar-search .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+        .topbar-search .search-icon svg{width:16px;height:16px;}
+        .topbar-search .search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:2px 6px;border-radius:4px;background:var(--glass-bg);border:1px solid var(--border-subtle);font-size:10px;color:var(--text-muted);font-family:'Inter',sans-serif;}
+        .topbar-right{display:flex;align-items:center;gap:8px;}
+        .topbar-btn{width:40px;height:40px;border-radius:12px;background:var(--input-bg);border:1px solid var(--input-border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;color:var(--text-secondary);position:relative;}
+        .topbar-btn:hover{background:var(--glass-bg-hover);border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .topbar-btn svg{width:18px;height:18px;}
+        .topbar-btn .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--bg-primary);}
+
+        .main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:24px 28px 40px;transition:margin-left .4s cubic-bezier(0.16,1,0.3,1);}
+
+        .stat-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;position:relative;overflow:hidden;}
+        .stat-card:hover{border-color:var(--glass-border-hover);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+        .stat-card .stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .stat-card .stat-icon svg{width:20px;height:20px;}
+        .stat-card .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-bottom:4px;}
+        .stat-card .stat-value{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--text-primary);line-height:1.2;}
+        .stat-card .stat-change{font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:9999px;margin-top:6px;}
+        .stat-card .stat-change.up{background:rgba(16,185,129,0.12);color:#34d399;}
+        .stat-card .stat-change.down{background:rgba(239,68,68,0.12);color:#f87171;}
+        .stat-card .stat-change svg{width:12px;height:12px;}
+
+        .chart-card{padding:20px;border-radius:var(--liquid-radius-md);background:var(--dark-glass-bg);backdrop-filter:blur(20px);border:1px solid var(--dark-glass-border);transition:all .3s;}
+        .chart-card:hover{border-color:var(--glass-border-hover);}
+        .chart-card .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .chart-card .chart-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:var(--text-primary);}
+        .chart-card .chart-subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+        .ai-card{padding:18px;border-radius:var(--liquid-radius-md);background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(245,158,11,0.05));border:1px solid rgba(168,85,247,0.15);transition:all .3s;position:relative;overflow:hidden;}
+        .ai-card:hover{border-color:rgba(168,85,247,0.3);transform:translateY(-1px);}
+        .ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--hela-amber));}
+        .ai-card .ai-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;background:rgba(168,85,247,0.15);color:#c084fc;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;}
+        .ai-card .ai-badge .pulse-dot{width:6px;height:6px;border-radius:50%;background:#a855f7;animation:pulse-glow-purple 2s infinite;}
+        .ai-card .ai-title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:6px;line-height:1.4;}
+        .ai-card .ai-desc{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+        .ai-card .ai-action{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 16px;border-radius:10px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.25);color:#c084fc;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;}
+        .ai-card .ai-action:hover{background:rgba(168,85,247,0.25);color:#d8b4fe;}
+
+        .alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:var(--liquid-radius-sm);background:var(--input-bg);border:1px solid var(--input-border);transition:all .25s;cursor:pointer;}
+        .alert-item:hover{border-color:var(--glass-border-hover);background:var(--glass-bg-hover);}
+        .alert-item .alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+        .alert-item .alert-dot.danger{background:var(--danger);box-shadow:0 0 8px rgba(239,68,68,0.4);}
+        .alert-item .alert-dot.warning{background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.4);}
+        .alert-item .alert-dot.info{background:var(--info);box-shadow:0 0 8px rgba(6,182,212,0.4);}
+        .alert-item .alert-title{font-size:13px;font-weight:600;color:var(--text-primary);}
+        .alert-item .alert-desc{font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+        .btn-sm{padding:7px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;border:none;}
+        .btn-primary{background:var(--btn-gradient);border:1px solid rgba(245,158,11,0.3);color:var(--text-primary);box-shadow:0 2px 8px rgba(245,158,11,0.1);}
+        .btn-primary:hover{background:var(--btn-gradient-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,158,11,0.2);}
+        .btn-ghost{background:transparent;border:1px solid var(--border-subtle);color:var(--text-secondary);}
+        .btn-ghost:hover{border-color:var(--glass-border-hover);color:var(--text-primary);background:var(--glass-bg-hover);}
+
+        .upgrade-banner{padding:20px 24px;border-radius:var(--liquid-radius-md);background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(245,158,11,0.08),rgba(16,185,129,0.06));border:1px solid rgba(168,85,247,0.2);position:relative;overflow:hidden;}
+        .upgrade-banner::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,0.15),transparent 70%);pointer-events:none;}
+        .upgrade-btn{padding:10px 24px;border-radius:12px;background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;font-family:'Inter',sans-serif;box-shadow:0 4px 15px rgba(168,85,247,0.3);}
+        .upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(168,85,247,0.4);}
+
+        .page-section{display:none;animation:fadeInPage .4s ease;}
+        .page-section.active{display:block;}
+        @keyframes fadeInPage{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+
+        .data-table{width:100%;border-collapse:separate;border-spacing:0;}
+        .data-table thead th{padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);text-align:left;border-bottom:1px solid var(--border-subtle);background:var(--input-bg);position:sticky;top:0;z-index:2;}
+        .data-table thead th:first-child{border-radius:10px 0 0 0;}
+        .data-table thead th:last-child{border-radius:0 10px 0 0;}
+        .data-table tbody td{padding:12px 14px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border-subtle);}
+        .data-table tbody tr{transition:background .2s;}
+        .data-table tbody tr:hover{background:var(--glass-bg-hover);}
+        .data-table tbody tr:last-child td{border-bottom:none;}
+        .status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:600;}
+        .status-pill.completed{background:rgba(16,185,129,0.12);color:#34d399;}
+        .status-pill.pending{background:rgba(245,158,11,0.12);color:#fbbf24;}
+        .status-pill.failed{background:rgba(239,68,68,0.12);color:#f87171;}
+        .status-pill.active{background:rgba(6,182,212,0.12);color:#22d3ee;}
+
+        .form-input-liquid{background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--liquid-radius-sm);padding:10px 14px;color:var(--input-text);transition:all .3s;width:100%;font-family:'Inter',sans-serif;font-size:13px;}
+        .form-input-liquid::placeholder{color:var(--input-placeholder);}
+        .form-input-liquid:focus{outline:none;border-color:var(--input-focus-border);box-shadow:var(--input-focus-shadow);}
+
+        .filter-chip{padding:6px 14px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-secondary);}
+        .filter-chip:hover{border-color:var(--glass-border-hover);color:var(--text-primary);}
+        .filter-chip.active{background:var(--btn-gradient);border-color:rgba(245,158,11,0.3);color:var(--text-primary);}
+
+        .sim-slider{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--input-border);outline:none;transition:all .3s;}
+        .sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#10b981);cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.3);transition:all .2s;}
+        .sim-slider::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 3px 12px rgba(245,158,11,0.4);}
+
+        @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
+        @keyframes pulse-glow-purple{0%,100%{box-shadow:0 0 0 0 rgba(168,85,247,0.5)}50%{box-shadow:0 0 0 6px rgba(168,85,247,0)}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes fadeInUp{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes scaleIn{0%{opacity:0;transform:scale(0.92)}100%{opacity:1;transform:scale(1)}}
+
+        .toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+        .toast-item{padding:14px 20px;border-radius:var(--liquid-radius-sm);backdrop-filter:blur(20px);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(0.16,1,0.3,1);max-width:360px;display:flex;align-items:center;gap:10px;}
+        .toast-item.show{transform:translateX(0);opacity:1;}
+        .toast-item.success{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);}
+        .toast-item.error{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);}
+        .toast-item.info{background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);}
+        .toast-item svg{width:18px;height:18px;flex-shrink:0;}
+        .toast-item span{font-size:13px;font-weight:500;color:var(--text-primary);}
+
+        .notif-panel{position:fixed;top:var(--topbar-h);right:0;width:380px;max-height:calc(100vh - var(--topbar-h));background:var(--bg-secondary);border-left:1px solid var(--border-subtle);z-index:35;transform:translateX(100%);transition:transform .35s cubic-bezier(0.16,1,0.3,1);overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,0.3);}
+        .notif-panel.open{transform:translateX(0);}
+
+        .sidebar-toggle{display:none;position:fixed;bottom:24px;left:24px;z-index:50;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#10b981);border:none;color:#fff;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.3);align-items:center;justify-content:center;transition:all .3s;}
+        .sidebar-toggle:hover{transform:scale(1.05);box-shadow:0 6px 28px rgba(245,158,11,0.4);}
+        .sidebar-toggle svg{width:22px;height:22px;}
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;backdrop-filter:blur(4px);}
+
+        /* ── Financial Page Specific ── */
+        .fin-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;}
+        .fin-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;grid-column:1/-1;}
+        .fin-chart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;}
+        .fin-insight-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);}
+        .fin-insight-item:last-child{border-bottom:none;}
+        .fin-insight-num{width:22px;height:22px;border-radius:6px;background:rgba(168,85,247,0.15);color:#c084fc;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+        .fin-insight-text{font-size:12px;color:var(--text-secondary);line-height:1.55;flex:1;}
+        .fin-insight-text strong{color:var(--text-primary);}
+        .fin-insight-value{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;margin-left:6px;align-self:center;}
+        .fin-insight-value.positive{color:var(--hela-emerald);}
+        .fin-insight-value.negative{color:var(--danger);}
+        .fin-kpi-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-subtle);}
+        .fin-kpi-row:last-child{border-bottom:none;}
+        .fin-kpi-label{font-size:12px;color:var(--text-muted);}
+        .fin-kpi-value{font-size:13px;font-weight:600;color:var(--text-primary);}
+        .fin-kpi-value.up{color:var(--hela-emerald);}
+        .fin-kpi-value.down{color:var(--danger);}
+        .fin-kpi-value.neutral{color:var(--hela-amber);}
+        .risk-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:9999px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;}
+        .risk-badge.low{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.2);}
+        .risk-badge.medium{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+        .risk-badge.high{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+        .expense-legend-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;}
+        .expense-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+        .expense-legend-label{font-size:11px;color:var(--text-secondary);flex:1;margin-left:8px;}
+        .expense-legend-val{font-size:11px;font-weight:600;color:var(--text-primary);}
+        .cash-flow-bar{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-subtle);}
+        .cash-flow-bar:last-child{border-bottom:none;}
+        .cf-bar-label{font-size:12px;color:var(--text-muted);width:80px;flex-shrink:0;}
+        .cf-bar-track{flex:1;height:8px;border-radius:4px;background:var(--input-border);overflow:hidden;position:relative;}
+        .cf-bar-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(0.16,1,0.3,1);}
+        .cf-bar-val{font-size:12px;font-weight:600;color:var(--text-primary);width:80px;text-align:right;flex-shrink:0;}
+
+        @media(max-width:1024px){
+            .sidebar{transform:translateX(-100%);}.sidebar.open{transform:translateX(0);}
+            .topbar{left:0;}.main-content{margin-left:0;}
+            .sidebar-toggle{display:flex;}.sidebar-overlay.show{display:block;}
+            .fin-layout{grid-template-columns:1fr;}.fin-stat-grid{grid-template-columns:repeat(2,1fr);}
+            .fin-chart-grid{grid-template-columns:1fr;}
+        }
+        @media(max-width:768px){
+            .topbar-search{display:none;}.topbar{padding:0 16px;}.notif-panel{width:100%;}
+            .main-content{padding:16px;}.fin-stat-grid{grid-template-columns:1fr 1fr;}
+        }
+        @media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+
+    <!-- ═══════════════ SIDEBAR ═══════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+            <div><div class="font-display font-bold text-base tracking-tight" style="color:var(--text-primary)">Hela<span style="color:var(--hela-amber)">core</span></div><div style="font-size:10px;color:var(--text-muted);margin-top:-1px;">AI Business Advisor</div></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item " data-page="dashboard" onclick="switchPage('dashboard',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-2a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg></span>Dashboard</a>
+            <a class="nav-item" href="money dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>HelaCore Money</a>
+            <a class="nav-item " href="ask hela dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></span>Ask Hela</a>
+<a class="nav-item" href="helaone dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a6 6 0 110 12 6 6 0 010-12zm0 3a3 3 0 100 6 3 3 0 000-6z"/></svg></span>HelaOne</a>
+<a class="nav-item" href="helabank dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M4 21V10m4 11V10m4 11V10m4 11V10m4 11V10M2 10l10-7 10 7M6 6V4h4v2"/></svg></span>HelaBank</a>
+            <a class="nav-item " href="ai studio dashboard.html" data-page="ai studio dashboard.html" onclick="switchPage('ai studio dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></span>AI Studio</a>
+            <a class="nav-item" href="ai agents dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></span>AI Agents</a>
+<a class="nav-item" href="projects dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></span>Projects</a>
+            <a class="nav-item active" data-page="financial" onclick="switchPage('financial',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Financial Overview</a>
+            <a class="nav-item " data-page="transactions" onclick="switchPage('transactions',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></span>Transactions</a>
+            <div class="nav-section-label" style="margin-top:8px;">Operations</div>
+            <a class="nav-item " data-page="inventory" onclick="switchPage('inventory',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></span>Inventory<span class="nav-badge count">3</span></a>
+            <a class="nav-item" href="customers dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Customers</a>
+            <a class="nav-item " data-page="loans" onclick="switchPage('loans',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></span>Loans & Financing</a>
+            <div class="nav-section-label" style="margin-top:8px;">Intelligence</div>
+            <a class="nav-item " data-page="simulations" onclick="switchPage('simulations',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></span>AI Simulations</a>
+            <a class="nav-item " data-page="market" onclick="switchPage('market',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Market Intelligence</a>
+            <a class="nav-item " data-page="opportunities" onclick="switchPage('opportunities',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></span>Opportunities</a>
+            <a class="nav-item " data-page="reports" onclick="switchPage('reports',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>Reports</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="settings dashboard.html" data-page="dashboard.html" onclick="switchPage('dashboard.html',this)"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span>Settings</a>
+            <a class="nav-item" href="help center dashboard.html"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>Help Center</a>
+            <a class="nav-item" onclick="HelacoreAuth.handleLogout()" style="color:#f87171;"><span class="nav-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span>Log Out</a>
+            <div class="sidebar-user" style="margin-top:8px;"><div class="avatar" id="sidebarAvatar">?</div><div class="user-info"><div class="user-name" id="sidebarUserName">Loading...</div><div class="user-role" id="sidebarUserRole">Business Owner</div></div></div>
+        </div>
+    </aside>
+
+    <!-- ═══════════════ TOPBAR ═══════════════ -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left"><h1 id="page-title">Financial Overview <span>Income & Expenses</span></h1></div>
+        <div class="topbar-search"><span class="search-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span><input type="text" placeholder="Search anything..." id="globalSearch"><span class="search-kbd">Ctrl+K</span></div>
+        <div class="topbar-right">
+            <button class="topbar-btn" onclick="showToast('No new messages','info')" aria-label="Messages"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></button>
+            <button class="topbar-btn" onclick="toggleNotifPanel()" aria-label="Notifications" id="notifBtn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="notif-dot"></span></button>
+            <button class="topbar-btn" onclick="showToast('Settings coming soon','info')" aria-label="Settings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+            <div class="topbar-avatar" onclick="window.location.href='settings dashboard.html'" style="width:40px;height:40px;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--input-border);transition:all .25s;"><div id="topbarAvatar" style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#10b981);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;border-radius:10px;">?</div></div>
+        </div>
+    </header>
+
+    <!-- ═══════════════ NOTIFICATION PANEL ═══════════════ -->
+    <div class="notif-panel" id="notifPanel">
+        <div style="padding:20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;"><h3 class="font-display font-semibold text-base" style="color:var(--text-primary)">Notifications</h3><button class="btn-ghost btn-sm" onclick="showToast('All read','success');document.querySelector('.notif-dot').style.display='none';">Mark all read</button></div>
+        <div style="padding:12px;">
+            <div class="alert-item" style="margin-bottom:8px;"><span class="alert-dot danger"></span><div style="flex:1;"><div class="alert-title">Low Stock Alert</div><div class="alert-desc">Sugar (5kg) — 8 units remaining</div></div></div>
+            <div class="alert-item" style="margin-bottom:8px;"><span class="alert-dot warning"></span><div style="flex:1;"><div class="alert-title">Payment Due</div><div class="alert-desc">KES 15,000 to Maize Suppliers tomorrow</div></div></div>
+            <div class="alert-item"><span class="alert-dot info"></span><div style="flex:1;"><div class="alert-title">Cash Flow Alert</div><div class="alert-desc">Projected shortfall KES 8,200 in 5 days</div></div></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+    <main class="main-content" id="mainContent">
+
+        <!-- ══════ FINANCIAL OVERVIEW PAGE ══════ -->
+        <section class="page-section active" id="page-financial">
+            <div class="fin-layout">
+
+                <!-- LEFT COLUMN: Charts & Data -->
+                <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+
+                    <!-- Page Header -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <div>
+                            <h2 class="font-display" style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Financial Overview</h2>
+                            <p style="font-size:13px;color:var(--text-secondary);">Complete financial health analysis for <strong style="color:var(--text-primary);">Kamau Fresh Produce</strong></p>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div class="filter-bar" style="display:flex;gap:4px;">
+                                <span class="filter-chip" onclick="setFinRange(this,'7d')">7D</span>
+                                <span class="filter-chip active" onclick="setFinRange(this,'30d')">30D</span>
+                                <span class="filter-chip" onclick="setFinRange(this,'90d')">90D</span>
+                                <span class="filter-chip" onclick="setFinRange(this,'1y')">1Y</span>
+                            </div>
+                            <button class="btn-primary btn-sm" onclick="showToast('Exporting financial report...','success')">Export</button>
+                        </div>
+                    </div>
+
+                    <!-- Stat Cards Row -->
+                    <div class="fin-stat-grid">
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(16,185,129,0.12);"><svg fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                                <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>18%</span>
+                            </div>
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-value" id="statRevenue">KES 96,850</div>
+                            <div class="stat-sub" style="font-size:11px;color:var(--text-muted);margin-top:4px;">vs last period</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(239,68,68,0.12);"><svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg></div>
+                                <span class="stat-change down"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>12%</span>
+                            </div>
+                            <div class="stat-label">Total Expenses</div>
+                            <div class="stat-value" id="statExpenses">KES 54,310</div>
+                            <div class="stat-sub" style="font-size:11px;color:var(--text-muted);margin-top:4px;">vs last period</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(245,158,11,0.12);"><svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                                <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>26%</span>
+                            </div>
+                            <div class="stat-label">Net Profit</div>
+                            <div class="stat-value" style="color:var(--hela-emerald);" id="statProfit">KES 42,540</div>
+                            <div class="stat-sub" style="font-size:11px;color:var(--text-muted);margin-top:4px;">vs last period</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                <div class="stat-icon" style="background:rgba(6,182,212,0.12);"><svg fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+                                <span class="stat-change up"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>2.1%</span>
+                            </div>
+                            <div class="stat-label">Profit Margin</div>
+                            <div class="stat-value" id="statMargin">43.9%</div>
+                            <div class="stat-sub" style="font-size:11px;color:var(--text-muted);margin-top:4px;">improvement this month</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue vs Expense Trend (Line Chart) -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div><div class="chart-title">Revenue vs Expenses</div><div class="chart-subtitle">Monthly trend — Last 6 months</div></div>
+                            <div style="display:flex;gap:12px;align-items:center;">
+                                <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);"><span style="width:10px;height:3px;border-radius:2px;background:#34d399;display:inline-block;"></span>Revenue</span>
+                                <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);"><span style="width:10px;height:3px;border-radius:2px;background:#f87171;display:inline-block;"></span>Expenses</span>
+                                <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);"><span style="width:10px;height:3px;border-radius:2px;background:#fbbf24;display:inline-block;border-style:dashed;border-width:0 0 2px 0;background:none;border-color:#fbbf24;"></span>Profit</span>
+                            </div>
+                        </div>
+                        <canvas id="revenueExpenseChart" height="220"></canvas>
+                    </div>
+
+                    <!-- Bottom Row: Expense Breakdown + Cash Flow -->
+                    <div class="fin-chart-grid">
+                        <!-- Expense Breakdown (Donut) -->
+                        <div class="chart-card">
+                            <div class="chart-header"><div><div class="chart-title">Expense Breakdown</div><div class="chart-subtitle">This month by category</div></div></div>
+                            <div style="display:flex;align-items:center;gap:20px;">
+                                <canvas id="expenseDonutChart" width="200" height="200" style="width:170px;height:170px;flex-shrink:0;"></canvas>
+                                <div style="flex:1;" id="expenseLegend"></div>
+                            </div>
+                        </div>
+
+                        <!-- Cash Flow Breakdown (Horizontal Bars) -->
+                        <div class="chart-card">
+                            <div class="chart-header"><div><div class="chart-title">Cash Flow Breakdown</div><div class="chart-subtitle">By source this month</div></div></div>
+                            <div style="margin-top:4px;">
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label">Sales</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#10b981,#34d399);" data-width="82%"></div></div>
+                                    <span class="cf-bar-val">KES 79,400</span>
+                                </div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label">Services</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#06b6d4,#22d3ee);" data-width="12%"></div></div>
+                                    <span class="cf-bar-val">KES 11,600</span>
+                                </div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label">Other</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#a855f7,#c084fc);" data-width="6%"></div></div>
+                                    <span class="cf-bar-val">KES 5,850</span>
+                                </div>
+                                <div style="height:1px;background:var(--border-subtle);margin:10px 0;"></div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label" style="color:var(--danger);">Inventory</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#ef4444,#f87171);" data-width="45%"></div></div>
+                                    <span class="cf-bar-val" style="color:var(--danger);">-KES 24,400</span>
+                                </div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label" style="color:var(--danger);">Operations</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#ef4444,#f87171);" data-width="30%"></div></div>
+                                    <span class="cf-bar-val" style="color:var(--danger);">-KES 16,200</span>
+                                </div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label" style="color:var(--danger);">Payroll</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#ef4444,#f87171);" data-width="22%"></div></div>
+                                    <span class="cf-bar-val" style="color:var(--danger);">-KES 12,000</span>
+                                </div>
+                                <div class="cash-flow-bar">
+                                    <span class="cf-bar-label" style="color:var(--danger);">Rent</span>
+                                    <div class="cf-bar-track"><div class="cf-bar-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,#fbbf24);" data-width="3%"></div></div>
+                                    <span class="cf-bar-val" style="color:var(--hela-amber);">-KES 1,710</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Comparison (Bar Chart) -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div><div class="chart-title">Monthly Profit Comparison</div><div class="chart-subtitle">Net profit over 6 months (KES)</div></div>
+                            <span class="risk-badge low" style="font-size:10px;">Trending Up</span>
+                        </div>
+                        <canvas id="profitBarChart" height="180"></canvas>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: AI Insights & KPIs -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+
+                    <!-- AI Financial Insight -->
+                    <div class="ai-card">
+                        <div class="ai-badge"><span class="pulse-dot"></span> AI Financial Insight</div>
+                        <div class="ai-title">4 Actions to Increase Profit by KES 15,700/mo</div>
+                        <div style="margin-top:12px;">
+                            <div class="fin-insight-item">
+                                <div class="fin-insight-num">1</div>
+                                <div class="fin-insight-text"><strong>Optimize inventory ordering</strong> — Bulk purchasing for maize flour saves KES 800/month</div>
+                                <span class="fin-insight-value positive">+KES 9,600/yr</span>
+                            </div>
+                            <div class="fin-insight-item">
+                                <div class="fin-insight-num">2</div>
+                                <div class="fin-insight-text"><strong>Add premium beverages</strong> — 35% margin vs current 22% average</div>
+                                <span class="fin-insight-value positive">+KES 3,200/mo</span>
+                            </div>
+                            <div class="fin-insight-item">
+                                <div class="fin-insight-num">3</div>
+                                <div class="fin-insight-text"><strong>Reduce weekend waste</strong> — 18% spoilage on Sundays, adjust Friday orders</div>
+                                <span class="fin-insight-value positive">+KES 1,500/mo</span>
+                            </div>
+                            <div class="fin-insight-item">
+                                <div class="fin-insight-num">4</div>
+                                <div class="fin-insight-text"><strong>Renegotiate rent</strong> — Market rate is KES 12K, you pay KES 15K</div>
+                                <span class="fin-insight-value positive">+KES 3,000/mo</span>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(16,185,129,0.06);border-top:1px solid rgba(16,185,129,0.15);margin-top:4px;border-radius:0 0 var(--liquid-radius-md) var(--liquid-radius-md);">
+                            <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">Total Potential</span>
+                            <span style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:var(--hela-emerald);">KES 15,700/mo</span>
+                        </div>
+                        <button class="ai-action" onclick="showToast('Opening detailed action plan...','info')" style="margin-top:10px;width:100%;justify-content:center;">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            View Full Action Plan
+                        </button>
+                    </div>
+
+                    <!-- Key Financial KPIs -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            Key Metrics
+                        </div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Gross Margin</span><span class="fin-kpi-value up">56.1%</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Operating Margin</span><span class="fin-kpi-value up">43.9%</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">EBITDA</span><span class="fin-kpi-value up">KES 48,200</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Current Ratio</span><span class="fin-kpi-value neutral">1.82x</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Debt-to-Equity</span><span class="fin-kpi-value up">0.24</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Days Receivable</span><span class="fin-kpi-value neutral">12 days</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Burn Rate</span><span class="fin-kpi-value down">KES 1,810/day</span></div>
+                        <div class="fin-kpi-row"><span class="fin-kpi-label">Runway</span><span class="fin-kpi-value up">23.6 months</span></div>
+                    </div>
+
+                    <!-- Expense Alerts -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                            Expense Alerts
+                        </div>
+                        <div class="alert-item" style="margin-bottom:8px;"><span class="alert-dot danger"></span><div style="flex:1;min-width:0;"><div class="alert-title">Inventory costs up 12%</div><div class="alert-desc">Supplier price increases driving this. Consider alternatives.</div></div></div>
+                        <div class="alert-item" style="margin-bottom:8px;"><span class="alert-dot warning"></span><div style="flex:1;min-width:0;"><div class="alert-title">Operations 8% above budget</div><div class="alert-desc">Utilities and transport costs exceeding targets.</div></div></div>
+                        <div class="alert-item"><span class="alert-dot info"></span><div style="flex:1;min-width:0;"><div class="alert-title">Payroll on target</div><div class="alert-desc">No changes from projected KES 12,000.</div></div></div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="chart-card" style="padding:16px 18px;">
+                        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                            <svg width="15" height="15" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Quick Actions
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <button class="btn-primary btn-sm" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;justify-content:center;" onclick="showToast('Generating P&L report...','info')">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Generate P&L Report
+                            </button>
+                            <button class="btn-ghost btn-sm" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;justify-content:center;" onclick="showToast('Opening budget planner...','info')">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Budget Planner
+                            </button>
+                            <button class="btn-ghost btn-sm" style="width:100%;text-align:left;display:flex;align-items:center;gap:8px;justify-content:center;" onclick="switchPage('simulations',document.querySelector('[data-page=simulations]'))">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                Run Financial Simulation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════ OTHER PAGES (stubs) ══════ -->
+        <section class="page-section" id="page-dashboard"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-2a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Dashboard</h2><p style="color:var(--text-muted);font-size:14px;">Main overview with health score, cash flow, AI recommendations, and opportunities.</p></div></section>
+        <section class="page-section" id="page-ai-advisor"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">AI Advisor</h2><p style="color:var(--text-muted);font-size:14px;">Your personal AI business consultant with profit recommendations and loan analysis.</p></div></section>
+        <section class="page-section" id="page-transactions"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(6,182,212,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Transactions</h2><p style="color:var(--text-muted);font-size:14px;">Full transaction history with filters, search, and CSV export.</p></div></section>
+        <section class="page-section" id="page-inventory"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Inventory</h2><p style="color:var(--text-muted);font-size:14px;">Stock levels and AI-powered restock recommendations.</p></div></section>
+        <section class="page-section" id="page-customers"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(236,72,153,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#f472b6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Customers</h2><p style="color:var(--text-muted);font-size:14px;">Customer relationship management.</p></div></section>
+        <section class="page-section" id="page-loans"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Loans & Financing</h2><p style="color:var(--text-muted);font-size:14px;">Manage loans and repayment scenarios.</p></div></section>
+        <section class="page-section" id="page-simulations"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(6,182,212,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">AI Simulations</h2><p style="color:var(--text-muted);font-size:14px;">What-if scenarios for pricing, hiring, and expansion.</p></div></section>
+        <section class="page-section" id="page-market"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Market Intelligence</h2><p style="color:var(--text-muted);font-size:14px;">Commodity prices and AI predictions.</p></div></section>
+        <section class="page-section" id="page-opportunities"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Opportunities</h2><p style="color:var(--text-muted);font-size:14px;">Funding, grants, and market opportunities.</p></div></section>
+        <section class="page-section" id="page-reports"><div style="text-align:center;padding:80px 20px;"><div style="width:64px;height:64px;border-radius:16px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="28" height="28" fill="none" stroke="#c084fc" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><h2 class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px;">Reports</h2><p style="color:var(--text-muted);font-size:14px;">Generate and download business reports.</p></div></section>
+    </main>
+
+            <script src="theme.js" defer></script>
+<script src="shared-auth.js" defer></script>
+<script src="live-data.js" defer></script>
+<script>
+    /* ═══════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════ */
+    const pageTitles = {
+        'dashboard':['Dashboard','Overview'],'ai-advisor':['AI Advisor','Chat & Insights'],
+        'financial':['Financial Overview','Income & Expenses'],'transactions':['Transactions','All Records'],
+        'inventory':['Inventory','Stock Management'],'customers':['Customers','CRM'],
+        'loans':['Loans & Financing','Borrowing'],'simulations':['AI Simulations','What-If Analysis'],
+        'market':['Market Intelligence','Prices & Trends'],'opportunities':['Opportunities','Funding & Grants'],
+        'reports':['Reports','Generate & Download'],
+    };
+    function switchPage(pageId, navEl){
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const page = document.getElementById('page-'+pageId);
+        if(page) page.classList.add('active');
+        if(navEl) navEl.classList.add('active');
+        const t = pageTitles[pageId] || ['Page',''];
+        document.getElementById('page-title').innerHTML = t[0]+' <span>'+t[1]+'</span>';
+        closeSidebar();
+        document.getElementById('mainContent').scrollTop = 0;
+        if(pageId === 'financial') setTimeout(initFinancialCharts, 60);
+    }
+    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show');}
+    function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
+    let notifOpen=false;
+    function toggleNotifPanel(){notifOpen=!notifOpen;document.getElementById('notifPanel').classList.toggle('open',notifOpen);}
+    document.addEventListener('click',function(e){if(notifOpen&&!document.getElementById('notifPanel').contains(e.target)&&!document.getElementById('notifBtn').contains(e.target)){notifOpen=false;document.getElementById('notifPanel').classList.remove('open');}});
+
+    /* ═══════════════════════════════════════════
+       TOAST
+       ═══════════════════════════════════════════ */
+    function showToast(msg, type='info'){
+        const c=document.getElementById('toastContainer'),t=document.createElement('div');
+        t.className='toast-item '+type;
+        const icons={success:'<svg fill="none" stroke="#34d399" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>',error:'<svg fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>',info:'<svg fill="none" stroke="#fbbf24" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'};
+        t.innerHTML=(icons[type]||icons.info)+'<span>'+msg+'</span>';
+        c.appendChild(t);
+        requestAnimationFrame(()=>{requestAnimationFrame(()=>{t.classList.add('show');});});
+        setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3500);
+    }
+
+    /* ═══════════════════════════════════════════
+       FILTER CHIPS
+       ═══════════════════════════════════════════ */
+    function setFinRange(el, range){
+        el.parentElement.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+        el.classList.add('active');
+        showToast('Switched to '+range+' view','info');
+    }
+
+    /* ═══════════════════════════════════════════
+       CHART DRAWING UTILITIES
+       ═══════════════════════════════════════════ */
+    function getCSS(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+    function drawLineChart(canvasId, labels, datasets, opts={}){
+        const canvas=document.getElementById(canvasId);if(!canvas)return;
+        const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        canvas.width=rect.width*dpr;canvas.height=(opts.height||rect.height)*dpr;
+        ctx.scale(dpr,dpr);
+        const w=rect.width,h=opts.height||rect.height;
+        const pad={t:24,r:20,b:32,l:56},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+        const allVals=datasets.flatMap(d=>d.data);
+        let maxV=Math.max(...allVals)*1.12,minV=0;
+        const range=maxV-minV||1;
+        ctx.strokeStyle=getCSS('--chart-grid')||'rgba(255,255,255,0.05)';ctx.lineWidth=1;
+        for(let i=0;i<=5;i++){
+            const y=pad.t+(ch/5)*i;
+            ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+            ctx.fillStyle=getCSS('--text-muted')||'#71717a';ctx.font='10px Inter';ctx.textAlign='right';
+            ctx.fillText('KES '+Math.round(maxV-(range/5)*i/1000)+'K',pad.l-6,y+3);
+        }
+        ctx.textAlign='center';ctx.fillStyle=getCSS('--text-muted')||'#71717a';
+        labels.forEach((l,i)=>{ctx.fillText(l,pad.l+(cw/(labels.length-1||1))*i,h-6);});
+        datasets.forEach(ds=>{
+            if(ds.dashed){
+                ctx.setLineDash([6,4]);
+            } else {
+                ctx.setLineDash([]);
+            }
+            ctx.beginPath();ctx.strokeStyle=ds.color;ctx.lineWidth=ds.lineWidth||2.5;ctx.lineJoin='round';ctx.lineCap='round';
+            ds.data.forEach((v,i)=>{
+                const x=pad.l+(cw/(ds.data.length-1||1))*i,y=pad.t+ch-((v-minV)/range)*ch;
+                i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+            });
+            ctx.stroke();
+            if(ds.fill!==false){
+                const lastI=ds.data.length-1,lastX=pad.l+(cw/lastI)*lastI;
+                ctx.lineTo(lastX,pad.t+ch);ctx.lineTo(pad.l,pad.t+ch);ctx.closePath();
+                const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+                grad.addColorStop(0,ds.fillColor||'rgba(245,158,11,0.15)');
+                grad.addColorStop(1,'rgba(0,0,0,0)');
+                ctx.fillStyle=grad;ctx.fill();
+            }
+            if(ds.dots!==false){
+                ds.data.forEach((v,i)=>{
+                    const x=pad.l+(cw/(ds.data.length-1||1))*i,y=pad.t+ch-((v-minV)/range)*ch;
+                    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=ds.color;ctx.fill();
+                    ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fillStyle=getCSS('--bg-primary')||'#050507';ctx.fill();
+                });
+            }
+            ctx.setLineDash([]);
+        });
+    }
+
+    function drawDonutChart(canvasId, data, colors){
+        const canvas=document.getElementById(canvasId);if(!canvas)return;
+        const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1,size=200;
+        canvas.width=size*dpr;canvas.height=size*dpr;
+        canvas.style.width=size+'px';canvas.style.height=size+'px';
+        ctx.scale(dpr,dpr);
+        const cx=size/2,cy=size/2,r=80,inner=52;
+        const total=data.reduce((a,d)=>a+d.value,0);
+        let startAngle=-Math.PI/2;
+        data.forEach((d,i)=>{
+            const slice=(d.value/total)*Math.PI*2;
+            ctx.beginPath();ctx.arc(cx,cy,r,startAngle,startAngle+slice);ctx.arc(cx,cy,inner,startAngle+slice,startAngle,true);ctx.closePath();
+            ctx.fillStyle=colors[i]||'#f59e0b';ctx.fill();
+            startAngle+=slice;
+        });
+        ctx.fillStyle=getCSS('--text-primary')||'#fff';ctx.font='bold 16px Space Grotesk';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('KES '+Math.round(total/1000)+'K',cx,cy-6);
+        ctx.fillStyle=getCSS('--text-muted')||'#71717a';ctx.font='10px Inter';ctx.fillText('Total',cx,cy+10);
+    }
+
+    function drawBarChart(canvasId, labels, datasets, opts={}){
+        const canvas=document.getElementById(canvasId);if(!canvas)return;
+        const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+        const h=opts.height||rect.height;
+        canvas.width=rect.width*dpr;canvas.height=h*dpr;ctx.scale(dpr,dpr);
+        const w=rect.width;
+        const pad={t:20,r:20,b:32,l:56},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+        const allVals=datasets.flatMap(d=>d.data);
+        let maxV=Math.max(...allVals)*1.15;if(maxV<=0)maxV=100;
+        ctx.strokeStyle=getCSS('--chart-grid')||'rgba(255,255,255,0.05)';ctx.lineWidth=1;
+        for(let i=0;i<=4;i++){
+            const y=pad.t+(ch/4)*i;
+            ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+            ctx.fillStyle=getCSS('--text-muted')||'#71717a';ctx.font='10px Inter';ctx.textAlign='right';
+            ctx.fillText('KES '+Math.round(maxV-(maxV/4)*i/1000)+'K',pad.l-6,y+3);
+        }
+        ctx.textAlign='center';ctx.fillStyle=getCSS('--text-muted')||'#71717a';
+        const groupW=cw/labels.length,barW=Math.min(groupW/datasets.length*0.6,32);
+        labels.forEach((l,li)=>{
+            const gx=pad.l+groupW*li+groupW/2;ctx.fillText(l,gx,h-6);
+            datasets.forEach((ds,di)=>{
+                const bx=gx-(datasets.length*barW)/2+di*barW+barW*0.12;
+                const bh=(ds.data[li]/maxV)*ch,by=pad.t+ch-bh;
+                ctx.fillStyle=ds.color;
+                const radius=Math.min(5,barW*0.15);
+                ctx.beginPath();ctx.moveTo(bx+radius,by);ctx.lineTo(bx+barW*0.76-radius,by);
+                ctx.quadraticCurveTo(bx+barW*0.76,by,bx+barW*0.76,by+radius);
+                ctx.lineTo(bx+barW*0.76,pad.t+ch);ctx.lineTo(bx,pad.t+ch);ctx.lineTo(bx,by+radius);
+                ctx.quadraticCurveTo(bx,by,bx+radius,by);ctx.fill();
+                // Value label on top
+                if(ds.showValues){
+                    ctx.fillStyle=ds.color;ctx.font='bold 10px Space Grotesk';ctx.textAlign='center';
+                    ctx.fillText('KES '+(ds.data[li]/1000).toFixed(1)+'K',bx+barW*0.38,by-6);
+                }
+            });
+        });
+    }
+
+    /* ═══════════════════════════════════════════
+       FINANCIAL CHARTS INITIALIZATION
+       ═══════════════════════════════════════════ */
+    const donutColors = ['rgba(239,68,68,0.85)','rgba(245,158,11,0.85)','rgba(6,182,212,0.85)','rgba(168,85,247,0.85)','rgba(16,185,129,0.85)'];
+    let finChartsInit = false;
+    function initFinancialCharts(){
+        if(finChartsInit) return;
+        finChartsInit = true;
+
+        /* Live data (HelacoreLive) when available, else static demo series */
+        const L = window.HelacoreLive;
+        const live = (L && L.series) ? L.series() : null;
+        const labels = live ? live.labels : ['Feb','Mar','Apr','May','Jun','Jul'];
+        const revSeries = live ? live.revenue : [72000,79500,84200,88400,92100,96850];
+        const expSeries = live ? live.expenses : [48000,50200,51800,52400,53600,54310];
+        const profitSeries = live ? live.profit : [24000,29300,32400,36000,38500,42540];
+
+        // Revenue vs Expense Line Chart
+        drawLineChart('revenueExpenseChart',
+            labels,
+            [
+                {data:revSeries,color:'rgba(52,211,153,0.9)',fillColor:'rgba(52,211,153,0.12)',lineWidth:2.5},
+                {data:expSeries,color:'rgba(248,113,113,0.9)',fillColor:'rgba(248,113,113,0.06)',lineWidth:2.5},
+                {data:profitSeries,color:'rgba(251,191,36,0.8)',fillColor:'rgba(251,191,36,0.05)',lineWidth:2,dashed:true,dots:false}
+            ],
+            {height:220}
+        );
+
+        // Expense Donut — live expense split when available
+        let expData;
+        if (L && L.expenseSplit) {
+            const split = L.expenseSplit();
+            const byLabel = {};
+            split.forEach(function(s){ byLabel[s.label] = s.value; });
+            expData = [
+                {value:byLabel['Inventory']||0,label:'Inventory'},
+                {value:byLabel['Operations']||0,label:'Operations'},
+                {value:byLabel['Payroll']||0,label:'Payroll'},
+                {value:byLabel['Rent']||0,label:'Rent'},
+                {value:byLabel['Utilities & Other']||0,label:'Utilities & Other'}
+            ];
+        } else {
+            expData = [
+                {value:24400,label:'Inventory'},
+                {value:16200,label:'Operations'},
+                {value:12000,label:'Payroll'},
+                {value:15000,label:'Rent'},
+                {value:6710,label:'Utilities & Other'}
+            ];
+        }
+        drawDonutChart('expenseDonutChart', expData, donutColors);
+
+        // Expense Legend
+        const legendEl = document.getElementById('expenseLegend');
+        legendEl.innerHTML = expData.map((d,i)=>`
+            <div class="expense-legend-item">
+                <span class="expense-legend-dot" style="background:${donutColors[i]};"></span>
+                <span class="expense-legend-label">${d.label}</span>
+                <span class="expense-legend-val">KES ${(d.value/1000).toFixed(1)}K</span>
+            </div>`).join('');
+
+        // Profit Bar Chart
+        drawBarChart('profitBarChart',
+            labels,
+            [{data:profitSeries,color:'rgba(52,211,153,0.8)',showValues:true}],
+            {height:180}
+        );
+
+        // Animate cash flow bars
+        setTimeout(()=>{
+            document.querySelectorAll('.cf-bar-fill').forEach(bar=>{
+                bar.style.width = bar.dataset.width;
+            });
+        }, 200);
+    }
+
+    /* ===== LIVE DATA (from live-data.js) ===== */
+    function populateLiveData() {
+        const L = window.HelacoreLive;
+        if (!L || !L.financials) return;
+        const f = L.financials();
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('statRevenue', L.fmt(f.revenue));
+        set('statExpenses', L.fmt(f.expenses));
+        set('statProfit', L.fmt(f.profit));
+        set('statMargin', f.revenue ? Math.round(f.profit / f.revenue * 100) + '%' : '0%');
+
+        /* Scale cash-flow bars onto live revenue/expenses */
+        const staticIn = 96850, staticOut = 54310;
+        const ki = f.revenue ? f.revenue / staticIn : 0;
+        const ke = f.expenses ? f.expenses / staticOut : 0;
+        const bars = document.querySelectorAll('.cash-flow-bar');
+        bars.forEach(bar => {
+            const fill = bar.querySelector('.cf-bar-fill');
+            const val = bar.querySelector('.cf-bar-val');
+            if (!fill || !val) return;
+            const isOut = val.textContent.indexOf('-') === 0;
+            const k = isOut ? ke : ki;
+            const raw = parseFloat(val.textContent.replace(/[^0-9.]/g, '')) || 0;
+            const scaled = Math.round(raw * k);
+            val.textContent = (isOut ? '-KES ' : 'KES ') + scaled.toLocaleString();
+        });
+
+        /* Re-draw charts with live data (charts init once; force re-init) */
+        finChartsInit = false;
+        initFinancialCharts();
+    }
+
+    // Initialize on load since financial is the active page
+    setTimeout(initFinancialCharts, 100);
+
+    /* ═══════════════════════════════════════════
+       KEYBOARD SHORTCUTS
+       ═══════════════════════════════════════════ */
+    document.addEventListener('keydown',function(e){
+        if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('globalSearch').focus();}
+        if(e.key==='Escape'){closeSidebar();if(notifOpen){notifOpen=false;document.getElementById('notifPanel').classList.remove('open');}}
+    });
+    
+    /* ===== USER DATA (from shared-auth.js) ===== */
+    function populateUser() {
+        const A = HelacoreAuth;
+        const nameEl = document.getElementById('sidebarUserName');
+        const roleEl = document.getElementById('sidebarUserRole');
+        const avEl = document.getElementById('sidebarAvatar');
+        const topAvEl = document.getElementById('topbarAvatar');
+        if (nameEl) nameEl.textContent = A.fullName();
+        if (roleEl) roleEl.textContent = A.getVal('role','role') || 'Business Owner';
+        if (avEl) avEl.textContent = A.initials();
+        if (topAvEl) topAvEl.textContent = A.initials();
+    }
+    /* shared-auth.js is a deferred script — it executes after parsing but
+       before DOMContentLoaded, so the auth-gated init must wait for the DOM */
+    document.addEventListener('DOMContentLoaded', function() {
+        HelacoreAuth.init(function() {
+            populateUser();
+            populateLiveData();
+        });
+    });
+</script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - Ecosystem: How AI Features Integrate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-inverse: #09090b;
+            --glass-bg: rgba(255,255,255,0.08); --glass-bg-hover: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.15); --glass-border-hover: rgba(255,255,255,0.25);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.2);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(255,255,255,0.05);
+            --glass-shine: rgba(255,255,255,0.1);
+            --dark-glass-bg: rgba(10,10,15,0.6); --dark-glass-border: rgba(255,255,255,0.1);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --input-focus-border: rgba(245,158,11,0.5); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.1);
+            --input-text: #ffffff; --input-placeholder: #71717a;
+            --border-subtle: rgba(255,255,255,0.1); --border-footer: rgba(255,255,255,0.1);
+            --footer-bg: rgba(0,0,0,0.2); --scrollbar-track: #050507; --scrollbar-thumb: #f59e0b;
+            --canvas-opacity: 0.6;
+            --gradient-text: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+            --chart-grid: rgba(255,255,255,0.05); --chart-line: rgba(245,158,11,0.6); --chart-fill: rgba(245,158,11,0.1);
+            --mobile-menu-bg: rgba(10,10,15,0.95);
+            --social-bg: rgba(255,255,255,0.05); --social-bg-hover: rgba(255,255,255,0.1);
+            --social-icon: #a1a1aa; --social-icon-hover: #ffffff;
+            --nav-hover-bg: rgba(255,255,255,0.1); --stats-bg: rgba(255,255,255,0.05);
+            --tag-bg: rgba(255,255,255,0.1);
+            --tag-text: rgba(255,255,255,0.5);
+        }
+        [data-theme="light"] {
+            --bg-primary: #fafaf9; --bg-secondary: #f5f5f4; --bg-tertiary: #e7e5e4;
+            --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e; --text-inverse: #ffffff;
+            --glass-bg: rgba(255,255,255,0.65); --glass-bg-hover: rgba(255,255,255,0.85);
+            --glass-border: rgba(0,0,0,0.08); --glass-border-hover: rgba(0,0,0,0.15);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.04);
+            --glass-inset-top: inset 0 1px 1px rgba(255,255,255,0.8);
+            --glass-inset-bottom: inset 0 -1px 1px rgba(0,0,0,0.03);
+            --glass-shine: rgba(255,255,255,0.5);
+            --dark-glass-bg: rgba(255,255,255,0.5); --dark-glass-border: rgba(0,0,0,0.08);
+            --dark-glass-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --input-bg: rgba(255,255,255,0.8); --input-border: rgba(0,0,0,0.12);
+            --input-focus-border: rgba(245,158,11,0.6); --input-focus-shadow: 0 0 20px rgba(245,158,11,0.15);
+            --input-text: #1c1917; --input-placeholder: #a8a29e;
+            --border-subtle: rgba(0,0,0,0.08); --border-footer: rgba(0,0,0,0.08);
+            --footer-bg: rgba(245,245,244,0.8); --scrollbar-track: #f5f5f4; --scrollbar-thumb: #d97706;
+            --canvas-opacity: 0.15;
+            --gradient-text: linear-gradient(135deg,#d97706 0%,#059669 50%,#0891b2 100%);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(16,185,129,0.15));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.25),rgba(16,185,129,0.25));
+            --chart-grid: rgba(0,0,0,0.06); --chart-line: rgba(217,119,6,0.7); --chart-fill: rgba(217,119,6,0.08);
+            --mobile-menu-bg: rgba(250,250,249,0.98);
+            --social-bg: rgba(0,0,0,0.05); --social-bg-hover: rgba(0,0,0,0.08);
+            --social-icon: #78716c; --social-icon-hover: #1c1917;
+            --nav-hover-bg: rgba(0,0,0,0.06); --stats-bg: rgba(255,255,255,0.6);
+            --tag-bg: rgba(0,0,0,0.06);
+            --tag-text: rgba(0,0,0,0.45);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; transition:background 0.5s ease,color 0.5s ease; }
+        .font-display { font-family:'Space Grotesk',sans-serif; }
+        .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); box-shadow:var(--glass-shadow),var(--glass-inset-top),var(--glass-inset-bottom); position:relative; overflow:hidden; border-radius:var(--liquid-radius-lg); transition:all 0.4s ease; }
+        [data-theme="light"] .liquid-glass { background:linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.4) 100%); }
+        .liquid-glass::before { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,transparent 100%); border-radius:var(--liquid-radius-lg) var(--liquid-radius-lg) 0 0; pointer-events:none; z-index:1; }
+        [data-theme="light"] .liquid-glass::before { background:linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 100%); }
+        .liquid-glass::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,var(--glass-shine),transparent); transition:left 0.7s ease-out; pointer-events:none; z-index:2; }
+        .liquid-glass:hover::after { left:100%; }
+        .liquid-glass:hover { border-color:var(--glass-border-hover); }
+        .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); border:1px solid var(--dark-glass-border); box-shadow:var(--dark-glass-shadow); border-radius:var(--liquid-radius-md); transition:all 0.3s ease; }
+        [data-theme="light"] .liquid-glass-dark { background:var(--dark-glass-bg); backdrop-filter:blur(20px) saturate(150%); }
+        .btn-liquid { position:relative; overflow:hidden; border-radius:9999px; padding:12px 28px; font-weight:600; background:var(--btn-gradient); border:1px solid rgba(245,158,11,0.3); color:var(--text-primary); transition:all 0.3s ease; box-shadow:0 4px 15px rgba(245,158,11,0.15); cursor:pointer; }
+        [data-theme="light"] .btn-liquid { border:1px solid rgba(217,119,6,0.4); box-shadow:0 4px 15px rgba(217,119,6,0.12); }
+        .btn-liquid:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,158,11,0.3); background:var(--btn-gradient-hover); }
+        [data-theme="light"] .btn-liquid:hover { box-shadow:0 8px 25px rgba(217,119,6,0.2); }
+        .theme-toggle { position:relative; width:44px; height:44px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(10px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s ease; color:var(--text-primary); }
+        .theme-toggle:hover { background:var(--glass-bg-hover); transform:scale(1.05); }
+        .theme-toggle svg { width:20px; height:20px; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+        .theme-toggle:hover svg { transform:rotate(15deg); }
+        [data-theme="light"] .theme-toggle .moon-icon { display:none; }
+        [data-theme="light"] .theme-toggle .sun-icon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun-icon, :root:not([data-theme]) .theme-toggle .sun-icon { display:none; }
+        [data-theme="dark"] .theme-toggle .moon-icon, :root:not([data-theme]) .theme-toggle .moon-icon { display:block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+        @keyframes float-reverse { 0%,100%{transform:translateY(0)} 50%{transform:translateY(15px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,158,11,0)} }
+        @keyframes chart-draw { 0%{stroke-dashoffset:1000} 100%{stroke-dashoffset:0} }
+        @keyframes counter-up { 0%{opacity:0;transform:translateY(20px)} 100%{opacity:1;transform:translateY(0)} }
+        @keyframes data-flow { 0%{transform:translateY(0);opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translateY(100%);opacity:0} }
+        @keyframes orbit-spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        @keyframes node-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+        @keyframes pulse-ring { 0%{transform:scale(1);opacity:0.6} 100%{transform:scale(1.8);opacity:0} }
+        @keyframes flow-dash { 0%{stroke-dashoffset:20} 100%{stroke-dashoffset:0} }
+        @keyframes status-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .animate-float { animation:float 6s ease-in-out infinite; }
+        .animate-float-reverse { animation:float-reverse 7s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s infinite; }
+        .animate-node-breathe { animation:node-breathe 3s ease-in-out infinite; }
+        .gradient-text-hela { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .reveal { opacity:0; transform:translateY(30px); transition:all 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .reveal.active { opacity:1; transform:translateY(0); }
+        .delay-100 { transition-delay:100ms; } .delay-200 { transition-delay:200ms; } .delay-300 { transition-delay:300ms; } .delay-400 { transition-delay:400ms; } .delay-500 { transition-delay:500ms; }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--scrollbar-track); } ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+        .form-input-liquid { background:var(--input-bg); border:1px solid var(--input-border); border-radius:var(--liquid-radius-md); padding:16px 20px; color:var(--input-text); transition:all 0.3s; }
+        .form-input-liquid::placeholder { color:var(--input-placeholder); }
+        .form-input-liquid:focus { outline:none; border-color:var(--input-focus-border); box-shadow:var(--input-focus-shadow); }
+        [data-theme="light"] select.form-input-liquid { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2357534e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; background-size:16px; padding-right:48px; -webkit-appearance:none; appearance:none; }
+        .mobile-menu { transform:translateX(100%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .mobile-menu.open { transform:translateX(0); }
+        .health-meter { background:conic-gradient(from 180deg,#ef4444 0deg,#f59e0b 90deg,#10b981 180deg,#10b981 360deg); border-radius:50%; }
+        .chart-line { stroke-dasharray:1000; animation:chart-draw 2s linear infinite; }
+        .data-stream { position:absolute; width:2px; height:20px; background:linear-gradient(180deg,transparent,var(--hela-amber),transparent); animation:data-flow 3s linear infinite; }
+        .text-theme-primary { color:var(--text-primary); } .text-theme-secondary { color:var(--text-secondary); } .text-theme-muted { color:var(--text-muted); }
+        .bg-theme-primary { background:var(--bg-primary); } .bg-theme-secondary { background:var(--bg-secondary); } .border-theme-subtle { border-color:var(--border-subtle); }
+        #bg-canvas { opacity:var(--canvas-opacity); transition:opacity 0.5s ease; }
+        .ecosystem-node { transition:transform 0.3s ease; }
+        .ecosystem-node:hover { transform:scale(1.15); z-index:10; }
+        .pulse-ring-container::before { content:''; position:absolute; inset:-8px; border-radius:50%; border:2px solid rgba(245,158,11,0.3); animation:pulse-ring 2s ease-out infinite; }
+        .flow-line { stroke-dasharray:5 5; animation:flow-dash 1s linear infinite; }
+        .layer-card { border-left:4px solid transparent; }
+        .layer-amber { border-left-color:#f59e0b; }
+        .layer-emerald { border-left-color:#10b981; }
+        .layer-cyan { border-left-color:#06b6d4; }
+        .layer-purple { border-left-color:#a855f7; }
+        .layer-rose { border-left-color:#f43f5e; }
+        .layer-indigo { border-left-color:#6366f1; }
+        .arch-toggle { cursor:pointer; background:none; border:none; }
+        .tag-pill { font-size:10px; font-weight:500; color:var(--tag-text); background:var(--tag-bg); padding:4px 10px; border-radius:6px; }
+        .status-dot { animation:status-pulse 2s ease-in-out infinite; }
+        .integration-line { stroke:var(--border-subtle); stroke-width:1; stroke-dasharray:4 4; }
+        [data-theme="light"] .integration-line { stroke:var(--border-subtle); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 md:px-6 py-4">
+        <div class="max-w-7xl mx-auto liquid-glass px-6 py-3 flex items-center justify-between" style="border-radius:9999px;">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center animate-pulse-glow">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span class="font-display font-bold text-xl tracking-tight text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="index.html" class="px-4 py-2 rounded-full hover:bg-[var(--nav-hover-bg)] transition-all text-sm font-medium text-theme-primary">Home</a>
+                <a href="features.html" class="px-4 py-2 rounded-full hover:bg-[var(--nav-hover-bg)] transition-all text-sm font-medium text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="px-4 py-2 rounded-full hover:bg-[var(--nav-hover-bg)] transition-all text-sm font-medium text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="px-4 py-2 rounded-full hover:bg-[var(--nav-hover-bg)] transition-all text-sm font-medium text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="px-4 py-2 rounded-full hover:bg-[var(--nav-hover-bg)] transition-all text-sm font-medium text-theme-primary">Impact</a>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
+                <a href="signup.html" class="hidden md:inline-flex btn-liquid text-sm font-semibold">Get Started</a>
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-full hover:bg-[var(--nav-hover-bg)]" aria-label="Open menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="mobile-menu fixed inset-y-0 right-0 w-80 max-w-full liquid-glass-dark z-50 p-6 lg:hidden" style="backdrop-filter:blur(40px);">
+            <div class="flex justify-end mb-8">
+                <button id="close-menu-btn" class="p-2 rounded-full hover:bg-[var(--nav-hover-bg)]" aria-label="Close menu">
+                    <svg class="w-6 h-6 text-theme-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <a href="index.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-[var(--nav-hover-bg)] transition-all text-theme-primary">Home</a>
+                <a href="features.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-[var(--nav-hover-bg)] transition-all text-theme-primary">Features</a>
+                <a href="ai intellligence.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-[var(--nav-hover-bg)] transition-all text-theme-primary">AI intelligence</a>
+                <a href="ecosystem.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-[var(--nav-hover-bg)] transition-all text-theme-primary">Ecosystem</a>
+                <a href="impact.html" class="mobile-nav-link px-4 py-3 rounded-xl hover:bg-[var(--nav-hover-bg)] transition-all text-theme-primary">Impact</a>
+                <a href="signup.html" class="btn-liquid text-center mt-4">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- =============================== HERO SECTION =============================== -->
+    <section id="home" class="min-h-screen relative flex items-center pt-24 pb-16 px-4 md:px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8 reveal active">
+                <div class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm" style="border-radius:9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">Ecosystem Architecture</span>
+                </div>
+
+                <h1 class="font-display text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight text-theme-primary">
+                    Every Feature<br>
+                    <span class="gradient-text-hela">Connected</span><br>
+                    Everything Works
+                </h1>
+
+                <p class="text-lg md:text-xl text-theme-secondary max-w-lg leading-relaxed">
+                    Helacore isn't a collection of isolated tools — it's a living ecosystem where AI intelligence, financial guidance, market data, and voice interfaces feed into each other to create compounding value for every business we serve.
+                </p>
+
+                <div class="flex flex-wrap gap-4">
+                    <a href="#architecture" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Explore Architecture</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </a>
+                    <a href="#live-status" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-[var(--nav-hover-bg)] transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                        <span>Live Status</span>
+                    </a>
+                </div>
+
+                <div class="pt-8 border-t border-theme-subtle">
+                    <p class="text-sm text-theme-muted mb-4">Ecosystem integration metrics</p>
+                    <div class="grid grid-cols-3 gap-6">
+                        <div>
+                            <div class="text-2xl font-bold font-display text-amber-400">6</div>
+                            <div class="text-xs text-theme-muted">Core Modules</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold font-display text-emerald-400">14</div>
+                            <div class="text-xs text-theme-muted">Integration Points</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold font-display text-cyan-400">99.7%</div>
+                            <div class="text-xs text-theme-muted">Sync Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ecosystem Orbital Visualization -->
+            <div class="relative flex items-center justify-center">
+                <div class="relative w-[420px] h-[420px] mx-auto ecosystem-orbit-container">
+                    <!-- Orbit Rings -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[380px] h-[380px] rounded-full border border-theme-subtle" style="animation:orbit-spin 30s linear infinite;"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[280px] h-[280px] rounded-full border border-dashed border-theme-subtle" style="animation:orbit-spin 22s linear infinite reverse;"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-[180px] h-[180px] rounded-full border border-theme-subtle" style="animation:orbit-spin 15s linear infinite;"></div>
+                    </div>
+
+                    <!-- Center: AI Engine -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="relative pulse-ring-container animate-node-breathe">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orbiting Feature Nodes -->
+                    <div class="absolute top-[2%] left-1/2 -translate-x-1/2 ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/30 flex items-center justify-center" id="node-health">
+                            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-[22%] right-[2%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/30 flex items-center justify-center" id="node-simulation">
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[22%] right-[5%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center" id="node-capital">
+                            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[2%] left-1/2 -translate-x-1/2 ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30 flex items-center justify-center" id="node-voice">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-[22%] left-[5%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-400/30 flex items-center justify-center" id="node-market">
+                            <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-[22%] left-[2%] ecosystem-node">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/30 flex items-center justify-center" id="node-marketplace">
+                            <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- SVG Connection Lines -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 420 420" fill="none">
+                        <line x1="210" y1="160" x2="210" y2="55" class="flow-line" stroke="rgba(245,158,11,0.2)" stroke-width="1.5"/>
+                        <line x1="260" y1="170" x2="365" y2="118" class="flow-line" stroke="rgba(16,185,129,0.2)" stroke-width="1.5"/>
+                        <line x1="260" y1="250" x2="355" y2="300" class="flow-line" stroke="rgba(6,182,212,0.2)" stroke-width="1.5"/>
+                        <line x1="210" y1="260" x2="210" y2="365" class="flow-line" stroke="rgba(168,85,247,0.2)" stroke-width="1.5"/>
+                        <line x1="160" y1="250" x2="65" y2="300" class="flow-line" stroke="rgba(244,63,94,0.2)" stroke-width="1.5"/>
+                        <line x1="160" y1="170" x2="55" y2="118" class="flow-line" stroke="rgba(99,102,241,0.2)" stroke-width="1.5"/>
+                        <!-- Cross connections -->
+                        <line x1="350" y1="140" x2="350" y2="290" class="flow-line" stroke="rgba(245,158,11,0.04)" stroke-width="1"/>
+                        <line x1="70" y1="140" x2="70" y2="290" class="flow-line" stroke="rgba(245,158,11,0.04)" stroke-width="1"/>
+                    </svg>
+
+                    <!-- Tooltip -->
+                    <div id="node-tooltip" class="absolute hidden liquid-glass-dark px-4 py-2 text-xs font-medium text-amber-400 pointer-events-none z-20 whitespace-nowrap border border-amber-400/20" style="border-radius:12px;"></div>
+                </div>
+
+                <!-- Floating Stats -->
+                <div class="absolute -bottom-4 -left-4 liquid-glass p-4 animate-float-reverse" style="border-radius:var(--liquid-radius-xl);">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold font-display text-theme-primary">14</p>
+                            <p class="text-xs text-theme-muted">Active Integrations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute -top-4 -right-4 liquid-glass p-4 animate-float" style="animation-delay:1.5s;border-radius:var(--liquid-radius-xl);">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold font-display text-theme-primary">94%</p>
+                            <p class="text-xs text-theme-muted">Sync Accuracy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== ARCHITECTURE LAYERS =============================== -->
+    <section id="architecture" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius:9999px;">
+                    <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">System Architecture</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">How <span class="gradient-text-hela">Everything Connects</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">The Helacore ecosystem is built in integrated layers — each feature doesn't just work alone, it feeds data into and draws intelligence from every other layer.</p>
+            </div>
+
+            <!-- Architecture Layer Cards -->
+            <div class="space-y-5">
+                <!-- Layer 1: Data Ingestion -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-amber reveal group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">Data Ingestion Layer</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full">Foundation</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">Every interaction — a voice command in Swahili, a manual expense entry, an SMS transaction alert — feeds into the unified data pipeline. The Financial Health Score, What-If Engine, and Market Intelligence all draw from this single source of truth.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag-pill">Voice Input</span>
+                                <span class="tag-pill">SMS Parsing</span>
+                                <span class="tag-pill">Manual Entry</span>
+                                <span class="tag-pill">M-Pesa Hooks</span>
+                                <span class="tag-pill">Bank Sync</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-amber-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer1-details">
+                                View data flow
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer1-details" class="hidden mt-5 pt-5 border-t border-theme-subtle">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-amber-400 font-display mb-1">2.4M+</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Data Points / Day</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">&lt; 200ms</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Ingestion Latency</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">AES-256</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Encryption</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 2: AI Decision Engine -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-emerald reveal delay-100 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">AI Decision Engine</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full">Core</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">The brain of the ecosystem. Receives processed data from the ingestion layer, applies predictive analytics and behavioral modeling, then outputs personalized guidance. It powers both the Financial Health Score calculations and the What-If Simulation scenarios simultaneously.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag-pill">Predictive Analytics</span>
+                                <span class="tag-pill">Behavioral Modeling</span>
+                                <span class="tag-pill">Context Analysis</span>
+                                <span class="tag-pill">Adaptive Learning</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-emerald-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer2-details">
+                                View processing metrics
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer2-details" class="hidden mt-5 pt-5 border-t border-theme-subtle">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-emerald-400 font-display mb-1">94%</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Prediction Accuracy</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">1.2s</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Avg Response Time</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">Continuous</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Learning Loop</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 3: Intelligence Output -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-cyan reveal delay-200 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">Intelligence Output Layer</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-cyan-400 bg-cyan-400/10 px-2.5 py-1 rounded-full">Delivery</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">The AI Engine's outputs are distributed across three channels simultaneously: the Financial Health Score dashboard, the What-If Simulation results, and Smart Capital Allocation recommendations. All three stay in perfect sync — a simulation that changes your inventory strategy automatically updates your health score and capital allocation.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag-pill">Health Score</span>
+                                <span class="tag-pill">Simulation Results</span>
+                                <span class="tag-pill">Capital Advice</span>
+                                <span class="tag-pill">Market Alerts</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-cyan-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer3-details">
+                                View output channels
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer3-details" class="hidden mt-5 pt-5 border-t border-theme-subtle">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-cyan-400 font-display mb-1">3-Way</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Sync Broadcast</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">Real-time</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Propagation</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">Zero</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Stale Data</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 4: Voice & Accessibility -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-purple reveal delay-300 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">Voice & Accessibility Interface</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-purple-400 bg-purple-400/10 px-2.5 py-1 rounded-full">Access</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">The multilingual voice interface isn't just an input method — it's a bidirectional bridge. When a farmer speaks in Swahili about their harvest, the NLP engine parses intent, feeds it to the AI Engine, and the response is delivered back as spoken guidance. This same input enriches the Market Intelligence Network with anonymized agricultural data.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag-pill">Swahili NLP</span>
+                                <span class="tag-pill">English NLP</span>
+                                <span class="tag-pill">Text-to-Speech</span>
+                                <span class="tag-pill">Intent Parsing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 5: Market Intelligence Network -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-rose reveal delay-400 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/20 to-red-500/20 border border-rose-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">Market Intelligence Network</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-rose-400 bg-rose-400/10 px-2.5 py-1 rounded-full">Collective</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">Creates a feedback loop: anonymized data from all users feeds trend analysis, which then improves the AI Engine's contextual understanding for every individual business. A price shift detected in Nakuru automatically informs inventory recommendations for a kiosk owner in Thika — all privacy-preserved.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag-pill">Anonymized Aggregation</span>
+                                <span class="tag-pill">Trend Detection</span>
+                                <span class="tag-pill">Regional Signals</span>
+                                <span class="tag-pill">Privacy-First</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 6: Marketplace Connector -->
+                <div class="liquid-glass p-6 md:p-8 layer-card layer-indigo reveal delay-500 group">
+                    <div class="flex items-start gap-6">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-400/20 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                                <h3 class="font-display text-xl font-semibold text-theme-primary">Marketplace Connector</h3>
+                                <span class="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 bg-indigo-400/10 px-2.5 py-1 rounded-full">Exchange</span>
+                            </div>
+                            <p class="text-theme-secondary text-sm mb-4 leading-relaxed">Closes the loop by turning AI guidance into action. When the Capital Allocation layer recommends sourcing from a specific supplier tier, the Marketplace Connector surfaces matching suppliers with pre-negotiated rates. When the Health Score identifies creditworthiness, financial institution partners receive verified readiness signals — enabling instant loan approvals.</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="tag-pill">Supplier Matching</span>
+                                <span class="tag-pill">Credit Signaling</span>
+                                <span class="tag-pill">Transaction Execution</span>
+                                <span class="tag-pill">Partner API</span>
+                            </div>
+                            <button class="arch-toggle text-xs text-indigo-400 font-medium flex items-center gap-1 hover:gap-2 transition-all" data-target="layer6-details">
+                                View marketplace metrics
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div id="layer6-details" class="hidden mt-5 pt-5 border-t border-theme-subtle">
+                                <div class="grid sm:grid-cols-3 gap-4">
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-indigo-400 font-display mb-1">340+</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Verified Suppliers</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">12</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Financial Partners</div>
+                                    </div>
+                                    <div class="liquid-glass-dark p-4">
+                                        <div class="text-2xl font-light text-theme-primary font-display mb-1">4.2s</div>
+                                        <div class="text-[10px] uppercase tracking-widest text-theme-muted">Avg Match Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== LIVE STATUS SECTION =============================== -->
+    <section id="live-status" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius:9999px;">
+                    <span class="w-2 h-2 bg-cyan-400 rounded-full status-dot"></span>
+                    <span class="text-theme-secondary">Real-Time Ecosystem Health</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">Live <span class="gradient-text-hela">System Status</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">Monitor the heartbeat of every integration point across the Helacore ecosystem in real time.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Status Card 1 -->
+                <div class="liquid-glass p-6 reveal group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Health Score Engine</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-emerald-400"><span class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></span>Operational</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">99.98%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-emerald-400" style="width:99.98%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 45ms</span>
+                        <span>Last check: 2s ago</span>
+                    </div>
+                </div>
+
+                <!-- Status Card 2 -->
+                <div class="liquid-glass p-6 reveal delay-100 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Simulation Engine</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-emerald-400"><span class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></span>Operational</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">99.95%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-emerald-400" style="width:99.95%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 1.2s</span>
+                        <span>Last check: 1s ago</span>
+                    </div>
+                </div>
+
+                <!-- Status Card 3 -->
+                <div class="liquid-glass p-6 reveal delay-200 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Capital Allocation</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-emerald-400"><span class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></span>Operational</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">99.97%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-emerald-400" style="width:99.97%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 380ms</span>
+                        <span>Last check: 3s ago</span>
+                    </div>
+                </div>
+
+                <!-- Status Card 4 -->
+                <div class="liquid-glass p-6 reveal delay-100 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Voice NLP Pipeline</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-amber-400"><span class="w-2 h-2 bg-amber-400 rounded-full status-dot"></span>Degraded</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">98.2%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-amber-400" style="width:98.2%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 2.1s</span>
+                        <span>Swahili model updating</span>
+                    </div>
+                </div>
+
+                <!-- Status Card 5 -->
+                <div class="liquid-glass p-6 reveal delay-200 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Market Intelligence</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-emerald-400"><span class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></span>Operational</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">99.99%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-emerald-400" style="width:99.99%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 120ms</span>
+                        <span>Last check: 1s ago</span>
+                    </div>
+                </div>
+
+                <!-- Status Card 6 -->
+                <div class="liquid-glass p-6 reveal delay-300 group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-sm font-semibold text-theme-primary">Marketplace API</h3>
+                        </div>
+                        <span class="flex items-center space-x-1.5 text-xs text-emerald-400"><span class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></span>Operational</span>
+                    </div>
+                    <div class="liquid-glass-dark p-3 mb-3">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-theme-muted">Uptime</span>
+                            <span class="text-theme-primary font-medium">99.96%</span>
+                        </div>
+                        <div class="w-full h-1.5 rounded-full" style="background:var(--tag-bg);">
+                            <div class="h-full rounded-full bg-emerald-400" style="width:99.96%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-theme-muted">
+                        <span>Latency: 4.2s</span>
+                        <span>Last check: 5s ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall System Health Bar -->
+            <div class="liquid-glass p-6 md:p-8 reveal">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h3 class="font-display text-lg font-semibold text-theme-primary mb-1">Overall Ecosystem Health</h3>
+                        <p class="text-sm text-theme-muted">Aggregate status across all 6 core modules and 14 integration points</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl font-bold font-display text-emerald-400">99.84%</span>
+                        <span class="liquid-glass-dark px-3 py-1 rounded-full text-xs text-emerald-400 font-medium">All Systems Go</span>
+                    </div>
+                </div>
+                <div class="w-full h-3 rounded-full" style="background:var(--tag-bg);">
+                    <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400" style="width:99.84%"></div>
+                </div>
+                <div class="flex justify-between mt-3 text-xs text-theme-muted">
+                    <span>Updated 2 seconds ago</span>
+                    <span>Next refresh in 58s</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== INTEGRATION FLOW SECTION =============================== -->
+    <section id="integration-flow" class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center space-x-2 liquid-glass px-4 py-2 rounded-full text-sm mb-6" style="border-radius:9999px;">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                    <span class="text-theme-secondary">Data Flow Visualization</span>
+                </span>
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-4 text-theme-primary">See the <span class="gradient-text-hela">Data Flow</span></h2>
+                <p class="text-lg md:text-xl text-theme-secondary max-w-2xl mx-auto">Follow a single data point from input to action — watch how information transforms as it moves through each ecosystem layer.</p>
+            </div>
+
+            <div class="reveal">
+                <div class="liquid-glass p-6 md:p-8">
+                    <div class="grid md:grid-cols-5 gap-4 items-center">
+                        <!-- Step 1 -->
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/20 flex items-center justify-center mb-3">
+                                <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            </div>
+                            <h4 class="font-display text-sm font-semibold text-theme-primary mb-1">Voice Input</h4>
+                            <p class="text-[10px] text-theme-muted">"Nimepata bei ya mahindi imetuka"</p>
+                        </div>
+
+                        <!-- Arrow 1 -->
+                        <div class="hidden md:flex items-center justify-center">
+                            <div class="flex-1 h-px bg-gradient-to-r from-amber-400/30 to-emerald-400/30 relative">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-emerald-400/50"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/20 flex items-center justify-center mb-3">
+                                <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            </div>
+                            <h4 class="font-display text-sm font-semibold text-theme-primary mb-1">NLP Parsing</h4>
+                            <p class="text-[10px] text-theme-muted">Intent: Price Alert + Context: Maize</p>
+                        </div>
+
+                        <!-- Arrow 2 -->
+                        <div class="hidden md:flex items-center justify-center">
+                            <div class="flex-1 h-px bg-gradient-to-r from-emerald-400/30 to-cyan-400/30 relative">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-cyan-400/50"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 flex items-center justify-center mb-3">
+                                <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h4 class="font-display text-sm font-semibold text-theme-primary mb-1">Action Delivered</h4>
+                            <p class="text-[10px] text-theme-muted">"Punguza ordia ya mahindi kwa 20%"</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Detail -->
+                    <div class="mt-8 pt-6 border-t border-theme-subtle">
+                        <div class="grid sm:grid-cols-4 gap-4">
+                            <div class="liquid-glass-dark p-4 text-center">
+                                <div class="text-lg font-bold font-display text-amber-400">0.3s</div>
+                                <div class="text-[10px] uppercase tracking-widest text-theme-muted mt-1">Voice to Text</div>
+                            </div>
+                            <div class="liquid-glass-dark p-4 text-center">
+                                <div class="text-lg font-bold font-display text-emerald-400">0.8s</div>
+                                <div class="text-[10px] uppercase tracking-widest text-theme-muted mt-1">Intent Extraction</div>
+                            </div>
+                            <div class="liquid-glass-dark p-4 text-center">
+                                <div class="text-lg font-bold font-display text-cyan-400">0.4s</div>
+                                <div class="text-[10px] uppercase tracking-widest text-theme-muted mt-1">AI Processing</div>
+                            </div>
+                            <div class="liquid-glass-dark p-4 text-center">
+                                <div class="text-lg font-bold font-display text-purple-400">1.5s</div>
+                                <div class="text-[10px] uppercase tracking-widest text-theme-muted mt-1">Response Delivery</div>
+                            </div>
+                        </div>
+                        <p class="text-center text-xs text-theme-muted mt-4">Total end-to-end latency: <span class="text-theme-primary font-semibold">3.0 seconds</span> from spoken word to actionable guidance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== CTA SECTION =============================== -->
+    <section class="py-24 px-4 md:px-6 relative">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <div class="liquid-glass p-12 md:p-16 relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400"></div>
+                <h2 class="font-display text-3xl md:text-5xl font-bold mb-6 text-theme-primary">Ready to Experience the <span class="gradient-text-hela">Ecosystem</span>?</h2>
+                <p class="text-lg text-theme-secondary max-w-xl mx-auto mb-8">Join over 1,000 businesses already using Helacore's integrated AI ecosystem to make smarter decisions every day.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="signup.html" class="btn-liquid inline-flex items-center space-x-2 text-base">
+                        <span>Get Started Free</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="features.html" class="liquid-glass-dark px-6 py-3 rounded-full font-semibold text-base hover:bg-[var(--nav-hover-bg)] transition-all inline-flex items-center space-x-2 text-theme-primary">
+                        <span>View All Features</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================== FOOTER =============================== -->
+    <footer class="py-16 px-4 md:px-6 border-t border-theme-subtle" style="background:var(--footer-bg);">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-tight text-theme-primary">Hela<span class="text-amber-400">core</span></span>
+                    </div>
+                    <p class="text-sm text-theme-muted leading-relaxed">AI-Powered Business Guidance Ecosystem. Transforming uncertainty into profitable clarity for businesses across emerging markets.</p>
+                </div>
+                <div>
+                    <h4 class="font-display font-semibold text-theme-primary mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="features.html" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Features</a></li>
+                        <li><a href="ai intellligence.html" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">AI Intelligence</a></li>
+                        <li><a href="ecosystem.html" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Ecosystem</a></li>
+                        <li><a href="impact.html" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Impact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-display font-semibold text-theme-primary mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">About Us</a></li>
+                        <li><a href="#" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-sm text-theme-muted hover:text-theme-primary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-display font-semibold text-theme-primary mb-4">Connect</h4>
+                    <div class="flex space-x-3 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all" style="background:var(--social-bg);" onmouseover="this.style.background='var(--social-bg-hover)'" onmouseout="this.style.background='var(--social-bg)'">
+                            <svg class="w-5 h-5" style="color:var(--social-icon);" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all" style="background:var(--social-bg);" onmouseover="this.style.background='var(--social-bg-hover)'" onmouseout="this.style.background='var(--social-bg)'">
+                            <svg class="w-5 h-5" style="color:var(--social-icon);" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all" style="background:var(--social-bg);" onmouseover="this.style.background='var(--social-bg-hover)'" onmouseout="this.style.background='var(--social-bg)'">
+                            <svg class="w-5 h-5" style="color:var(--social-icon);" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                    </div>
+                    <p class="text-xs text-theme-muted">hello@helacore.ai</p>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-theme-subtle flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-xs text-theme-muted">&copy; 2025 Helacore. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-xs text-theme-muted hover:text-theme-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-xs text-theme-muted hover:text-theme-primary transition-colors">Terms of Service</a>
+                    <a href="#" class="text-xs text-theme-muted hover:text-theme-primary transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =============================== JAVASCRIPT =============================== -->
+    <script>
+        // ===== THEME TOGGLE =====
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        function getStoredTheme() {
+            return localStorage.getItem('hela-theme');
+        }
+
+        function setTheme(theme) {
+            if (theme === 'light') {
+                html.setAttribute('data-theme', 'light');
+            } else {
+                html.removeAttribute('data-theme');
+            }
+            localStorage.setItem('hela-theme', theme);
+        }
+
+        // Initialize theme from storage
+        const storedTheme = getStoredTheme();
+        if (storedTheme) {
+            setTheme(storedTheme);
+        }
+
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = html.getAttribute('data-theme');
+            if (currentTheme === 'light') {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        });
+
+        // ===== MOBILE MENU =====
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.add('open');
+        });
+
+        closeMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.remove('open');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.mobile-nav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // ===== SCROLL REVEAL =====
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(function(el) {
+            revealObserver.observe(el);
+        });
+
+        // ===== ARCHITECTURE LAYER TOGGLES =====
+        document.querySelectorAll('.arch-toggle').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var targetEl = document.getElementById(targetId);
+                if (targetEl) {
+                    var isHidden = targetEl.classList.contains('hidden');
+                    if (isHidden) {
+                        targetEl.classList.remove('hidden');
+                        this.querySelector('svg').style.transform = 'rotate(90deg)';
+                    } else {
+                        targetEl.classList.add('hidden');
+                        this.querySelector('svg').style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+        });
+
+        // ===== NODE TOOLTIPS =====
+        var nodeTooltip = document.getElementById('node-tooltip');
+        var nodeData = {
+            'node-health': 'Financial Health Score',
+            'node-simulation': 'What-If Simulation',
+            'node-capital': 'Smart Capital Allocation',
+            'node-voice': 'Voice Interface',
+            'node-market': 'Market Intelligence',
+            'node-marketplace': 'Marketplace Connector'
+        };
+
+        document.querySelectorAll('.ecosystem-node').forEach(function(node) {
+            node.addEventListener('mouseenter', function(e) {
+                var nodeId = this.querySelector('div') ? this.querySelector('div').id : null;
+                if (nodeId && nodeData[nodeId]) {
+                    nodeTooltip.textContent = nodeData[nodeId];
+                    nodeTooltip.classList.remove('hidden');
+                }
+            });
+
+            node.addEventListener('mousemove', function(e) {
+                var containerRect = this.closest('.ecosystem-orbit-container').getBoundingClientRect();
+                var x = e.clientX - containerRect.left + 15;
+                var y = e.clientY - containerRect.top - 10;
+                nodeTooltip.style.left = x + 'px';
+                nodeTooltip.style.top = y + 'px';
+            });
+
+            node.addEventListener('mouseleave', function() {
+                nodeTooltip.classList.add('hidden');
+            });
+        });
+
+        // ===== NAVBAR SCROLL EFFECT =====
+        var navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.style.paddingTop = '8px';
+                navbar.style.paddingBottom = '8px';
+            } else {
+                navbar.style.paddingTop = '16px';
+                navbar.style.paddingBottom = '16px';
+            }
+        });
+
+        // ===== THREE.JS BACKGROUND (if available) =====
+        (function() {
+            var canvas = document.getElementById('bg-canvas');
+            if (!canvas || typeof THREE === 'undefined') return;
+
+            var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Particles
+            var particleCount = 200;
+            var positions = new Float32Array(particleCount * 3);
+            var colors = new Float32Array(particleCount * 3);
+            var sizes = new Float32Array(particleCount);
+
+            var colorPalette = [
+                new THREE.Color('#f59e0b'),
+                new THREE.Color('#10b981'),
+                new THREE.Color('#06b6d4')
+            ];
+
+            for (var i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 80;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 80;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+
+                var color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+
+                sizes[i] = Math.random() * 2 + 0.5;
+            }
+
+            var geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            var material = new THREE.PointsMaterial({
+                size: 1.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            var particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Connection lines
+            var lineGeometry = new THREE.BufferGeometry();
+            var linePositions = new Float32Array(particleCount * particleCount * 6);
+            var lineColors = new Float32Array(particleCount * particleCount * 6);
+            var lineIndex = 0;
+
+            for (var i = 0; i < particleCount; i++) {
+                for (var j = i + 1; j < particleCount; j++) {
+                    var dx = positions[i * 3] - positions[j * 3];
+                    var dy = positions[i * 3 + 1] - positions[j * 3 + 1];
+                    var dz = positions[i * 3 + 2] - positions[j * 3 + 2];
+                    var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < 15) {
+                        linePositions[lineIndex * 6] = positions[i * 3];
+                        linePositions[lineIndex * 6 + 1] = positions[i * 3 + 1];
+                        linePositions[lineIndex * 6 + 2] = positions[i * 3 + 2];
+                        linePositions[lineIndex * 6 + 3] = positions[j * 3];
+                        linePositions[lineIndex * 6 + 4] = positions[j * 3 + 1];
+                        linePositions[lineIndex * 6 + 5] = positions[j * 3 + 2];
+
+                        var alpha = 1 - (dist / 15);
+                        lineColors[lineIndex * 6] = 0.96 * alpha;
+                        lineColors[lineIndex * 6 + 1] = 0.62 * alpha;
+                        lineColors[lineIndex * 6 + 2] = 0.04 * alpha;
+                        lineColors[lineIndex * 6 + 3] = 0.96 * alpha;
+                        lineColors[lineIndex * 6 + 4] = 0.62 * alpha;
+                        lineColors[lineIndex * 6 + 5] = 0.04 * alpha;
+
+                        lineIndex++;
+                    }
+                }
+            }
+
+            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions.slice(0, lineIndex * 6), 3));
+            lineGeometry.setAttribute('color', new THREE.BufferAttribute(lineColors.slice(0, lineIndex * 6), 3));
+
+            var lineMaterial = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending
+            });
+
+            var lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
+
+            // Animation
+            var mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', function(e) {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                particles.rotation.y += 0.0005;
+                particles.rotation.x += 0.0002;
+                lines.rotation.y += 0.0005;
+                lines.rotation.x += 0.0002;
+
+                camera.position.x += (mouseX * 3 - camera.position.x) * 0.02;
+                camera.position.y += (-mouseY * 3 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Resize
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+    </script>
+
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>

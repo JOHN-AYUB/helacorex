@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helacore - AI Identity Onboarding</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Social Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --hela-amber: #f59e0b; --hela-gold: #d97706; --hela-emerald: #10b981; --hela-cyan: #06b6d4;
+            --liquid-radius-sm: 12px; --liquid-radius-md: 20px; --liquid-radius-lg: 28px; --liquid-radius-xl: 36px;
+            --bg-primary: #050507; --bg-secondary: #0a0a0f; --bg-tertiary: #111118;
+            --text-primary: #ffffff; --text-secondary: #a1a1aa; --text-muted: #71717a;
+            --glass-bg: rgba(255,255,255,0.08); --glass-border: rgba(255,255,255,0.15);
+            --dark-glass-bg: rgba(10,10,15,0.6);
+            --input-bg: rgba(255,255,255,0.05); --input-border: rgba(255,255,255,0.1);
+            --btn-gradient: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(16,185,129,0.2));
+            --btn-gradient-hover: linear-gradient(135deg,rgba(245,158,11,0.3),rgba(16,185,129,0.3));
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Reusable Liquid Classes --- */
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        
+        .liquid-glass {
+            background: linear-gradient(135deg,var(--glass-bg) 0%,rgba(255,255,255,0.03) 100%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            border-radius: var(--liquid-radius-lg);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        
+        .liquid-glass-dark {
+            background: var(--dark-glass-bg);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--liquid-radius-md);
+            transition: all 0.3s ease;
+        }
+
+        .btn-liquid {
+            position: relative;
+            overflow: hidden;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-weight: 600;
+            background: var(--btn-gradient);
+            border: 1px solid rgba(245,158,11,0.3);
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.15);
+        }
+        .btn-liquid:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245,158,11,0.3);
+            background: var(--btn-gradient-hover);
+        }
+
+        .form-input-liquid {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: var(--liquid-radius-md);
+            padding: 16px 20px;
+            color: white;
+            width: 100%;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .form-input-liquid:focus {
+            border-color: rgba(245,158,11,0.5);
+            box-shadow: 0 0 20px rgba(245,158,11,0.1);
+        }
+
+        /* --- Social Auth Buttons --- */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            border-radius: var(--liquid-radius-md);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .social-btn:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+        .social-btn.google:hover { border-color: #DB4437; }
+        .social-btn.apple:hover { border-color: #fff; }
+        .social-btn.facebook:hover { border-color: #4267B2; }
+        .social-btn.twitter:hover { border-color: #1DA1F2; }
+        .social-btn.whatsapp:hover { border-color: #25D366; }
+
+        /* --- Role Selection Cards --- */
+        .role-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .role-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.08);
+            border-color: var(--hela-amber);
+            box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3);
+        }
+        .role-card.selected {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--hela-amber);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+
+        /* --- Step Logic --- */
+        .step-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .step-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Loading Animation --- */
+        .ai-loader {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .ai-loader-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--hela-amber), var(--hela-emerald), var(--hela-cyan));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg,#f59e0b 0%,#10b981 50%,#06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--hela-emerald);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050507; }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <!-- Background 3D Canvas -->
+    <canvas id="bg-canvas" class="fixed inset-0 w-full h-full -z-10" style="opacity: 0.6;"></canvas>
+
+    <!-- Navigation (Simplified for Onboarding) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-emerald-500 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <span class="font-display font-bold text-xl text-white">Hela<span class="text-amber-400">core</span></span>
+            </div>
+            <a href="index.html" class="text-sm text-gray-400 hover:text-white transition-colors">Back to Home</a>
+        </div>
+    </nav>
+
+    <!-- Main Onboarding Container -->
+    <main class="flex-grow flex items-center justify-center px-4 pt-24 pb-12">
+        <div class="w-full max-w-4xl grid lg:grid-cols-2 gap-8 items-start">
+            
+            <!-- Left Column: Context / Visuals -->
+            <div class="hidden lg:block sticky top-32">
+                <div class="liquid-glass p-8 mb-6">
+                    <h2 class="font-display text-3xl font-bold mb-4 text-white">Activate Your <br><span class="gradient-text">Helacore OS</span></h2>
+                    <p class="text-gray-400 mb-6 text-sm leading-relaxed">
+                        Helacore isn't just software; it's a cognitive layer for your business. We are analyzing millions of data points to build a strategy unique to you.
+                    </p>
+                    
+                    <!-- Dynamic Preview Area -->
+                    <div id="preview-box" class="liquid-glass-dark p-4 border-l-4 border-amber-500 transition-all duration-500">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div id="preview-icon" class="w-8 h-8 rounded bg-amber-500/20 flex items-center justify-center text-amber-400">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <span id="preview-title" class="text-xs font-bold text-gray-300 uppercase tracking-wider">System Ready</span>
+                        </div>
+                        <p id="preview-text" class="text-xs text-gray-400">Select your business type to initialize the predictive engine.</p>
+                    </div>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="liquid-glass-dark p-6">
+                    <h4 class="text-xs text-gray-500 font-bold mb-4 uppercase">Onboarding Progress</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 text-sm text-emerald-400" id="prog-1">
+                            <i class="fa-solid fa-check-circle"></i> <span>Identity Verification</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-500" id="prog-2">
+                            <i class="fa-regular fa-circle"></i> <span>Business Classification</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-500" id="prog-3">
+                            <i class="fa-regular fa-circle"></i> <span>AI Configuration</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-500" id="prog-4">
+                            <i class="fa-regular fa-circle"></i> <span>Dashboard Initialization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: The Wizard Form -->
+            <div class="liquid-glass p-6 md:p-10 relative z-10 min-h-[500px] flex flex-col justify-center">
+                
+                <!-- STEP 1: Welcome & Auth -->
+                <div id="step-1" class="step-container active">
+                    <h2 class="font-display text-2xl md:text-3xl font-bold mb-2 text-white">Welcome to the Future</h2>
+                    <p class="text-gray-400 mb-8 text-sm">Create your account to activate your AI Business Advisor.</p>
+                    
+                    <div class="space-y-3 mb-6">
+                        <!-- Social Options -->
+                        <button class="social-btn google" onclick="simulateSocialLogin('Google')">
+                            <i class="fa-brands fa-google"></i> Continue with Google
+                        </button>
+                        <button class="social-btn apple" onclick="simulateSocialLogin('Apple')">
+                            <i class="fa-brands fa-apple"></i> Continue with Apple
+                        </button>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button class="social-btn facebook" onclick="simulateSocialLogin('Facebook')">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </button>
+                            <button class="social-btn twitter" onclick="simulateSocialLogin('X (Twitter)')">
+                                <i class="fa-brands fa-x-twitter"></i>
+                            </button>
+                            <button class="social-btn whatsapp" onclick="simulateSocialLogin('WhatsApp')">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-gray-700"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-500 text-xs">OR CONTINUE WITH EMAIL</span>
+                        <div class="flex-grow border-t border-gray-700"></div>
+                    </div>
+
+                    <form onsubmit="handleEmailAuth(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Email Address</label>
+                            <input type="email" id="auth-email" class="form-input-liquid" placeholder="name@company.com" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Phone Number (Optional)</label>
+                            <input type="tel" id="auth-phone" class="form-input-liquid" placeholder="+254 7..." >
+                        </div>
+                        <button type="submit" class="btn-liquid w-full mt-2">Create Account</button>
+                    </form>
+                </div>
+
+                <!-- STEP 2: User Type Selection -->
+                <div id="step-2" class="step-container">
+                    <h2 class="font-display text-2xl font-bold mb-2 text-white">Who are you?</h2>
+                    <p class="text-gray-400 mb-6 text-sm">Select your primary role to customize the AI engine.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="role-grid">
+                        <!-- Roles injected by JS -->
+                    </div>
+                    
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="nextStep()" id="step-2-next" class="btn-liquid opacity-50 cursor-not-allowed" disabled>Continue</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Business Details -->
+                <div id="step-3" class="step-container">
+                    <h2 class="font-display text-2xl font-bold mb-2 text-white">Business Context</h2>
+                    <p class="text-gray-400 mb-6 text-sm">Help us understand your scale and stage.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Business Name</label>
+                            <input type="text" id="biz-name" class="form-input-liquid" placeholder="e.g. Maize Traders Ltd">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Monthly Revenue</label>
+                                <select id="biz-revenue" class="form-input-liquid">
+                                    <option value="<50k">Less than 50k</option>
+                                    <option value="50k-200k">50k - 200k</option>
+                                    <option value="200k-1m">200k - 1M</option>
+                                    <option value=">1m">Over 1M</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Employees</label>
+                                <select id="biz-employees" class="form-input-liquid">
+                                    <option value="1">Just me</option>
+                                    <option value="2-5">2 - 5</option>
+                                    <option value="6-20">6 - 20</option>
+                                    <option value="20+">20+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="prevStep()" class="text-gray-400 hover:text-white text-sm">Back</button>
+                        <button onclick="nextStep()" class="btn-liquid">Next Step</button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: AI Personalization -->
+                <div id="step-4" class="step-container">
+                    <h2 class="font-display text-2xl font-bold mb-2 text-white">AI Preferences</h2>
+                    <p class="text-gray-400 mb-6 text-sm">How do you want your advisor to interact with you?</p>
+                    
+                    <div class="space-y-4">
+                        <div class="liquid-glass-dark p-4 flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Voice Assistant</h4>
+                                <p class="text-xs text-gray-400">Speak naturally to get advice.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="ai-voice" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="liquid-glass-dark p-4 flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-white">Primary Language</h4>
+                                <p class="text-xs text-gray-400">Market analysis & reports.</p>
+                            </div>
+                            <select id="ai-lang" class="bg-black/30 border border-gray-700 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-32 p-2">
+                                <option value="en">English</option>
+                                <option value="sw">Swahili</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-2">Primary Goal (Select one)</label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white/5 rounded">
+                                    <input type="radio" name="goal" value="growth" checked class="text-amber-500 focus:ring-amber-500 bg-gray-800 border-gray-600">
+                                    <span class="text-sm text-gray-300">Increase Profits & Growth</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white/5 rounded">
+                                    <input type="radio" name="goal" value="stability" class="text-amber-500 focus:ring-amber-500 bg-gray-800 border-gray-600">
+                                    <span class="text-sm text-gray-300">Financial Stability & Debt Mgmt</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-white/5 rounded">
+                                    <input type="radio" name="goal" value="expansion" class="text-amber-500 focus:ring-amber-500 bg-gray-800 border-gray-600">
+                                    <span class="text-sm text-gray-300">Expansion & New Markets</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="prevStep()" class="text-gray-400 hover:text-white text-sm">Back</button>
+                        <button onclick="startAIInit()" class="btn-liquid">Initialize AI</button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Processing -->
+                <div id="step-5" class="step-container text-center">
+                    <div class="w-20 h-20 mx-auto mb-6 relative">
+                        <div class="absolute inset-0 bg-amber-500/20 rounded-full animate-ping"></div>
+                        <div class="absolute inset-0 bg-gradient-to-tr from-amber-400 to-emerald-500 rounded-full animate-pulse flex items-center justify-center">
+                            <i class="fa-solid fa-brain text-3xl text-white"></i>
+                        </div>
+                    </div>
+                    <h2 class="font-display text-2xl font-bold mb-2 text-white">Helacore is thinking...</h2>
+                    <p id="ai-status-text" class="text-amber-400 text-sm mb-6 font-mono">Connecting to neural network...</p>
+                    <div class="ai-loader">
+                        <div id="ai-bar" class="ai-loader-bar"></div>
+                    </div>
+                    <div class="mt-8 text-xs text-gray-500 space-y-1" id="console-log">
+                        <!-- Logs injected by JS -->
+                    </div>
+                </div>
+
+                <!-- STEP 6: Success -->
+                <div id="step-6" class="step-container text-center">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/50">
+                        <i class="fa-solid fa-check text-4xl text-emerald-400"></i>
+                    </div>
+                    <h2 class="font-display text-2xl font-bold mb-2 text-white">You are ready.</h2>
+                    <p class="text-gray-400 mb-8 text-sm">Your dashboard is now customized based on your profile as a <span id="final-role" class="text-amber-400 font-bold">User</span>.</p>
+                    
+                    <a href="index.html" class="btn-liquid inline-block w-full">Go to Dashboard</a>
+                    
+                    <div class="mt-6 text-xs text-gray-500">
+                        <p>Session ID: <span id="session-id" class="font-mono"></span></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification Element -->
+    <div id="toast">Notification Message</div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA & STATE ---
+        const roles = [
+            { id: 'sme', label: 'SME Owner', icon: 'fa-shop', color: 'text-amber-400', desc: 'Kiosk, retail, or general trade.' },
+            { id: 'farmer', label: 'Farmer', icon: 'fa-wheat-awn', color: 'text-emerald-400', desc: 'Crop cultivation & agriculture.' },
+            { id: 'vendor', label: 'Vendor', icon: 'fa-boxes-stacked', color: 'text-cyan-400', desc: 'Supply chain & inventory focus.' },
+            { id: 'startup', label: 'Startup Founder', icon: 'fa-rocket', color: 'text-purple-400', desc: 'Tech, scaling, & investment.' },
+            { id: 'trader', label: 'Trader', icon: 'fa-arrow-trend-up', color: 'text-blue-400', desc: 'Forex, stocks, or commodities.' },
+            { id: 'expanding', label: 'Expanding Business', icon: 'fa-building', color: 'text-rose-400', desc: 'Multi-branch logistics.' }
+        ];
+
+        let currentStep = 1;
+        let userData = {
+            email: '',
+            phone: '',
+            role: null,
+            businessName: '',
+            revenue: '',
+            employees: '',
+            voiceEnabled: true,
+            language: 'en',
+            goal: 'growth'
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderRoles();
+            initParticles(); // Three.js Background
+        });
+
+        // --- UI FUNCTIONS ---
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function updateProgress(step) {
+            // Simple logic to highlight progress steps
+            for(let i=1; i<=4; i++) {
+                const el = document.getElementById(`prog-${i}`);
+                if(i < step) {
+                    el.className = "flex items-center gap-3 text-sm text-emerald-400 transition-colors duration-300";
+                    el.innerHTML = `<i class="fa-solid fa-check-circle"></i> <span>${getStepName(i)}</span>`;
+                } else if (i === step) {
+                    el.className = "flex items-center gap-3 text-sm text-amber-400 transition-colors duration-300";
+                    el.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${getStepName(i)}</span>`;
+                } else {
+                    el.className = "flex items-center gap-3 text-sm text-gray-500 transition-colors duration-300";
+                    el.innerHTML = `<i class="fa-regular fa-circle"></i> <span>${getStepName(i)}</span>`;
+                }
+            }
+        }
+
+        function getStepName(i) {
+            const names = ["", "Identity", "Classification", "Configuration", "Finalizing"];
+            return names[i];
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function nextStep() {
+            // Validation before moving
+            if(currentStep === 3) {
+                userData.businessName = document.getElementById('biz-name').value;
+                userData.revenue = document.getElementById('biz-revenue').value;
+                userData.employees = document.getElementById('biz-employees').value;
+                if(!userData.businessName) {
+                    showToast("Please enter a business name.");
+                    return;
+                }
+            }
+
+            if(currentStep === 4) {
+                userData.voiceEnabled = document.getElementById('ai-voice').checked;
+                userData.language = document.getElementById('ai-lang').value;
+                userData.goal = document.querySelector('input[name="goal"]:checked').value;
+            }
+
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            updateProgress(currentStep);
+        }
+
+        function prevStep() {
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            updateProgress(currentStep);
+        }
+
+        // --- STEP 1: AUTH SIMULATION ---
+        function simulateSocialLogin(provider) {
+            // In a real app, this calls Clerk.signInWithOAuth()
+            showToast(`Connecting to ${provider}...`);
+            setTimeout(() => {
+                userData.email = `user@${provider.toLowerCase()}.com`;
+                document.getElementById('auth-email').value = userData.email; // Fill for visual
+                nextStep();
+            }, 1000);
+        }
+
+        function handleEmailAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const phone = document.getElementById('auth-phone').value;
+            
+            if(email) {
+                userData.email = email;
+                userData.phone = phone;
+                showToast("Account verified successfully!");
+                nextStep();
+            }
+        }
+
+        // --- STEP 2: ROLE SELECTION ---
+        function renderRoles() {
+            const grid = document.getElementById('role-grid');
+            grid.innerHTML = roles.map(role => `
+                <div class="role-card liquid-glass-dark p-4 cursor-pointer" onclick="selectRole('${role.id}')" id="role-card-${role.id}">
+                    <div class="flex items-center gap-3 mb-2">
+                        <i class="fa-solid ${role.icon} ${role.color} text-xl"></i>
+                        <h3 class="font-bold text-white">${role.label}</h3>
+                    </div>
+                    <p class="text-xs text-gray-400">${role.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function selectRole(roleId) {
+            // Remove selected class from all
+            document.querySelectorAll('.role-card').forEach(el => el.classList.remove('selected'));
+            // Add to selected
+            document.getElementById(`role-card-${roleId}`).classList.add('selected');
+            
+            userData.role = roleId;
+            
+            // Enable button
+            const btn = document.getElementById('step-2-next');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            // Update Preview Box dynamically
+            const roleData = roles.find(r => r.id === roleId);
+            updatePreview(roleData);
+        }
+
+        function updatePreview(role) {
+            const icon = document.getElementById('preview-icon');
+            const title = document.getElementById('preview-title');
+            const text = document.getElementById('preview-text');
+            const box = document.getElementById('preview-box');
+
+            // Reset animation
+            box.classList.remove('opacity-100');
+            box.classList.add('opacity-50');
+            
+            setTimeout(() => {
+                icon.innerHTML = `<i class="fa-solid ${role.icon}"></i>`;
+                icon.className = `w-8 h-8 rounded bg-white/10 flex items-center justify-center ${role.color}`;
+                title.textContent = role.label + " Mode";
+                
+                // Adaptive Text
+                if(role.id === 'farmer') text.textContent = "AI Module: Weather & Crop Forecasting Active.";
+                else if(role.id === 'vendor') text.textContent = "AI Module: Inventory Optimization Active.";
+                else if(role.id === 'startup') text.textContent = "AI Module: Burn Rate & Investor Pitching Active.";
+                else text.textContent = "AI Module: General Business Intelligence Active.";
+
+                box.classList.remove('opacity-50');
+                box.classList.add('opacity-100');
+            }, 200);
+        }
+
+        // --- STEP 5: AI INITIALIZATION SIMULATION ---
+        function startAIInit() {
+            nextStep(); // Go to loading screen
+            
+            const bar = document.getElementById('ai-bar');
+            const status = document.getElementById('ai-status-text');
+            const logs = document.getElementById('console-log');
+            
+            let progress = 0;
+            const messages = [
+                "Encrypting user identity...",
+                "Connecting to Supabase data cluster...",
+                `Analyzing ${userData.revenue} revenue patterns...`,
+                "Loading language model (Swahili/English)...",
+                "Calibrating risk tolerance...",
+                "Finalizing dashboard layout..."
+            ];
+
+            const interval = setInterval(() => {
+                progress += 2;
+                bar.style.width = `${progress}%`;
+                
+                if(progress % 15 === 0 && messages.length > 0) {
+                    const msg = messages.shift();
+                    status.textContent = msg;
+                    // Add to console log
+                    const p = document.createElement('p');
+                    p.textContent = `> ${msg}`;
+                    logs.prepend(p);
+                }
+
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    completeOnboarding();
+                }
+            }, 50);
+        }
+
+        function completeOnboarding() {
+            document.getElementById('final-role').textContent = roles.find(r => r.id === userData.role).label;
+            document.getElementById('session-id').textContent = "HELA-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            
+            setTimeout(() => {
+                nextStep();
+            }, 500);
+        }
+
+        // --- VISUALS: THREE.JS PARTICLES (Copied & Adapted from User Code) ---
+        function initParticles() {
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particleCount = 200;
+            const positions = new Float32Array(particleCount*3);
+            const colors = new Float32Array(particleCount*3);
+            
+            for(let i=0; i<particleCount*3; i+=3){
+                positions[i] = (Math.random()-0.5)*20;
+                positions[i+1] = (Math.random()-0.5)*20;
+                positions[i+2] = (Math.random()-0.5)*20;
+                
+                // Helacore Amber/Green tint
+                const t = Math.random();
+                colors[i] = 0.96*(1-t)+0.06*t;
+                colors[i+1] = 0.62*(1-t)+0.73*t;
+                colors[i+2] = 0.04*(1-t)+0.51*t;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.05, vertexColors: true, transparent: true, opacity: 0.6
+            });
+            
+            const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+            
+            function animate(){
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0003;
+                particles.rotation.x += 0.0001;
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', ()=>{
+                camera.aspect = window.innerWidth/window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+    </script>
+    <!-- ==================== HELA VOICE ==================== -->
+    <link rel="stylesheet" href="hela-voice.css">
+    <script src="hela-voice-engine.js"></script>
+    <script src="hela-voice-widget.js"></script>
+<script src="hela-desktop-popup.js"></script>
+<script src="hela-voice-bridge.js"></script>
+</body>
+</html>
